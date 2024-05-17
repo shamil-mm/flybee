@@ -8,7 +8,6 @@ const order=async(req,res)=>{
         const userId=req.session.user_id
         const userfind=await Cart.findOne({userId:req.session.user_id}).populate('userId').populate("items.productId")
         const products=userfind.items
-        console.log(products)
         const orderproducts=[]
         const addressId=req.query.id
         let total=parseInt(req.query.total)
@@ -41,7 +40,6 @@ const order=async(req,res)=>{
     req.flash('order',"order")
     res.redirect('/checkout')
 }else{
- 
    await Order.findOneAndUpdate({userId:req.session.user_id},{$push:{OrderedProducts:orderproducts}})
    const data=await Order.findOne({userId:req.session.user_id})
   
