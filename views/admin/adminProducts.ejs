@@ -1,0 +1,170 @@
+<style>
+    .preview-container {
+      display: inline-block;
+      position: relative;
+    }
+    .delete-btn {
+      position: absolute;
+      bottom: 15px;
+      right: 40%;
+      background-color:#3BB77E ;
+      color:rgb(255, 255, 255)  ;
+      border: none;
+      border-radius: 20%;
+      cursor: pointer;
+    }
+    .image-preview {
+      max-width: 200px;
+      max-height: 200px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+  </style>
+<%-include('../layouts/header')%>
+
+            <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Products grid</h2>
+                        <p>Lorem ipsum dolor sit amet.</p>
+                    </div>
+                    <div>
+                 
+                        <a href="/admin/add_product" class="btn btn-primary btn-sm rounded">Add New Product</a>
+                        <a href="/admin/delete_render" class="btn btn-primary btn-sm rounded">Deletded Product List</a>
+                    </div>
+                   
+                </div>
+                <header class="card card-body mb-4">
+                    <div class="row gx-3">
+                   
+                        <div class="col-lg-4 col-md-6 me-auto">
+                            <input type="text" placeholder="Search..." class="form-control" />
+                        </div>
+                        
+                       
+                    </div>
+                </header>
+                <!-- card-header end// -->
+              
+                 
+                   
+               <div class="row">
+                    
+                    <%if(data){%> 
+                        <%data.forEach((product)=>{%>
+                    <div class="col-xl-3 col-lg-4 col-md-6" id="onecolumn<%=product._id%>">
+                        <div class="card card-product-grid" >
+                            <br>
+                                <a href="#" class="img-wrap"> <img style="max-height: 16em;"  src="/proimgs/<%=product.image[2]%>" alt="Product" /> </a>
+                                <br>
+                        
+                            <div class="info-wrap text-center">
+                                
+                                <h4> <%=product.product_name%></h4>
+                                <p style="max-height: 4vh;overflow:scroll; scrollbar-width:none;"><%=product.Description%></p>
+                                
+                                <div class="price mt-1"> <%=product.price%></div>
+             
+                                <br>
+                                
+                                <a  href="/admin/Edit_product/?id=<%=product._id%>" class="btn btn-sm font-sm rounded btn-brand" onclick="editData('<%=product._id%>')" > <i class="material-icons md-edit"> </i> Edit </a>
+                                <%if(product.is_list==false){%>
+                                    <a  class="btn btn-sm font-sm btn-light rounded" onclick="listData('<%=product._id%>','<%=product.is_list%>')" id="list">List</a>
+                                    <%}%>
+                                <%if(product.is_list==true){%>
+                                    <a  class="btn btn-sm font-sm btn-light rounded" onclick="listData('<%=product._id%>','<%=product._is_list%>')" id="list">Unlist</a>
+                                    <%}%>
+                                <a class="btn btn-sm font-sm btn-light rounded" onclick="deletefn('<%=product._id%>')" > <i class="material-icons md-delete_forever" ></i>Delete</a>
+                            </div>
+                            
+                        </div>
+                
+                    </div>
+                    <%})%>
+                        <%}%>
+                </div>  
+              
+              
+                
+                
+                <!-- row.// -->
+                <div class="pagination-area mt-15 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                            <li class="page-item"><a class="page-link" href="#">02</a></li>
+                            <li class="page-item"><a class="page-link" href="#">03</a></li>
+                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                            <li class="page-item"><a class="page-link" href="#">16</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>               
+            </section>
+            <script>
+               function listData(id){
+                fetch('/admin/List_product/?id='+id,{method:'post'})
+               const list= document.getElementById('list')
+              
+               if(list.innerText=="List"){   
+                list.innerText='Unlist'
+               }   
+               else if(list.innerText=="Unlist"){   
+                list.innerText="List"
+               }   
+               }
+              function deletefn(id){
+Swal.fire({
+    title: 'Are you sure to delete this?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes sure ! '
+  }).then((result) => {
+    if (result.isConfirmed) {
+        fetch('/admin/delete_pro/?id='+id,{method:'post'})
+        let x= document.getElementById('onecolumn'+id)
+               x.remove()
+    }
+  });
+
+ }
+              
+            // 
+            if('<%-msg%>'){
+                window.onload = function() {
+    // Use SweetAlert to show an alert
+    Swal.fire({
+        
+          text: '<%-msg%>',
+          icon: 'info',
+          confirmButtonText: 'OK'
+    });
+  };
+
+
+
+            }
+            if('<%-msg1%>'){
+                window.onload = function() {
+    // Use SweetAlert to show an alert
+    Swal.fire({
+        
+          text: '<%-msg1%>',
+          icon: 'success',
+          confirmButtonText: 'OK'
+    });
+  };
+
+
+
+            }
+              
+            
+            </script>
+
+          <%-include('../layouts/footer')%>

@@ -1,0 +1,45 @@
+<%- include('../layouts/header') %>
+<section class="content-main">
+    <form action=""  method="post" enctype="multipart/form-data" onsubmit="">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New user</h2>
+                </div>
+            </div>    
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="product_title" class="form-label">User Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="product_title" name="title" />
+                        </div>
+                        <div class="row gx-3">
+                           
+                            <div class="col-md-4 mb-3">
+                                <label for="product_color" class="form-label">Email</label>
+                                <input type="email" placeholder="Type here" class="form-control" id="product_color" name="color"/>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="product_color11" class="form-label">Password</label>
+                                <input type="password" placeholder="Type here" class="form-control" id="product_color11" name="color"/>
+                            </div>
+                           
+                        </div>
+                        <div class="mb-4">
+                            <label for="product_brand" class="form-label">confirm-Password</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="product_brand" name="brand" />
+                        </div>  
+                        <div class="mb-4">
+                            <input type="submit" class="btn" style="background-color: #3BB77E; color:white"/>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+            
+            
+         
+        </div>
+    </form> 
+</section>
+<%- include('../layouts/footer') %>

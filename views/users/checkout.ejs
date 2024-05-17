@@ -1,0 +1,283 @@
+
+<%-include('../layouts/userheader')%>
+
+        <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title">Checkout<span>Shop</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	<div class="checkout">
+					<%if(product.length>0){%>
+	                <div class="container">
+            			<div class="checkout-discount">
+            				<div class="cart-discount">
+                                <form action="#">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" required placeholder="coupon code">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-primary-2" type="submit"  style="height: fit-content;"><i class="icon-long-arrow-right"></i></button>
+                                        </div><!-- .End .input-group-append -->
+                                    </div><!-- End .input-group -->
+                                </form>
+                            </div><!-- End .cart-discount -->
+            			</div><!-- End .checkout-discount -->
+            			<form method="post" id="orderAddress">
+						
+		                	<div class="row">
+		                		<div class="col-lg-9">
+                                    <!-- render the address details -->
+                                    <div class="row">
+										
+										<%if(addressFound){%>
+											
+										<%datas.addresses.forEach((value)=>{%>
+											
+								    		<div class="col-lg-6" id="<%=value._id%>">
+								    			<div class="card card-dashboard">
+								    				<div class="card-body">
+														
+								    					<h3 class="card-title">Address</h3>
+														<p class="addressdetails">name: <%=value.name%> <br>
+															address: <%=value.address%> <br>
+															email: <%=value.email%> <br>
+															country: <%=value.country%> <br>
+															city: <%=value.city%> <br>
+															state: <%=value.state%> <br>
+															pincode: <%=value.pincode%> <br>
+															phone: <%=value.phone%> <br>
+                                                           select address for delivery &nbsp; <input class="Allcheckbox" id="inputBox" type="checkbox" style="margin:3vh;"  value="<%=value._id%>" onclick="checkfunction('<%=value._id%>')"> 
+														</p>
+														
+														<a href="/editAddressrender?id=<%=value._id%>">Edit<i class="icon-edit"></i></a> &nbsp; &nbsp;
+														<a  style="color:  #ff01019a;" onclick="return deletefn('<%=value._id%>')" >Delete <i class="fa fa-trash-o"></i></a></p>
+                                                        
+								    				</div><!-- End .card-body -->
+								    			</div><!-- End .card-dashboard -->
+								    		</div><!-- End .col-lg-6 -->
+											<%})%>
+											<%}else{%>
+												<p>address not fount on cart <a href="/personalInfo">click </a>here to set address</p>
+											<%}%>	
+								    	</div><!-- End .row -->
+                                        
+		                			</div><!-- End .col-lg-9 -->
+                                    
+		                		<aside class="col-lg-3">
+									
+		                			<div class="summary">
+		                				<h3 class="summary-title">Your Order</h3><!-- End .summary-title -->
+										
+		                				<table class="table table-summary">
+		                					<thead>
+		                						<tr>
+		                							<th>Product</th>
+		                							<th style="text-align: center;">quantity</th>
+		                							
+		                							<th>Total</th>
+		                						</tr>
+		                					</thead>
+
+		                					<tbody>
+												
+										
+										
+												<%product.forEach((value)=>{%>
+											
+												
+												
+		                						<tr>
+		                							<td><a href="#"></a><%=value.productId.product_name%></td>
+
+		                							<td class="quantity" style="text-align: center;"><%=value.quantity%></td>
+		                							
+		                							<td class="price"><%=value.productId.price%></td>
+		                						</tr>
+												
+												<%})%>
+		                						<tr class="summary-subtotal">
+		                							<td >Subtotal:</td>
+		                							<td id="sub"><%=total%></td>
+		                						</tr><!-- End .summary-subtotal -->
+												
+		                						<tr>
+		                							<td>Shipping:</td>
+		                							<td id="shippingstatus"></td>
+		                						</tr>
+												<tr class="summary-total">
+		                							<td>Total:</td>
+		                							<td id="gtotal"></td>
+		                						</tr><!-- End .summary-total -->
+												
+												
+		                					</tbody>
+		                				</table><!-- End .table table-summary -->
+
+		                				<div class="accordion-summary" id="accordion-payment">
+										    
+
+										   
+											<div>
+												<input type="radio" class="collapsed checkAnchor" name="pMethod" value="Cash_on_delivery">Cash on delivery</input>
+											</div>
+											<div>
+												<input  type="radio" class="collapsed checkAnchor" name="pMethod" value="Razorpay">Razorpay</input>
+											</div>
+										           
+											
+										    
+										            
+
+										    
+										</div><!-- End .accordion -->
+
+		                				<button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+		                					<span class="btn-text">Place Order</span>
+		                					<span class="btn-hover-text">Proceed to Checkout</span>
+		                				</button>
+		                			</div><!-- End .summary -->
+									
+		                		</aside><!-- End .col-lg-3 -->
+		                	</div><!-- End .row -->
+            			</form>
+	                </div><!-- End .container -->
+					<%}else{%>
+						<div class="container" style="text-align: center;">
+							<div id="cart">
+								<h2 >No products in your cart</h2>
+							
+								<a href="/product">Add Product</a>
+							</div>
+						</div>
+						
+						<%}%>
+                </div><!-- End .checkout -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+		
+
+
+
+
+
+
+
+
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            function deletefn(id){
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete ?`,
+                    icon: 'warning',
+                    showCancelButton:true,
+                    confirmButtonText: 'Yes,delete it',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/deleteAddress?id='+id,{method:'delete'})
+                        const row=document.getElementById(id)
+                        row.style.display='none';
+                        return true
+                        
+                    }else{
+                        return false
+                    } 
+                });
+          
+                
+            }
+			
+        </script>
+		<script>
+		
+		 function checkfunction(id){
+			const addressform=document.getElementById('orderAddress')
+			addressform.setAttribute('action','/Order?id='+id+'&total='+'<%=total%>')
+			const checkboxes=document.getElementsByClassName('Allcheckbox')
+			for (let checkbox of checkboxes) {
+					if(checkbox.value==id){
+						checkbox.checked=true
+					}else{
+						checkbox.checked=false
+					}
+				
+       
+            }
+			
+			
+			
+				
+			
+		 }
+		 if('<%=order%>'){
+			Swal.fire({
+  icon: 'success',
+  title: 'Order Saved!',
+  text: 'Your order has been successfully saved.',
+  showCancelButton: true,  
+  confirmButtonText: 'Purchase More Products',
+}).then((result) => {
+ 
+  if (result.isConfirmed) {
+	 window.location.href = '/product';  
+  } else {
+    window.location.href = '/personalInfo'; 
+  }
+});
+
+		 }
+		 window.onload=function(){
+			
+			
+		
+		
+			const id=document.getElementById('inputBox').value
+			const addressform=document.getElementById('orderAddress')
+			const checkboxes=document.getElementsByClassName('Allcheckbox')
+			if(checkboxes.length==1){
+				for (let checkbox of checkboxes) {
+					checkbox.checked=true
+					const checkAnchor=document.querySelectorAll('.checkAnchor')
+					checkAnchor.forEach((element) => {
+            element.addEventListener('click', () => {
+				if(element.value=="Cash_on_delivery"){
+					addressform.setAttribute('action','/Order?id='+id+'&total='+'<%=total%>'&'payment='+element.value)
+				}else if(element.value=="Razorpay"){
+					console.log(element.value)
+				}
+                    });
+			
+		            })
+					
+					// addressform.setAttribute('action','/Order?id='+id+'&total='+'<%=total%>')
+				}
+			}
+
+		const sub= document.getElementById('sub').innerText
+		if(sub>50000){
+		document.getElementById('shippingstatus').innerText="Free shipping"
+		document.getElementById('gtotal').innerText='<%=total%>'
+		}else{
+			document.getElementById('shippingstatus').innerText="100₹"
+			document.getElementById('gtotal').innerText=parseInt('<%=total%>')+100
+		}
+
+
+
+		 }
+		 
+		</script>
+
+        <%-include('../layouts/userfooter')%>    

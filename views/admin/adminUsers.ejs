@@ -1,0 +1,121 @@
+<%- include('../layouts/header') %>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">User Management</h2>
+            <p>Lorem ipsum dolor sit amet.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row gx-3">
+                        <div class="col-lg-6 col-md-6">
+                            <input type="text" placeholder="Search..." class="form-control" />
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-6">
+                            <select class="form-select">
+                                <option>Show 10</option>
+                                <option>Show 20</option>
+                                <option>Show 30</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-6">
+                            <button class="btn btn-primary">Search</button>
+                        </div>
+                        
+                    </div>
+                </header>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User name</th>
+                                    <th>Email</th>
+                                    <th>Date Registered</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                             
+                                <%if(message){%>
+                                    <%for(let i=0;i<message.length;i++){%>  
+                                        <tr>
+                                            <td><%= i+1 %></td>
+                                            <td><%=message[i].User_name%></td>
+                                            <td><%=message[i].User_email%></td> 
+                                            <td><%=message[i].createdate.toLocaleDateString() %></td>
+                                            <td class="text-end">
+                                               
+                                                <%if(message[i].Is_block==false){%>
+                                               <button class="btn"  style="background-color: #d43737; color: white; width: 84px;" onclick="block_user(this,'<%=message[i]._id%>')" >Block</button>  
+                                               <%}else{%> 
+                                               <button class="btn" style="background-color:#3BB77E; color: white; width: 84px;" onclick="block_user(this,'<%=message[i]._id%>')" >UnBlock</button> 
+                                               <%}%>  
+                                            </td>    
+                                        </tr>
+
+                                    <%}%>
+                                    
+                                <%}%>
+                               
+                                
+                                <!-- Add more user rows as needed -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- table-responsive //end -->
+                </div>
+                <!-- card-body end// -->
+            </div>
+            <!-- card end// -->
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-3 col-6">
+
+       
+    </div>
+
+    <div class="pagination-area mt-15 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+              
+            </ul>
+        </nav>
+    </div>
+</section>
+<!-- content-main end// -->
+<script>
+   
+   function block_user(buttontag,id){
+    
+   
+    if(buttontag.innerText=='UnBlock'){
+        buttontag.innerText="Block";
+       buttontag.style.background='#d43737';
+       buttontag.style.color='white'
+       buttontag.style.width='84px'
+    }
+    else if(buttontag.innerText=='Block'){
+        buttontag.innerText='UnBlock';
+       buttontag.style.background='#3BB77E';
+       buttontag.style.color='white'
+    }
+    
+    fetch(`/admin/block/?userid=${id}`,{method:'POST'})
+    .then(response=>{
+        if(!response){
+            throw new Error('net work issue')
+        }
+    })
+    .catch(error=>{
+        console.log('Error',error)
+    })
+   }
+ 
+    
+</script>
+<%-include("../layouts/footer")%>

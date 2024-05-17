@@ -1,0 +1,236 @@
+<%- include('../layouts/header')%>
+            <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Order List</h2>
+                        <p>Lorem ipsum dolor sit amet.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="card mb-4">
+                            <header class="card-header">
+                                <div class="row gx-3">
+                                    <div class="col-lg-4 col-md-6 me-auto">
+                                        <input type="text" placeholder="Search..." class="form-control" />
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-6">
+                                        <select class="form-select">
+                                            <option>Status</option>
+                                            <option>Active</option>
+                                            <option>Disabled</option>
+                                            <option>Show all</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-6">
+                                        <select class="form-select">
+                                            <option>Show 20</option>
+                                            <option>Show 30</option>
+                                            <option>Show 40</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </header>
+                            <!-- card-header end// -->
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Customer name</th>
+                                                <th>Price</th>
+                                                <th>Quantity</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                                <th>Total</th>
+                                                <th class="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%for(let key of all){%>   
+                                            <tr>
+                                                <td><%=key._id.toString().substr(-5)%></td>
+                                                <td><b><%=key.shippingAddress.name%></b></td>
+                                                <td><%=key.productId.price%></td>
+                                                <td><%=key.quantity%></td>
+                                                <td>
+                                                    
+                                                      
+                                                        <select id="drop<%=key.id%>" class="badge rounded-pill alert-dark selects" onclick="uniqueAvoid('<%=key.id%>','<%=key.orderStatus%>')" onchange="changevalue('<%=key._id%>')">
+                                                        <option id="selected<%=key.id%>" selected value="Pending"><%=key.orderStatus%></option>
+                                                        <option value="Pending">Pending</option>
+                                                        <option value="Shipping">Shipping</option>
+                                                        <option value="Delivered">Delivered</option>
+                                                        <option value="Canceled">Canceled</option>
+                                                        <option value="Processing">Processing</option>
+                                                        <option value="Return">Return</option>
+                                                        </select>
+                                                    
+                                                    
+                                                   
+                                                
+                                                
+                                                </td>
+                                                
+                                                <td id="dt"><%=key.orderDate.toDateString()%></td>
+                                                <td><%=key.quantity*key.productId.price%></td>
+                                                <td class="text-end">
+                                                    
+                                                    <button class="btn btn-md rounded font-sm"  data-toggle="modal" data-target="#exampleModalCenter" onclick="datafetch('<%=key._id%>')">Detail </button>
+                                                </td>
+                                               
+                                            </tr>
+                                            <%}%>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- table-responsive //end -->
+                            </div>
+                            <!-- card-body end// -->
+                        </div>
+                        <!-- card end// -->
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="mb-3">Filter by</h5>
+                                <form>
+                                    <div class="mb-4">
+                                        <label for="order_id" class="form-label">Order ID</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_id" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_customer" class="form-label">Customer</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_customer" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Order Status</label>
+                                        <select class="form-select">
+                                            <option>Published</option>
+                                            <option>Draft</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_total" class="form-label">Total</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_total" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_created_date" class="form-label">Date Added</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_created_date" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_modified_date" class="form-label">Date Modified</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_modified_date" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_customer_1" class="form-label">Customer</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_customer_1" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- card end// -->
+                    </div>
+                </div>
+                <div class="pagination-area mt-15 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                            <li class="page-item"><a class="page-link" href="#">02</a></li>
+                            <li class="page-item"><a class="page-link" href="#">03</a></li>
+                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                            <li class="page-item"><a class="page-link" href="#">16</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                
+            </section>
+            
+         <!-- Button trigger modal -->
+
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        
+        <div class="modal-body">
+         <div id="fetchdata" style="padding-left: 10vh;" ></div>   
+         
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+  
+      <script>
+        function changevalue(id){
+            console.log(id)
+            const dropData= document.getElementById("drop"+id)
+            // console.log(dropData.value)
+            fetch("/admin/changeStatus?value="+dropData.value+"&id="+id,{method:"post"})
+        }
+       
+        function uniqueAvoid(id,value){
+           
+           const dropData= document.getElementById("drop"+id)
+           const selectedDta= document.getElementById("selected"+id)
+           if(selectedDta==null){
+            return
+           }
+           for(i=0;i<dropData.options.length;i++){
+            if(dropData.options[i].value==value){
+                dropData.options[i].remove()
+            }
+           }
+          
+        }
+      
+
+        function datafetch(id){
+           
+            fetch('/admin/veiwproduct?id='+id,{method:"post"})
+            .then((res)=>{
+              return  res.json()
+            })
+            .then((data)=>{
+                const divone=document.getElementById('fetchdata')
+                divone.innerHTML=`
+                <h3>User Info</h3>
+                <p>Name :   ${data.shippingAddress.name}</p>
+                <p>Address :${data.shippingAddress.address}</p>
+                <p>Country :${data.shippingAddress.country}</p>
+                <p>City :   ${data.shippingAddress.city}</p>
+                <p>State :  ${data.shippingAddress.state}</p>
+                <p>Pincode :${data.shippingAddress.pincode}</p>
+                <p>Phone :  ${data.shippingAddress.phone}</p><br>
+                <h4>Payment</h4>
+                <p>PaymentMethod :  ${data.paymentMethod}</p>
+                <p>PaymentStatus :  ${data.paymentStatus}</p><br>
+                
+                <h3>Product Info</h3>
+                <img style="width: 25vh;height: 25vh;" src="/proimgs/${data.productId.image[2]}" atl="img"></img>
+                <p>Product name :   ${data.productId.product_name}</p>
+                <p>Product size :   ${data.productId.size}</p>
+                <p>Brand :   ${data.productId.brand}</p>
+                <p>Description :   ${data.productId.Description}</p>
+                <p>price :   ${data.productId.price}</p>
+                <p>stock :   ${data.productId.stock}</p>
+                <p>quantity :   ${data.quantity}</p>
+        
+                `
+                })
+        }
+
+      </script>        
+   
+<%-include("../layouts/footer")%>

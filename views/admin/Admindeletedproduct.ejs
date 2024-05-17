@@ -1,0 +1,97 @@
+<%-include('../layouts/header')%>
+
+<section class="content-main"> 
+    <h3> List of deleted products</h3>
+    
+    <div class="content-header">
+   
+
+
+                        
+                        <table class="table table-hover">
+                           
+                           
+                            <thead>
+                                <tr>
+                                    
+                                   
+                                    <th>Image</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>price</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                           
+                                <%if(data){%>
+                                    <%data.forEach((singles)=>{%>
+                                       
+                                    
+                                <tr id="card<%=singles._id%>">
+                                    
+                                    <td><img src="/proimgs/<%=singles.image[0]%>" alt="" width="150em"></td>
+                                <td><%=singles.product_name%></td>
+                                <td><p style=" width:28em; overflow: scroll; scrollbar-width: none;"><%=singles.Description%></p></td>
+                                 <td><%=singles.price%></td>          
+                                 <td class="text-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                         <div class="dropdown-menu">
+                                            <a class="dropdown-item text-danger" onclick="recover('<%=singles._id%>')">Recover</a>
+                                            <a  class="dropdown-item text-danger" onclick="delete_p('<%=singles._id%>')">Delete permanently</a>
+                                         </div>
+                                        </div>
+                                    </td>
+                                    
+                                </tr>
+                                <%})%>
+                                <%}%> 
+                                
+                       
+                               
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                </div>    
+                <script>
+                   function delete_p(id){
+                    Swal.fire({
+        title: 'Confirm Deletion',
+        text: 'Are you sure you want to delete this permanently?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/admin/delete_p/?id='+id,{method:"post"})
+                   const s= document.getElementById('card'+id)
+                   s.remove()
+        }})
+                      
+                   }
+                function recover(id){
+                     Swal.fire({
+        title: 'Confirm recovery',
+        text: 'Are you sure!Do you want to recover this ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, recover it!',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/admin/recover/?id='+id,{method:'post'})
+                 const x=document.getElementById('card'+id)
+                x.remove()
+        }})
+                    
+                }
+         
+                </script>
+<%-include('../layouts/footer')%>

@@ -1,0 +1,325 @@
+<style>
+    .preview-container {
+      display: inline-block;
+      position: relative;
+    }
+    .delete-btn {
+      position: absolute;
+      bottom: 15px;
+      right: 40%;
+      background-color:#3BB77E ;
+      color:rgb(255, 255, 255)  ;
+      border: none;
+      border-radius: 20%;
+      cursor: pointer;
+    }
+    .image-preview {
+      max-width: 200px;
+      max-height: 200px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    #sizeDropdown{
+        color: rgba(0, 0, 0, 0.703);
+        background-color:#f4f5f9;
+        border: none;
+        height: 5vh;
+        width: 8vh;
+        border-radius: 4px;
+        font-size: small;
+    }
+  </style>
+<%-include ('../layouts/header')%>
+            <section class="content-main">
+                <form  id="fm" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+                    <!-- action="/admin/editproduct" -->
+                <div class="row">
+                    <div class="col-9">
+                        <div class="content-header">
+                            <h2 class="content-title">Edit Product</h2>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="col-lg-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-4">
+                                   
+                                        
+                                        
+                                     
+
+                                  
+                                      
+                                    
+                                    <label for="product_title" class="form-label">Product title</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_title" name="title" value="<%=data.product_name%>" />
+                                </div>
+                                <div class="row gx-3">
+                                   
+                                    <div class="col-md-4 mb-3">
+                                           
+                                            <div class="form-group">
+                                                <label for="sizeDropdown">size &nbsp; </label>
+                                                <select  id="sizeDropdown" name="size">
+                                                    <option class="sizeSelect" value="XS">XS</option>
+                                                    <option class="sizeSelect" value="S">S</option>
+                                                    <option class="sizeSelect" value="M">M</option>
+                                                    <option class="sizeSelect" value="L">L</option>
+                                                    <option class="sizeSelect" value="XL">XL</option>
+                                                
+                                                </select>
+                                            </div>
+                                                                                
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="product_brand" class="form-label">Brand</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_brand" name="brand"  value="<%=data.brand%>"/>
+                                </div>  
+                            </div>
+                        </div>
+                        <!-- card end// -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div>
+                                    <label class="form-label">Description</label>
+                                    <textarea placeholder="Type here" class="form-control" rows="4" name="description" id="product_description"> <%=data.Description%></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div>
+                                    <label id="h" class="form-label">Images</label>
+                                    <input class="form-control" type="file" name="images" style="float: left;" id="imageInput" accept="image/*" multiple maxlength="3"/>
+                                    <div id="imagePreviews" >
+                                        <%for(i=0;i<3;i++){%>
+                                        <div class="preview-container con">
+                                            <img class="image-preview" src="/proimgs/<%=data.image[i]%>" > 
+                                          <a class="delete-btn" id="d1" >Delete</a>
+                                    </div>
+                                    <%}%> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                     
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <label class="form-label">Price</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name="price" id="product_price"  value="<%=data.price%>"/>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Stock</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name="quantity" id="product_quantity"  value="<%=data.stock%>"/>
+                                </div>
+                              
+                                
+                                 <hr />
+                                <h5 class="mb-3">Categories</h5>
+                                
+                                <%category.forEach((value)=>{%>
+                                    <div class="form-check">
+                                        <input class="form-check-input procheck" type="checkbox" value="<%=value._id%>" id="product-cat" name="checkbox1" onchange="tick('<%=value._id %>')"/>
+                                        <label class="form-check-label" for="product-cat"><%=value.name%></label>
+                                    </div>
+                                        <% })%>
+                            </div>
+                        </div>
+                        <div>
+                            <input class="btn btn-md rounded font-sm hover-up" type="submit" onclick="sentId('<%=data._id%>')"></input>
+                        </div>
+                    
+                    </div>
+                   
+                   
+                 
+                </div>
+            </form>  
+            </section>
+            <script>
+               function sentId(id){
+               document.getElementById('fm').setAttribute('action',"/admin/editproduct/?id="+id)
+               }
+        
+           let conItem=document.getElementsByClassName('con')
+            for(i=0;i<3;i++){
+                conItem[i].querySelector('.delete-btn').addEventListener('click',function(){
+                  let full_div= this.closest('.con')
+                  full_div.style.display='none'
+
+                })
+            }
+            
+        
+          
+
+                
+            let imageInput = document.getElementById('imageInput');
+            let imagePreviews = document.getElementById('imagePreviews')
+
+
+      
+      imageInput.addEventListener('change', function(event) {
+      imagePreviews.innerHTML = ''; 
+      
+      var files = event.target.files;
+      if(files.length<=3){
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        
+        if (file) {
+          var reader = new FileReader();
+          
+          reader.onload = function(event) {
+            var previewContainer = document.createElement('div');
+            previewContainer.className = 'preview-container';
+
+            var img = document.createElement('img');
+           
+                    img.src =event.target.result;
+               
+        
+           
+          
+            img.className = 'image-preview';
+
+            var deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = 'Delete';
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.addEventListener('click', function() {
+            previewContainer.remove();
+            });
+
+            previewContainer.appendChild(img);
+            previewContainer.appendChild(deleteBtn);
+            imagePreviews.appendChild(previewContainer);
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      }
+    }else{
+        alert("maximun files size is 3")
+    }
+    });
+                
+   
+function validateForm() {
+    var checkboxes=document.getElementsByClassName('procheck')
+        var title = document.getElementById('product_title').value.trim()
+        var brand = document.getElementById('product_brand').value.trim()
+         var description = document.getElementById('product_description').value.trim()
+        var price = document.getElementById('product_price').value.trim()
+        var quantity = document.getElementById('product_quantity').value.trim()
+        
+        
+     
+        if (title==''||  brand=='' || description==''|| price ==''|| quantity=='') {
+         
+            swal.fire({
+        title: 'Oops!',
+        text: 'Please fill out all the fields.',
+        icon: 'warning'
+    });
+            return false
+        }
+       
+       
+       
+        if (isNaN(parseFloat(price))) {
+            Swal.fire({
+        icon: 'error',
+        title: 'Invalid Input',
+        text: 'Price must be a number.',
+        confirmButtonText: 'OK'
+    });
+            return false
+        }
+        if(price<=0){
+            
+            Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'its a negavite number!!!',
+    });
+            return  false
+        }
+        if (isNaN(parseFloat(quantity))) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'quantity must be number',
+    });
+            return false
+        }
+        if(quantity<0){
+            
+            Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'stock should be positive !!!',
+    });
+            return  false
+        }
+             
+    for (let checkbox of checkboxes) {
+		if(checkbox.checked==false){
+         Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'selcet category',
+    });
+    return false
+		}else{
+            return true
+        }
+
+        
+            }
+
+        
+        return true
+    }
+    window.onload=function(){
+      let a= document.querySelectorAll('.form-check-input')
+       
+      let one='<%=data.category._id%>'
+      a.forEach((value)=>{ 
+       if( value.value==one){
+        value.checked=true
+       }
+    
+      })
+    
+    const sizeSelect=document.querySelectorAll('.sizeSelect')
+    let size="<%=data.size%>"
+    sizeSelect.forEach((value)=>{
+        if(value.value==size){
+            value.selected=true
+        }
+    })
+}
+   
+function tick(id){
+    
+			const checkboxes=document.getElementsByClassName('procheck')
+			for (let checkbox of checkboxes) {
+					if(checkbox.value==id){
+						checkbox.checked=true
+					}else{
+						checkbox.checked=false
+					}
+				
+       
+            }
+		 }
+            </script>
+      
+           <%-include('../layouts/footer')%>

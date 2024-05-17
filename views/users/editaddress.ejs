@@ -1,0 +1,123 @@
+
+
+
+<%-include('../layouts/userheader')%>
+
+<div class="container">
+    <div class="main">
+        
+      
+        <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/homepage">HOME</a></li>
+                    <li class="breadcrumb-item"><a href="/product">PRODUCT</a></li>
+                    
+                </ol>
+            </div>
+        </nav><!-- End .breadcrumb-nav -->
+        <form id="addressForm" action="/addorupdateaddress" method="post">
+            <div class="row">
+                <div class="col-sm-12">
+                    <label>Name *</label>
+                    <input type="text" class="form-control" id="name" name="name" value="" >
+                </div>
+                <div class="col-sm-12">
+                    <label>Country *</label>
+                    <input type="text" class="form-control" id="country" name="country">
+                </div>
+                <div class="col-sm-12">
+                    <label>Address *</label>
+                    <input type="text" class="form-control" id="address" name="address" >
+                </div>
+                <div class="col-sm-6">
+                    <label>City *</label>
+                    <input type="text" class="form-control" id="city" name="city" >
+                </div>
+                <div class="col-sm-6">
+                    <label>State *</label>
+                    <input type="text" class="form-control" id="state" name="state" >
+                </div>
+                <div class="col-sm-6">
+                    <label>Pincode *</label> &nbsp;<span id="pincode_label" style="color: red;"></span>
+                    <input type="text" class="form-control" id="pincode"  name="pincode">
+                </div>
+                <div class="col-sm-6">
+                    <label>Phone *</label> &nbsp;<span id="phone_label" style="color: red;"></span>
+                    <input type="text" class="form-control" id="phone" name="phone">
+                </div>
+            </div>
+            
+            <label>Email address *</label> &nbsp; <span id="email_label" style="color: red;"></span>
+            <input type="email" class="form-control" id="email" name="email"  >
+        
+            <button type="button" onclick="validateForm()" class="btn btn-outline-primary-2">
+                
+                <span>ADD ADDRESS</span>
+                <i class="icon-long-arrow-right"></i>
+            </button>
+            <br>
+        </form>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+        <script>
+            function hasRepeatedCharacters(value) {
+        var lowerCaseValue = value.toLowerCase();
+        var repeatedRegex = /(.)\1{2,}/;
+        return !repeatedRegex.test(lowerCaseValue);
+    }
+            function validateForm() {
+              
+                var name = document.getElementById('name').value;
+                var country = document.getElementById('country').value;
+                var address = document.getElementById('address').value;
+                var city = document.getElementById('city').value;
+                var state = document.getElementById('state').value;
+                var pincode = document.getElementById('pincode').value;
+                var phone = document.getElementById('phone').value;
+                var email = document.getElementById('email').value;
+        
+               
+                if (!name || !country || !address || !city || !state || !pincode || !phone || !email) {
+                    Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please fill out all required fields.'
+            });
+            return false;
+                }
+                
+            let a= document.getElementById('email')
+                var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                
+                  document.getElementById('email_label').innerText= 'Please enter a valid email address';
+                    return false;
+                }
+                var pincodePattern = /^\d{6}$/;
+                if (!pincodePattern.test(pincode)) {
+                    document.getElementById('pincode_label').innerText='Please enter a valid pincode';
+                    return false;
+                }
+                var phonePattern = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
+                if (!phonePattern.test(phone)) {
+                    document.getElementById('phone_label').innerText='Please enter a valid phone number';
+                    return false;
+                }
+                if (hasRepeatedCharacters(name)==false ||hasRepeatedCharacters(country)==false ||hasRepeatedCharacters(address)==false ||hasRepeatedCharacters(city)==false) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Repeated characters are not allowed.'
+            });
+            return false;
+        }
+
+
+                document.getElementById('addressForm').submit();
+            }
+        </script>
+        
+        <br>
+</div>
+</div>
+<%-include('../layouts/userfooter')%>

@@ -1,0 +1,264 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<%-include('../layouts/userheader')%>
+
+        <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title">Shopping Cart<span>Shop</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	<div class="cart">
+	                <div class="container">
+						<%if(productsFound){%>	
+	                	<div class="row">
+	                		<div class="col-lg-9">
+	                			<table class="table table-cart table-mobile">
+									<thead>
+										<tr>
+											<th>Product</th>
+											<th>Price</th>
+											<th>Quantity</th>
+											<th>Total</th>
+											<th></th>
+										</tr>
+									</thead>
+									<!-- product starts here================================================ -->
+									
+									
+								
+									<tbody >
+										
+
+											
+										
+										<%data.forEach((value)=>{%>
+											
+										<tr class="rowsof" id="row<%=value.productId._id%>" >
+											<td class="product-col"  onclick="rowselection('<%=value.productId._id%>')">
+												<div class="product">
+													<figure class="product-media">
+														<a href="#">
+															<img src="/proimgs/<%=value.productId.image[2]%>" alt="Product image">
+														</a>
+													</figure>
+
+													<h3 class="product-title">
+														<a ><%=value.productId.product_name%></a>
+													</h3><!-- End .product-title -->
+												</div><!-- End .product -->
+											</td>
+											<td class="price-col"><%=value.productId.price%></td>
+											<td class="quantity-col">
+                                                <div class="cart-product-quantity">
+                                                    <input class="numberTag" type="number" value="<%=value.quantity%>" min="1" max="5" onchange="datachange(this,'<%=value.productId._id%>','<%=value.productId.price%>','<%=value.productId.quantity%>')" step="1" data-decimals="0"  required >
+													
+                                                </div><!-- End .cart-product-quantity -->
+                                            </td>
+											<td class="total-col cart_total"  id="total<%=value.productId._id%>"><%=value.productId.price*value.quantity%></td>
+										<td class="remove-col"><button class="btn-remove" onclick="return removeRow('<%=value.productId._id%>','<%=value.productId.price%>')"><i class="icon-close"></i></button></td>
+										</tr>
+										<%})%>
+										
+									</tbody>
+									
+					<!-- product ends here================================================ -->
+					
+								</table ><!-- End .table table-wishlist -->
+
+	                			<div class="cart-bottom">
+			            			
+
+			            			
+		            			</div><!-- End .cart-bottom -->
+	                		</div><!-- End .col-lg-9 -->
+
+						
+							<%if(data.length>0){%>
+	                		<aside id="hideData" class="col-lg-3" id="cartchart">
+								
+	                			<div class="summary summary-cart" >
+	                				<h3 class="summary-title"> Cart Total </h3><!-- End .summary-title -->
+
+	                				<table class="table table-summary">
+	                					<tbody>
+	                						
+	                						<tr class="summary-subtotal">
+	                							<td>Subtotal:</td>
+	                							<td id="carttotal"></td>
+	                						</tr>
+	                						<tr class="summary-shipping">
+	                							<td>Shipping:</td>
+	                							<td>&nbsp;</td>
+	                						</tr>
+
+	                						<tr class="summary-shipping-row">
+	                							<td>
+													<div class="custom-control custom-radio">
+														<input type="radio" id="free-shipping" name="shipping" class="custom-control-input">
+														<label class="custom-control-label" for="free-shipping">Free Shipping</label>
+													</div><!-- End .custom-control -->
+	                							</td>
+	                							<td>0.00</td>
+	                						</tr><!-- End .summary-shipping-row -->
+
+	                						
+
+	                						<tr class="summary-shipping-row">
+	                							<td>
+	                								<div class="custom-control custom-radio">
+														<input type="radio" id="express-shipping" name="shipping" class="custom-control-input">
+														<label class="custom-control-label" for="express-shipping">Shipping cost:</label>
+													</div><!-- End .custom-control -->
+	                							</td>
+	                							<td>100.00</td>
+	                						</tr><!-- End .summary-shipping-row -->
+
+	                						
+
+	                						<tr class="summary-total">
+	                							<td>Total:</td>
+	                							<td id="grandtotal"></td>
+	                						</tr><!-- End .summary-total -->
+	                					</tbody>
+	                				</table><!-- End .table table-summary -->
+
+	                				<a href="/checkout" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
+	                			</div><!-- End .summary -->
+								<%}%>
+		            			<a href="/product" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
+	                		</aside><!-- End .col-lg-3 -->
+	                	</div><!-- End .row -->
+						<%}else{%>
+								<%=message%>
+							<%}%>
+	                </div><!-- End .container -->
+                </div><!-- End .cart -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+		<script>
+			
+window.onload=function(){
+					
+
+				var ft=0
+				const totalamount=document.getElementsByClassName('cart_total')
+				const total=document.getElementById('carttotal')
+				const Gtotal=document.getElementById('grandtotal')
+				Array.from(totalamount).forEach((element)=>{
+						ft+=parseInt(element.textContent)
+				})
+			total.innerHTML=ft
+			Gtotal.innerHTML=ft
+			const radioButton=document.getElementById('express-shipping')
+			
+			if(ft>=50000){
+		const radioButton1=document.getElementById('free-shipping')
+		radioButton1.checked = true;
+	          }else{
+				const radioButton2=document.getElementById('express-shipping')
+		radioButton2.checked = true;
+		Gtotal.innerHTML=ft+100
+			  }
+			  if('<%=cart%>'){
+				
+				Swal.fire({
+            
+            text: '<%=cart%>',
+            icon: 'success',
+            
+        })
+			  }
+
+			  
+			}
+			
+function datachange(tag,id,price,quantity){
+			const countValue=tag.value
+			totalPrice=countValue*price
+			const totaltag=document.getElementById('total'+id)
+			totaltag.innerHTML=Math.round(totalPrice)
+			if(countValue==5){
+				Swal.fire({
+            icon: 'error',
+            title: 'Product Limit Exceeded',
+            text: `You have reached the maximum limit of products.`,
+        });
+			}
+// =============================================================================
+ 
+ const totalamount = document.getElementsByClassName('cart_total');
+    finalTotal = 0; 
+    Array.from(totalamount).forEach((element) => {
+        finalTotal += parseInt(element.textContent);
+    });
+    const total = document.getElementById('carttotal');
+    const Gtotal = document.getElementById('grandtotal');
+    total.innerHTML = finalTotal;
+    Gtotal.innerHTML = finalTotal;
+	if(finalTotal>50000){
+		const radioButton1=document.getElementById('free-shipping')
+		radioButton1.checked = true;
+	}else{
+		const radioButton2=document.getElementById('express-shipping')
+		radioButton2.checked = true;
+		Gtotal.innerHTML=finalTotal+100
+
+			  }
+// =============================================================================	
+			fetch(`/cartdynamic?id=${id}&value=${countValue}&price=${price}&quantity=${quantity}`,{method:'post'})
+			}
+		function removeRow(id,price){
+			
+				Swal.fire({
+            title: 'Are you sure?',
+            text: 'You are about to remove this product.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, remove it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+             document.getElementById('row'+id).remove()
+				let rowof=document.getElementsByClassName('rowsof')
+				if(rowof.length<=0){
+					document.getElementById("hideData").remove()
+				}
+			const total=document.getElementById('carttotal')
+			const Gtotal=document.getElementById('grandtotal')
+			
+			
+			
+			
+			
+			
+				fetch('/removeCartProduct?id='+id,{method:'post'})
+				const totalprice=total.textContent-price
+			const Grandtotal=Gtotal.textContent-price
+				total.innerHTML=totalprice
+			Gtotal.innerHTML=Grandtotal
+			
+				
+            }
+        });
+				
+			
+				
+			}
+
+		</script>
+		
+        <%-include('../layouts/userfooter')%>
+       

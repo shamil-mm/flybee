@@ -1,0 +1,524 @@
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<%-include('../layouts/userheader')%>
+	
+        <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title">My Account<span>Shop</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-3">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/homePage">Home</a></li>
+                        
+                        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	<div class="dashboard">
+	                <div class="container">
+	                	<div class="row">
+	                		<aside class="col-md-4 col-lg-3">
+	                			<ul class="nav nav-dashboard flex-column mb-3 mb-md-0" role="tablist">
+								    <li class="nav-item">
+								        <a class="nav-link active" id="tab-dashboard-link" data-toggle="tab" href="#tab-dashboard" role="tab" aria-controls="tab-dashboard" aria-selected="true">Personal INFO</a>
+								    </li>
+								    <li class="nav-item">
+								        <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-orders" role="tab" aria-controls="tab-orders" aria-selected="false">Orders</a>
+								    </li>
+								    <li class="nav-item">
+								        <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads" role="tab" aria-controls="tab-downloads" aria-selected="false">Downloads</a>
+								    </li>
+								    <li class="nav-item">
+								        <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Adresses</a>
+								    </li>
+								   
+								    <li class="nav-item">
+								        <a class="nav-link" href="#">Sign Out</a>
+								    </li>
+								</ul>
+	                		</aside><!-- End .col-lg-3 -->
+							
+	                		<div class="col-md-8 col-lg-9">
+	                			<div class="tab-content">
+								    <div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel" aria-labelledby="tab-dashboard-link">
+									
+										<span>NAME :<%=data.User_name%>  </span><br>
+                                      <span>EMAIL :<%=data.User_email%>  </span> <br>
+                                      <span>PHONE :<%=data.User_number%>  </span> <br><br>
+									 
+									 Edit your <a href="#tab-account" class="tab-trigger-link" data-toggle="modal" data-target="#One">password</a> and account <a href="#tab-account" class="tab-trigger-link" data-toggle="modal" data-target="#exampleModal">details</a>
+								    </div><!-- .End .tab-pane -->
+									<!-- Button trigger modal -->
+									
+
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		
+		<div class="modal-body" style="padding: 5vh;">
+			<form id="addressForm" action="/edituser" method="post" onsubmit="return validateForm()">
+				<div class="row">
+					<div class="col-sm-12">
+						<label>Name *</label><span id="nameError" style="color: red;"></span>
+						<input type="text" class="form-control" id="name" name="name"  value="<%=data.User_name%>">
+					</div>
+					
+					<div class="col-sm-12">
+						<label>Email *</label><span id="emailError" style="color: red;"></span>
+						<input type="email" class="form-control" id="email" name="email" value="<%=data.User_email%>">
+					</div>
+					<div class="col-sm-12">
+						<label>Phone *</label><span id="phoneError" style="color: red;"></span>
+						<input type="text" class="form-control" id="phone" name="phone" value="<%=data.User_number%>">
+					</div>
+					
+					
+					<div class="col-sm-6" style="display: none;">
+						<label>password *</label>
+						<input type="text" class="form-control" id="password" name="password" value="">
+					</div>
+					<div class="col-sm-6" style="display: none">
+						<label>re-password *</label> &nbsp;<span id="re-password" style="color: red;"></span>
+						<input type="text" class="form-control" id="re-password"  name="re-password" value="">
+					</div>
+				
+					
+				</div>
+				
+				
+				<button type="submit" class="btn btn-outline-primary-2">
+					
+					<span>Save New password</span>
+					<i class="icon-long-arrow-right"></i>
+				</button>
+				<br>
+			</form>
+		</div>
+		
+	  </div>
+	</div>
+  </div>
+  <!-- change password modal -->
+  <div class="modal fade" id="One" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		
+		<div class="modal-body" style="padding: 5vh;">
+			<form id="addressFormpassword" action="/userpassword" method="post" onsubmit="return passvalidateForm()">
+				<div class="row">
+				
+					<div class="col-sm-6">
+						<label>New password *</label><span id="passwordError" style="color: red;"></span>
+						<input type="text" class="form-control" id="newpassword" name="password" value="">
+					</div><br>
+					<div class="col-sm-6" >
+						<label>re-password *</label> &nbsp;<span id="repasswordError" style="color: red;"></span>
+						<input type="text" class="form-control" id="repassword"  name="re_password" value="">
+					</div>
+					<div class="col-sm-6" >
+						<span id="repas" style="color: red;"></span>
+					</div>
+				
+					
+				</div>
+				
+				
+				<button type="submit" class="btn btn-outline-primary-2">
+					
+					<span>Save changes</span>
+					<i class="icon-long-arrow-right"></i>
+				</button>
+				<br>
+			</form>
+		</div>
+		
+	  </div>
+	</div>
+  </div>
+  <div class="tab-pane fade" id="tab-orders" role="tabpanel" aria-labelledby="tab-orders-link">
+    <div class="table-responsive"> 
+		<%if(orderfound){%>
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark" style="text-align: center; ">
+                <tr>
+                    <th class="col-sm-2 col-md-2 col-lg-2">Image</th>
+                    <th class="col-sm-2 col-md-2 col-lg-2">Name</th>
+                    <th class="col-sm-2 col-md-2 col-lg-2">Payment</th>
+                    <th class="col-sm-2 col-md-2 col-lg-2">Status</th>
+                    <th class="col-sm-2 col-md-2 col-lg-2">Date</th>
+                    <th class="col-sm-2 col-md-2 col-lg-2">Action</th>
+                </tr>
+            </thead>
+			
+            <tbody>
+				
+				<% order.OrderedProducts.forEach((value) => { %>
+					
+                <tr  style="text-align: center; background-color: rgb(250, 250, 250);">
+					
+                    <td><img src="/proimgs/<%=value.productId.image[2]%>" alt="User Image"></td>
+                    <td><%= value.productId.product_name %></td>
+                    <td><%= value.productId.price %></td>
+                    <td id="ROW<%=value._id%>"><%=value.orderStatus%></td>
+                    <td class="dateData" id="<%=value._id%>" value="'<%=value.orderDate%>'"></td>
+					<td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>')">view details</a> </td>
+                    
+				
+                </tr>
+				<% }) %>
+				
+            </tbody>
+			
+        </table>
+		
+				<%}else{%>
+					<p>Order not found... make order please <a href="/product">click</a></p><%}%>
+    </div>
+
+   
+</div>
+
+								  
+
+								    <div class="tab-pane fade" id="tab-address" role="tabpanel" aria-labelledby="tab-address-link">
+										<div class="row">
+										<%if(addressFound){%>
+										<%datas.addresses.forEach((value)=>{%>
+								    
+								    		<div class="col-lg-6" id="<%=value._id%>">
+								    			<div class="card card-dashboard">
+								    				<div class="card-body">
+														
+								    					<h3 class="card-title">Address</h3>
+														<p>name: <%=value.name%> <br>
+															address: <%=value.address%> <br>
+															email: <%=value.email%> <br>
+															country: <%=value.country%> <br>
+															city: <%=value.city%> <br>
+															state: <%=value.state%> <br>
+															pincode: <%=value.pincode%> <br>
+															phone: <%=value.phone%> <br>
+														
+														</p>
+														
+														<a href="/editAddressrender?id=<%=value._id%>">Edit<i class="icon-edit"></i></a> &nbsp; &nbsp;
+														<a  style="color:  #ff01019a;" onclick="return deletefn('<%=value._id%>')" >Delete <i class="fa fa-trash-o"></i></a></p>
+								    				</div><!-- End .card-body -->
+								    			</div><!-- End .card-dashboard -->
+								    		</div><!-- End .col-lg-6 -->
+											<%})%>
+								    	<%}else{%>
+											<p><%=message%></p>	
+											<%}%>
+								    	</div><!-- End .row -->
+										
+										<a href="/EditAddress" id="clickone" class="btn btn-outline-primary-2">
+											<span>Add Address</span>
+											<i class="icon-long-arrow-right"></i>
+										</a>
+								    </div><!-- .End .tab-pane -->
+
+								   
+									
+								</div>
+	                		</div><!-- End .col-lg-9 -->
+	                	</div><!-- End .row -->
+	                </div><!-- End .container -->
+                </div><!-- End .dashboard -->
+            </div><!-- End .page-content -->
+ 
+		</main><!-- End .main -->
+
+
+		
+  <!-- Button trigger modal -->
+
+  
+  <!-- Modal  -->
+  <div class="modal fade" id="exampleModalCenter000" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+	  <div class="modal-content">
+		<div >
+			<!-- <h5 class="modal-title" id="exampleModalLongTitle">View details</h5> -->
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="width: 5vh;height: 5vh;">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		
+		  
+				
+				
+		<div class="modal-body">
+			<p id="shabeeb"></p>
+		  <div class="container pl-5">
+			<h4>User Info</h4>
+			<div class="pl-5" style="width: 60vh;">
+				
+				
+				<span >NAME :</span><br>
+				<span>EMAIL :</span> <br>
+				<span>ADDRESS:</span> <br>
+				<span>CITY:</span> <br>
+				<span>STATE:</span> <br>
+				<span>COUNTRY:</span> <br>
+				<span>PIN CODE:</span> <br>
+				<span>PHONE :</span> <br>
+				<h6>Payment</h6>
+				<span > PAYMENT METHOD:</span><br>
+				<span > STATUS:</span><br><br>
+				<h6>Product info</h6>
+				<IMG style="width: 25vh; height: 28vh;"> </IMG><br>
+				<span ></span><br>
+				<span ></span><br>
+				<span ></span><br>
+				<span ></span><br>
+				<span ></span><br> 
+				<button  class="btn btn-outline-primary-2" style="margin-top: 5vh;margin-bottom: 5vh;">cancel order</button>
+				
+				<br>
+			</div>
+			
+		  </div>
+		 
+		
+		
+		</div>
+	
+				
+	
+		
+	  </div>
+	</div>
+  </div>
+
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+
+
+
+		function openDetailsModal(rowid,status) {
+			
+    $('#exampleModalCenter000').modal('show');
+	fetch('/productDetailsInOrder?id='+rowid,{method:"post"})
+	.then(res =>res.json())
+	.then(res=>{
+		
+		const userInfo = res.result[0];
+		
+		document.querySelector('.pl-5 span:nth-of-type(1)').textContent = `NAME : ${userInfo.shippingAddress.name}`;
+        document.querySelector('.pl-5 span:nth-of-type(2)').textContent = `EMAIL : ${userInfo.shippingAddress.email}`;
+        document.querySelector('.pl-5 span:nth-of-type(3)').textContent = `ADDRESS : ${userInfo.shippingAddress.address}`;
+        document.querySelector('.pl-5 span:nth-of-type(4)').textContent = `CITY : ${userInfo.shippingAddress.city}`;
+        document.querySelector('.pl-5 span:nth-of-type(5)').textContent = `STATE : ${userInfo.shippingAddress.state}`;
+        document.querySelector('.pl-5 span:nth-of-type(6)').textContent = `COUNTRY : ${userInfo.shippingAddress.country}`;
+        document.querySelector('.pl-5 span:nth-of-type(7)').textContent = `PIN CODE : ${userInfo.shippingAddress.pincode}`;
+        document.querySelector('.pl-5 span:nth-of-type(8)').textContent = `PHONE : ${userInfo.shippingAddress.phone}`;
+        document.querySelector('.pl-5 span:nth-of-type(9)').textContent = `PAYMENT METHOD : ${userInfo.paymentMethod}`;
+        document.querySelector('.pl-5 span:nth-of-type(10)').textContent = `STATUS : ${userInfo.paymentStatus}`;
+        document.querySelector('.pl-5 img').src=`/proimgs/${userInfo.productId.image[2]}`
+        document.querySelector('.pl-5 span:nth-of-type(11)').textContent = `PRODUCT NAME : ${userInfo.productId.product_name}`;
+        document.querySelector('.pl-5 span:nth-of-type(12)').textContent = `PRODUCT SIZE : ${userInfo.productId.size}`;
+        document.querySelector('.pl-5 span:nth-of-type(13)').textContent = `BRAND : ${userInfo.productId.brand}`;
+        document.querySelector('.pl-5 span:nth-of-type(14)').textContent = `DESCRIPTION : ${userInfo.productId.Description}`;
+        document.querySelector('.pl-5 span:nth-of-type(15)').textContent = `PRICE : ${userInfo.productId.price}`;
+		document.querySelector('.pl-5 button').setAttribute('onclick',`cancelproduct( '${status}','${userInfo._id}')`)
+		document.querySelector('.pl-5 button').setAttribute('id',`b${rowid}`)
+		if(status=="Canceled"){
+				console.log("hello beee")
+				document.getElementById("b"+rowid).remove()
+				
+			}
+		
+	
+	})
+	
+}
+
+
+ function cancelproduct(status,rowid){
+	
+	swal.fire({
+        title: "Are you sure?",
+    text: "Do you want to remove this product from your order?",
+    icon: "warning",
+    showCancelButton: true, 
+    confirmButtonText: "Yes, remove it", 
+    cancelButtonText: "No, keep it",
+    confirmButtonColor: "#c69c61",
+    cancelButtonColor: "#c69c61",
+    })
+    .then((result) => {
+    if (result.value) {
+		
+        fetch('/removeproductorder?id='+rowid,{method:'post'})
+				$('#exampleModalCenter000').modal('hide');
+    } else{
+		swal.fire({
+    title: "Cancelled",
+    text: "Product is not removed from your order.",
+    icon: "info",
+    timer: 1000, 
+    showConfirmButton: false
+});
+        
+    }
+});
+const rowone=document.getElementById("ROW"+rowid).innerHTML="Canceled"
+}
+
+
+		
+
+		function deletefn(id){
+			Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to delete ?`,
+                icon: 'warning',
+                showCancelButton:true,
+                confirmButtonText: 'Yes,delete it',
+            }).then((result) => {
+                if (result.isConfirmed) {
+					fetch('/deleteAddress?id='+id,{method:'delete'})
+					const row=document.getElementById(id)
+					row.style.display='none';
+                    return true
+					
+                }else{
+					return false
+				} 
+            });
+     
+			
+		}
+	</script>
+	<script>
+		window.onload=function(){
+		const dateTags=document.getElementsByClassName('dateData')
+		console.log(dateTags.value)
+		for(i=0;i<dateTags.length;i++){
+			const date=new Date(dateTags[i].getAttribute('value'))
+			const id=dateTags[i].getAttribute('id')
+			const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+			document.getElementById(id).innerHTML=formattedDate
+			
+		}
+		
+
+		
+		}
+		function validateForm() {
+			
+			const name = document.getElementById('name').value.trim();
+			const email = document.getElementById('email').value.trim();
+			const phone = document.getElementById('phone').value.trim();
+	
+			document.getElementById('nameError').textContent = '';
+			document.getElementById('emailError').textContent = '';
+			document.getElementById('phoneError').textContent = '';
+	
+			if (name === '') {
+				document.getElementById('nameError').textContent = 'Name is required';
+				return false;
+			}
+	
+			if (email === '') {
+				document.getElementById('emailError').textContent = 'Email is required';
+				return false;
+			} else if (!isValidEmail(email)) {
+				document.getElementById('emailError').textContent = 'Invalid email format';
+				return false;
+			}
+	
+	
+			if (phone === '') {
+				document.getElementById('phoneError').textContent = 'Phone is required';
+				return false;
+			} else if (!isValidPhone(phone)) {
+				document.getElementById('phoneError').textContent = 'Invalid phone number';
+				return false;
+			}
+	
+			
+			return true;
+		}
+	
+		
+		function isValidEmail(email) {
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			return emailRegex.test(email);
+		}
+	
+		
+		function isValidPhone(phone) {
+			const phoneRegex = /^\d{10}$/; 
+			return phoneRegex.test(phone);
+		}
+
+		if('<%=form%>'){
+			Swal.fire({
+                title: 'INFO',
+				text: "<%=form%>",
+                icon: 'warning',
+                
+            })
+		}
+		if('<%=pass%>'){
+			Swal.fire({
+                
+				text: "<%=pass%>",
+                icon: 'success',
+                
+            })
+		}
+
+
+
+		
+    function passvalidateForm() {
+      
+        const password = document.getElementById('newpassword').value;
+        const rePassword = document.getElementById('repassword').value;
+		document.getElementById('passwordError').textContent = '';
+		document.getElementById('repasswordError').textContent = '';
+		document.getElementById('repas').textContent = '';
+		console.log(password)
+		console.log(rePassword)
+
+	
+        if (!password) {
+            document.getElementById('passwordError').textContent = 'Enter password.';
+            return false;
+        }
+        if (!rePassword) {
+			console.log("re")
+            document.getElementById('repasswordError').textContent = 're-enter password.';
+            return false;
+        }
+        if (password !== rePassword) {
+            document.getElementById('repas').textContent = 'Passwords do not match.';
+            return false;
+        }
+        if (password.length < 6) {
+            document.getElementById('repas').textContent = 'Password must be at least 6 characters long.';
+            return false;
+        }
+        return true;
+    }
+</script>
+	
+	
+
+	
+
+
+
+ <%-include('../layouts/userfooter')%>     

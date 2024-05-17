@@ -1,0 +1,123 @@
+<%- include("../layouts/header") %>
+
+<section class="content-main"> 
+    <h3> List of deleted categories</h3>
+    
+    <div class="content-header">
+   
+
+
+                        
+                        <table class="table table-hover">
+                           
+                           
+                            <thead>
+                                <tr>
+                                    
+                                   
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                 
+                                    <th>Status</th>
+                                    
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%d_categories.forEach((d_category)=>{%>
+                                    
+                                <tr id="row<%=d_category._id%>">
+                                    
+                                    
+                                    
+                                    <td ><b id="name123"><%=d_category.name%></b></td>
+                                    <td><%=d_category.description%></td>
+                                   
+                                    <%if(d_category.is_list==false){%>
+                                        <td id=list_id>List</td>
+                                        <%}else if(d_category.is_list==true){%>
+                                            <td id=list_id>Unlist</td>
+                                            <%}%>
+                                    
+                                        
+                                            
+                                            
+                                           
+                                    <td class="text-end">
+                                        <div class="dropdown">
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item text-danger" onclick="recover('<%=d_category._id%>')">Recover</a>
+                                                <a class="dropdown-item text-danger" onclick="deletepermanently('<%=d_category._id%>')">Delete permanently</a>
+            
+                                               
+                                            </div>
+                                        </div>
+                                        <!-- dropdown //end -->
+                                    </td>
+                                    
+                                </tr>
+                                
+                                <%})%>
+                               
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                </div>    
+            </section>
+
+
+
+
+
+            <script>
+                function deletepermanently(id){
+                    Swal.fire({
+        title: 'Are you sure?',
+        text: 'You are about to delete this category permanently. Proceed?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes,delete it!',
+        cancelButtonText: 'No,cancel!',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/admin/deletepermanently/category/?id='+id,{method:'post'})
+            const row= document.getElementById(`row${id}`)
+       row.remove()
+                
+        } 
+    });
+
+                 
+        
+       
+        
+    }
+
+    function recover(id) {
+   
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'You are about to recover this category. Proceed?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes,recover it!',
+        cancelButtonText: 'No,cancel!',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // User confirmed, proceed with recovery
+            fetch('/admin/recover_cate/?id=' + id, { method: 'post' })
+            const row= document.getElementById(`row${id}`)
+       row.remove()
+                
+        } 
+    });
+}
+
+
+            </script>
+                        
+<%- include("../layouts/footer") %>

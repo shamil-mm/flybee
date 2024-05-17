@@ -1,0 +1,201 @@
+<%-include('../layouts/header')%> 
+<section class="content-main">
+      <div class="content-header">
+<div>
+            <h2 class="content-title card-title">Dress Categories</h2>
+           
+        </div>
+        <div>
+            <input type="text" placeholder="Search Categories" class="form-control bg-white" />
+        </div>
+    </div>
+   
+    <div class="card">
+        
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    
+                    <form method="post" action="/admin/add_category" onsubmit="return validationform()">
+                        
+                        <div class="mb-4">
+                            <label for="dress_name" class="form-label">Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="dress_name"  name="category_name"/>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Description</label>
+                            <textarea placeholder="Type here" class="form-control" name="category_description" id="category_description"></textarea>
+                        </div>
+                       
+                        <div class="d-grid">
+                            <button class="btn btn-primary" type="submit" >Create category</button>
+                        </div>
+                    </form>
+                </div>
+                <br>
+                <div class="col-md-9">
+                    <div class="table-responsive">
+                        <br>
+                        <h3> List of categories</h3>
+                       <a href="/admin/delete/page"> <button class="btn btn-primary float-end">Deleted categories</button></a>
+                       
+                        <table class="table table-hover">
+                           
+                            <thead>
+                                <tr>
+                                    
+                                   
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                 
+                                    <th>Status</th>
+                                    
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                           
+                                <%categories.forEach((category)=>{%>
+                                    
+                                <tr id="row<%=category._id%>">
+                                    
+                                    
+                                    
+                                    <td><b><%=category.name%></b></td>
+                                    <td><%=category.description%></td>
+                                   
+                                    <%if(category.is_list==false){%>
+                                        <td id=list_id>List</td>
+                                        <%}else if(category.is_list==true){%>
+                                            <td id=list_id>Unlist</td>
+                                            <%}%>
+                                    
+                                        
+                                            
+                                            
+                                           
+                                    <td class="text-end">
+                                        <div class="dropdown">
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item text-danger" onclick="deletedata('<%=category._id%>')">Delete</a>
+                                                <a class="dropdown-item" href="/admin/edit?id=<%=category._id%>" >Edit info</a>
+                                                <%if(category.is_list==false){%>
+                                                <a class="dropdown-item text-danger" onclick="listChange(this,'<%=category._id%>')">List</a>
+                                                <%}else if(category.is_list==true){%>
+                                                <a class="dropdown-item text-danger" onclick="listChange(this,'<%=category._id%>')">Unlist</a>
+                                                    <%}%>
+                                            </div>
+                                        </div>
+                                        <!-- dropdown //end -->
+                                    </td>
+                                    
+                                </tr>
+                                
+                                <%})%>
+                           
+                               
+                            </tbody>
+                           
+                        </table>
+                     
+                        <br>
+                     
+
+                    </div>
+                </div>
+                <!-- .col// -->
+            </div>
+            <!-- .row // -->
+        </div>
+    
+        <!-- card body .// -->
+    </div>
+    
+    <!-- card .// -->
+    <!-- Button trigger modal -->
+
+ 
+  
+
+  
+  
+  
+</section>
+<div>
+   
+</div>
+
+<script>
+    let list=document.getElementById("list_id")
+    
+    function listChange(Atag,id){
+        // console.log(Atag.innerText)
+        if(Atag.innerText=="List"){
+            Atag.innerText="Unlist"  
+            list.innerText="Unlist" 
+        }else{
+            Atag.innerText="List"
+            list.innerText="List" 
+        }
+        fetch("/admin/list_unlist/?cate_id="+id,{method:'POST'})
+        .then(Response=>{
+            if(!Response){
+                throw new Error('net work issue')
+            }
+        }).catch((error)=>{
+            console.log("Error",error)
+        })
+        
+        
+    }
+
+  
+    function validationform(){ 
+        let name_input=document.getElementById('dress_name').value
+        let des_input=document.getElementById('category_description').value
+        
+
+
+        if(name_input.trim()==""){
+            Swal.fire({
+  text: 'Please Enter Your Category Name',
+  icon: 'info'
+}); return false
+        }
+        if(des_input.trim()==""){
+            Swal.fire({
+  text: 'Please Enter Your Category description',
+  icon: 'info'
+}); return false
+        }
+    }
+    function deletedata(id) {
+  Swal.fire({
+    title: 'Are you sure to delete this?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes sure ! '
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // User confirmed deletion
+      fetch(`/admin/category/delete/?id=${id}`, {
+        method: 'POST'
+      })
+      let row = document.getElementById(`row${id}`);
+          if (row) {
+            row.remove();
+          }
+    }
+  });
+}
+
+    
+
+
+</script>
+
+
+<%-include('../layouts/footer')%>

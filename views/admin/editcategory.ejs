@@ -1,0 +1,19 @@
+<%-include('../layouts/header')%> 
+<section class="content-main">
+    
+
+       
+      
+                <form id="form1" method="POST">
+                    
+                        <label for="dress_name1" class="form-label">Name</label>
+                        <input type="text" placeholder="Type here" class="form-control" id="dress_name1" name="edit_name" value="<%=data.name%>"/>
+                   
+                        <label class="form-label">Description</label>
+                        <textarea placeholder="Type here" class="form-control"  name="edit_description" id="dress_cat"><%=data.description%></textarea>
+                        <button class="btn btn-primary text-end" type="submit">Edit category</button>
+                    
+                </form>
+    
+   </section>
+  <%-include('../layouts/footer')%> 

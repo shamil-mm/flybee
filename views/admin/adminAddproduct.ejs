@@ -1,0 +1,292 @@
+<style>
+    .preview-container {
+      display: inline-block;
+      position: relative;
+    }
+    .delete-btn {
+      position: absolute;
+      bottom: 15px;
+      right: 40%;
+      background-color:#3BB77E ;
+      color:rgb(255, 255, 255)  ;
+      border: none;
+      border-radius: 20%;
+      cursor: pointer;
+    }
+    .image-preview {
+      max-width: 200px;
+      max-height: 200px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    #sizeDropdown{
+        color: rgba(0, 0, 0, 0.703);
+        background-color:#f4f5f9;
+        border: none;
+        height: 5vh;
+        width: 8vh;
+        border-radius: 4px;
+        font-size: small;
+    }
+  </style>
+<%-include ('../layouts/header')%>
+            <section class="content-main">
+                <form action="/admin/add_pro"  method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+                    
+                <div class="row">
+                    <div class="col-9">
+                        <div class="content-header">
+                            <h2 class="content-title">Add New Product</h2>
+                        </div>
+                    </div>
+          
+                    <div class="col-lg-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-4">
+                                   
+                                        
+                                        
+                                        
+                                      
+                                    
+                                    <label for="product_title" class="form-label">Product title</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_title" name="title"  />
+                                </div>
+                                <div class="row gx-3">
+                                   
+                                    <div class="col-md-4 mb-3">
+                                           
+                                            <div class="form-group">
+                                                <label for="sizeDropdown">size</label>
+                                                <select  id="sizeDropdown" name="size">
+                                                    <option value="XS">XS</option>
+                                                    <option value="S">S</option>
+                                                    <option value="M">M</option>
+                                                    <option value="L">L</option>
+                                                    <option value="XL">XL</option>
+                                                
+                                                </select>
+                                            </div>
+                                                                                
+                                       
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="product_brand" class="form-label">Brand</label>
+                                    <input type="text" placeholder="Type here" class="form-control" id="product_brand" name="brand" />
+                                </div>  
+                            </div>
+                        </div>
+                        <!-- card end// -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div>
+                                    <label class="form-label">Description</label>
+                                    <textarea placeholder="Type here" class="form-control" rows="4" name="description" id="product_description"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div>
+                                    <label class="form-label">Images</label>
+                                    <input class="form-control" type="file" name="images" style="float: left;" id="image" onchange="previewImage(event)" accept="image/*" multiple maxlength="3" required/>
+                                    <div id="imagePreview" ></div>
+                                </div>
+                            </div>
+                        </div>
+                     
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <label class="form-label">Price</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name="price" id="product_price"/>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Stock</label>
+                                    <input type="text" placeholder="Type here" class="form-control" name="quantity" id="product_quantity"/>
+                                </div>
+                              
+                                
+                                 <hr />
+                                <h5 class="mb-3">Categories</h5>
+                                <%category.forEach((value)=>{%>
+                                <div class="form-check">
+                                    <input class="form-check-input procheck" type="checkbox" value="<%=value._id %>" id="product_cat" name="checkbox1" onchange="tick('<%=value._id %>')"/>
+                                    <label class="form-check-label" for="product_cat"><%=value.name %></label>
+                                </div>
+                                    <% })%>
+                                   
+                                
+                            </div>
+                        </div>
+                        <div>
+                            <input class="btn btn-md rounded font-sm hover-up" type="submit"></input>
+                        </div>
+                    
+                    </div>
+             
+                 
+                </div>
+            </form>  
+            </section>
+            <script>
+var count = 0;
+var images = [];
+var buttons = [];
+function previewImage(event) {
+    var files = event.target.files;
+    var total_files = files.length;
+    if (total_files + count > 3) {
+        Swal.fire({
+    icon: 'warning',
+    title: 'Oops...',
+    text: 'You can only upload 3 images...',
+});
+
+        return;
+    }
+    if (count<3) {
+        for (var i=0;i<total_files;i++) {
+            if (count < 3) {
+                 var image = URL.createObjectURL(files[i]);
+                 var newimage = document.createElement('img');
+                 var previewDiv = document.getElementById('imagePreview');
+                 newimage.src = image;
+                  newimage.width = 200;
+                 newimage.height = 200;
+                previewDiv.appendChild(newimage);
+                   images.push(newimage);
+                 var button1 = document.createElement('button');
+                button1.textContent = "remove";
+                 button1.style.display = 'block';
+                   button1.style.backgroundColor = "#3BB77E";
+                 button1.style.border = "none";
+                   button1.style.borderRadius = '3px';
+                   button1.style.marginLeft = '8vh';
+                 button1.style.padding = "8px 15px";
+                             button1.style.color = "white";
+
+                (function (i) {
+                    button1.onclick = function () {
+                        removeImage(i);
+                    };
+                })(count);
+
+                previewDiv.appendChild(button1);
+                buttons.push(button1);
+                count++;
+            } else {
+                break;
+            }
+        }
+    } else {
+        Swal.fire({
+    icon: 'warning',
+    title: 'Oops...',
+    text: 'You can upload only 3 images.',
+});
+
+    }
+}
+
+function removeImage(i) {
+    images[i].remove()
+    buttons[i].remove()
+    count--
+    console.log(count)
+}
+
+function validateForm() {
+         
+      
+
+       var checkboxes=document.getElementsByClassName('procheck')
+        var title = document.getElementById('product_title').value.trim()
+        var brand = document.getElementById('product_brand').value.trim()
+        var description = document.getElementById('product_description').value.trim()
+        var price = document.getElementById('product_price').value.trim()
+        var quantity = document.getElementById('product_quantity').value.trim()
+        
+        
+        if (title===''||brand==='' ||description===''||price ===''||quantity==='') {
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Fill out all the fields!',
+    });
+            return false
+        }
+        
+        if (isNaN(parseFloat(price))) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'price must be number',
+    });
+            return false
+        }
+        if(price<=0){
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'its a negavite number!!!',
+    });
+            return  false
+        }
+        if (isNaN(parseFloat(quantity))) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'quantity must be number',
+    });
+            return false
+        }
+        if(quantity<0){
+        Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'stock should be positive!!!',
+    });
+            return  false
+        }
+        
+    for (let checkbox of checkboxes) {
+		if(checkbox.checked==false){
+         Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+            text: 'selcet category',
+        });
+        return false	
+        }else{
+            return true
+        }
+         
+    }
+     return true
+    }
+    function tick(id){
+			const checkboxes=document.getElementsByClassName('procheck')
+			for (let checkbox of checkboxes) {
+					if(checkbox.value==id){
+						checkbox.checked=true
+					}else{
+						checkbox.checked=false
+					}
+				
+       
+            }
+		 }
+    
+
+
+            </script>
+            
+
+          
+           <%-include('../layouts/footer')%>

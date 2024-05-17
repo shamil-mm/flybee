@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Nest Dashboard</title>
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="description" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:title" content="" />
+        <meta property="og:type" content="" />
+        <meta property="og:url" content="" />
+        <meta property="og:image" content="" />
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" href="/imgs/theme/favicon.svg" />
+        <!-- Template CSS -->
+        <link href="/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    </head>
+
+    <body>
+        <main>
+            
+            <section class="content-main mt-80 mb-80">
+                <div class="card mx-auto card-login">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Create an Account</h4>
+                        <form action="/admin/loadRGform" method="post" onsubmit="return validateForm()">
+                            <div class="mb-3">
+                                <label class="form-label">User Name</label>
+                                <input class="form-control" placeholder="Your User Name" type="text"  name="username" id="name"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input class="form-control" placeholder="Your email" type="text" name="useremail" id="email" />
+                            </div>
+                            <!-- form-group// -->
+                            
+                           
+                            <div class="mb-3">
+                                <label class="form-label">Create password</label>
+                                <input class="form-control" placeholder="Password" type="password" name="userpassword" id="password" />
+                            </div>
+                        
+                            <div class="mb-3">
+                                <label class="form-label">Confirm password</label>
+                                <input class="form-control" placeholder="Password" type="password" name="userpassword_2" id="password1"/>
+                            </div>
+                        
+                           
+                      
+                            <div class="mb-4">
+                                <button type="submit" class="btn btn-primary w-40">Login</button>
+                            </div>
+                           
+                        </form>
+                        
+                        <p class="text-center mb-2">Already have an account? <a href="/admin/">Sign in now</a></p>
+                    </div>
+                </div>
+            </section>
+            
+        </main>
+
+        <script>
+            function validateForm() {
+                const username = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('password1').value;
+                if (username === "" || email === "" || password === "" || confirmPassword === "") {
+                    alert("All fields must be filled out");
+                    return false;
+                }
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert("Invalid email format");
+                    return false;
+                }
+                if (password.length < 6) {
+                    alert("Password must be at least 8 characters long");
+                    return false;
+                }
+                if (password !== confirmPassword) {
+                    alert("Passwords do not match");
+                    return false;
+                }
+        
+                return true;
+            }
+        </script>
+        
+        <script src="/js/vendors/jquery-3.6.0.min.js"></script>
+        <script src="/js/vendors/bootstrap.bundle.min.js"></script>
+        <script src="/js/vendors/jquery.fullscreen.min.js"></script>
+        <!-- Main Script -->
+        <script src="/js/main.js?v=1.1" type="text/javascript"></script>
+    </body>
+</html>
