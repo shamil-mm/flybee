@@ -10,7 +10,7 @@ const cartRender=async(req,res)=>{
                
                 res.render('cart',{data:data.items,productsFound:true,cart:req.flash('cart')}) 
             }else{
-                console.log("data not found")
+               
                 let text='No products found in your cart. Add products...!';
                 res.render('cart',{productsFound:false,message:text,cart:req.flash('cart')})
             }
@@ -18,7 +18,7 @@ const cartRender=async(req,res)=>{
     }
     else{
         res.redirect('/homePage')
-        console.log('user missing form cart render')
+       
     }
     } catch (error) {
         console.log(error)

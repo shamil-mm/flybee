@@ -13,8 +13,7 @@ const addToCart=async(req,res)=>{
                 items:{ productId:product._id,
                         quantity:1,
                         
-                        }
-
+               }
             })
             
             await cart.save()
