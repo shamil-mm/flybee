@@ -1,0 +1,123 @@
+<%-include('../layouts/header')%> 
+<section class="content-main">
+
+    <div class="container">
+        <%if(data){%>
+        
+        
+        <form method="post" action="/admin/loadCouponEdit?id=<%=data._id%>" onsubmit="return validationform()">
+                        
+            <div class="mb-1">
+                <label for="dress_name" class="form-label">Name</label>
+                <input type="text" placeholder="Type here" class="form-control" id="coupon_name"  name="coupon_name" value="<%=data.name%>"/>
+            </div>
+            <div class="mb-1">
+                <label for="dress_name" class="form-label">Code</label>
+                <input type="text" placeholder="Type here" class="form-control" id="coupon_code"  name="coupon_code" value="<%=data.code%>"/>
+            </div>
+           
+            <div class="mb-1">
+                <label class="form-label">Minimun Amount</label>
+                <input type="text" placeholder="Type here" class="form-control" name="coupon_minAmount" id="coupon_minAmount" value="<%=data.minAmount%>"></input>
+            </div>
+            <div class="mb-1">
+                <label class="form-label">Maximum Amount</label>
+                <input type="text" placeholder="Type here" class="form-control" name="coupon_maxAmount" id="coupon_maxAmount" value="<%=data.maxAmount%>"></input>
+            </div>
+            <div class="mb-1">
+                <label class="form-label">Discount Amount</label>
+                <input type="text" placeholder="Type here" class="form-control" name="coupon_discount" id="coupon_discount" value="<%=data.discountAmount%>"></input>
+            </div>
+            <div class="mb-1">
+                <label class="form-label">Expiration Date</label>
+                <input type="date" placeholder="Type here" class="form-control" name="coupon_exDate" id="coupon_exDate" value="<%=data.expirationDate.toISOString().split('T')[0]%>"></input>
+            </div>
+            <div class="mb-1">
+                <label class="form-label">Usage Limit</label>
+                <input type="text" placeholder="Type here" class="form-control" name="coupon_usageLimit" id="coupon_usageLimit" value="<%=data.usageLimit%>"></input>
+            </div>
+            
+            <div class="mb-1">
+                <button class="btn btn-primary" type="submit" >Edit Coupon</button>
+                 </div>
+           
+            
+          
+           
+                
+                
+              
+        </form>
+        <%}%>
+        
+    </div>
+    <script>
+        function validationform() {
+            let isValid = true;
+            const couponName = document.getElementById('coupon_name');
+            const couponCode = document.getElementById('coupon_code');
+            const couponMinAmount = document.getElementById('coupon_minAmount');
+            const couponMaxAmount = document.getElementById('coupon_maxAmount');
+            const couponDiscount = document.getElementById('coupon_discount');
+            const couponExDate = document.getElementById('coupon_exDate');
+            const couponUsageLimit = document.getElementById('coupon_usageLimit');
+           
+    
+    
+    
+    
+            function setInvalid(field, message) {
+                field.classList.add('is-invalid');
+                field.setAttribute('placeholder', message);
+                isValid = false;
+            }
+    
+            function resetField(field) {
+                field.classList.remove('is-invalid');
+                field.setAttribute('placeholder', 'Type here');
+            }
+            resetField(couponName);
+            resetField(couponCode);
+            resetField(couponMinAmount);
+            resetField(couponMaxAmount);
+            resetField(couponDiscount);
+            resetField(couponExDate);
+            resetField(couponUsageLimit);
+           
+            if (couponName.value.trim() === '') {
+                setInvalid(couponName, 'Coupon name is required');
+            }
+    
+            if (couponCode.value.trim() === '') {
+                setInvalid(couponCode, 'Coupon code is required');
+            }
+    
+            if (couponMinAmount.value.trim() === '' || isNaN(couponMinAmount.value) || Number(couponMinAmount.value) < 0) {
+                setInvalid(couponMinAmount, 'Valid minimum amount is required');
+            }
+    
+            if (couponMaxAmount.value.trim() === '' || isNaN(couponMaxAmount.value) || Number(couponMaxAmount.value) < 0) {
+                setInvalid(couponMaxAmount, 'Valid maximum amount is required');
+            }
+    
+            if (couponDiscount.value.trim() === '' || isNaN(couponDiscount.value) || Number(couponDiscount.value) < 0) {
+                setInvalid(couponDiscount, 'Valid discount amount is required');
+            }
+    
+            if (couponExDate.value.trim() === '') {
+                setInvalid(couponExDate, 'Expiration date is required');
+            }
+    
+            if (couponUsageLimit.value.trim() === '' || isNaN(couponUsageLimit.value) || Number(couponUsageLimit.value) < 0) {
+                setInvalid(couponUsageLimit, 'Valid usage limit is required');
+            }
+    
+           
+    
+            return isValid;
+        }
+    </script>
+
+
+</section>
+<%-include('../layouts/footer')%> 

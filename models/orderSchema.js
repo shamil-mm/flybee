@@ -4,7 +4,6 @@ const mongoose=require('mongoose')
      OrderedProducts:[{
                productId:{type:mongoose.Schema.Types.ObjectId,ref:'product'},
                quantity:{type:Number,default:1},
-               productTotal:{type:Number},
                shippingAddress:{
                                  name:{type:String, required: true},
                               address:{type:String, required: true},
@@ -16,13 +15,18 @@ const mongoose=require('mongoose')
                               phone:{type:String, required: true}
                            },
                   orderDate:{type:Date,default:Date.now},
-                  paymentMethod:{type:String,default:'cash on delivery'},
-                  orderStatus:{type:String,default:"Pending",enum:["Pending","Processing","Canceled","Delivered","Return","Shipping"]},
-                  paymentStatus:{type:String,default:"Not paid",enum:["Not paid","Paid","Failed"]}, 
+                  paymentMethod:{type:String,default:'cash on delivery',enum:['cash on delivery','Rasorpay']},
+                  orderStatus:{type:String,default:"Placed",enum:["Placed","Pending","Processing","Canceled","Delivered","Return","Shipping"]},
+                  paymentStatus:{type:String,default:"Not paid",enum:["Not paid","Paid","Failed"]},
+                  returnRequest:{type:Boolean,default:false}, 
                   cancellationReason:{type:String,default:'none'}
+                  
+         
                
 
-     }]
+     }],
+     TotalAmount:{type:Number,required:true},
+     couponPercentage:{type:Number,default:0}
      
       
       

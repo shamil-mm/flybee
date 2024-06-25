@@ -2,78 +2,98 @@ const express=require('express')
 const adminRouter = express()
 const adminmulter=require('../middleware/multerimg')
 const Auth=require('../middleware/adminAuth')
+// Set view engine
 adminRouter.set('view engine', 'ejs');
 adminRouter.set('views', 'views/admin');
-const aDlogin=require('../controller/Admin/aDlogin')
-const aDregister=require('../controller/Admin/aDregister')
-const loadRGform=require('../controller/Admin/loadRGform')
-const ADotp=require('../controller/Admin/ADotp')
-const loadOTP=require('../controller/Admin/loadOTP')
-const resentOTP=require('../controller/Admin/resentOTP')
-const loadLIform=require('../controller/Admin/loadLIform')
-const aDhome=require('../controller/Admin/aDhome')
-const aDproducts=require('../controller/Admin/aDproducts')
-const loadProduct=require('../controller/Admin/loadProduct')
-const aDcategories=require('../controller/Admin/aDcategories')
-const aDaddproduct=require('../controller/Admin/aDaddproduct')
-const aDorder=require('../controller/Admin/aDorder')
-const aDdetails=require('../controller/Admin/aDdetails')
-const aDusers=require('../controller/Admin/aDusers')
-const aDblock=require('../controller/Admin/aDblock')
-const aDcategory=require('../controller/Admin/aDcategory')
-const aDlist=require('../controller/Admin/aDlist')
-const aDeditCate=require('../controller/Admin/aDeditCate')
-const aDeditproduct=require('../controller/Admin/aDeditproduct')
-const aDedit=require('../controller/Admin/aDedit')
-const Adcatedelete=require('../controller/Admin/Adcatedelete')
-const Adcatedeletepermanently=require('../controller/Admin/Adcatedeletepermanently')
-const adrecover=require('../controller/Admin/adrecover')
-const aDpro_List=require('../controller/Admin/aDpro_List')
-const aDdelete_pro=require('../controller/Admin/aDdelete_pro')
-const aDdelete_render=require('../controller/Admin/aDdelete_render')
-const aDloadP_delete=require('../controller/Admin/aDloadP_delete')
-const aDrecover_p=require('../controller/Admin/aDrecover_p')
-const aDrecover_cate=require('../controller/Admin/aDrecover_cate')
-const logOut=require('../controller/Admin/logOut')
-const aDeditCateload=require('../controller/Admin/aDeditCateload')
-const veiwproduct=require('../controller/Admin/veiwproduct')
-const changeStatus=require('../controller/Admin/changeStatus')
 
-adminRouter.get('/',Auth.is_logout,aDlogin)
-adminRouter.get('/register',Auth.is_logout,aDregister)
-adminRouter.post('/loadRGform',loadRGform)
-adminRouter.post('/loadLIform',loadLIform)
-adminRouter.get('/otp',ADotp)
-adminRouter.post('/loadOTP',loadOTP)
-adminRouter.get('/resentOTP',resentOTP)
-adminRouter.get('/home',Auth.is_login,aDhome) 
-adminRouter.get('/users',Auth.is_login,aDusers)
-adminRouter.get('/products',Auth.is_login,aDproducts)
-adminRouter.get('/Edit_product',Auth.is_login,aDeditproduct)
-adminRouter.post('/editproduct',adminmulter.upload.array('images'),aDedit)
-adminRouter.post('/delete_pro',aDdelete_pro)
-adminRouter.get('/delete_render',Auth.is_login,aDdelete_render)
-adminRouter.post('/recover',aDrecover_p)
-adminRouter.post('/delete_p',aDloadP_delete)
-adminRouter.post('/List_product',aDpro_List)
-adminRouter.get('/categories',Auth.is_login,aDcategories)
-adminRouter.post('/add_category',aDcategory)
-adminRouter.post('/recover_cate',aDrecover_cate)
-adminRouter.post('/list_unlist',aDlist)
-adminRouter.get('/add_product',Auth.is_login,aDaddproduct)
-adminRouter.post('/add_pro',adminmulter.upload.array('images'),loadProduct)
-adminRouter.get('/order',Auth.is_login,aDorder)
-adminRouter.get('/details',Auth.is_login,aDdetails)
-adminRouter.post('/block',aDblock)
-adminRouter.get('/edit',Auth.is_login,aDeditCate)
-adminRouter.post('/edit',aDeditCateload)
-adminRouter.post('/category/delete',Adcatedelete)
-adminRouter.get('/delete/page',Auth.is_login,adrecover)
-adminRouter.post('/deletepermanently/category',Adcatedeletepermanently)
-adminRouter.post('/veiwproduct',veiwproduct)
-adminRouter.post('/changeStatus',changeStatus)
+// Controllers
+const admin=require('../controller/Admin/admin')
+const product=require('../controller/Admin/product')
+const category=require('../controller/Admin/category')
+const users=require('../controller/Admin/users')
+const logOut=require('../controller/Admin/logOut')
+const order=require('../controller/Admin/order')
+const Coupons=require('../controller/Admin/Coupons')
+const offer=require('../controller/Admin/offer')
+const salesReport=require('../controller/Admin/salesReport')
+
+
+// landing signin and register process
+adminRouter.get('/',Auth.is_logout,admin.LoginPage)
+adminRouter.get('/register',Auth.is_logout,admin.registerPage)
+adminRouter.get('/otp',admin.otpPageRender)
+adminRouter.post('/loadOTP',admin.loadOTP)
+adminRouter.get('/resentOTP',admin.resentOTP)
+adminRouter.get('/home',Auth.is_login,admin.homePage) 
+adminRouter.post('/loadRGform',admin.loadRegisterForm)
+adminRouter.post('/loadLIform',admin.loadLoginForm)
+
+
+// logOut
 adminRouter.get('/logout',Auth.is_login,logOut)
 
+
+// users process
+adminRouter.get('/users',Auth.is_login,users.usersPageRender)
+adminRouter.post('/block',users.userBlockUnblock)
+
+
+// products process
+adminRouter.get('/products',Auth.is_login,product.productPageRender)
+adminRouter.post('/List_product',product.productListUnlistLoader)
+adminRouter.get('/Edit_product',Auth.is_login,product.editProductPageRender)
+adminRouter.post('/editproduct',adminmulter.upload.array('images'),product.editProductLoad)
+adminRouter.get('/add_product',Auth.is_login,product.addProductPageRender)
+adminRouter.post('/add_pro',adminmulter.upload.array('images'),product.addProductLoad)
+adminRouter.get('/delete_render',Auth.is_login,product.deletedProductPageRender)
+adminRouter.post('/delete_pro',product.productDelete)
+adminRouter.post('/recover',product.productRecover)
+adminRouter.post('/delete_p',product.deleteProductPermanently)
+
+adminRouter.post('/upload',adminmulter.upload.single('croppedImage'),product.imageUpload)
+
+
+// categorys process
+adminRouter.get('/categories',Auth.is_login,category.categoryRenderPage)
+adminRouter.post('/add_category',category.loadAddCategory)
+adminRouter.post('/recover_cate',category.loadCategoryRecover)
+adminRouter.post('/list_unlist',category.categoryListUnlistLoader)
+adminRouter.get('/edit',Auth.is_login,category.editCategoryPageRender)
+adminRouter.post('/edit',category.editCategoryLoader)
+adminRouter.post('/category/delete',category.categoryDelete)
+adminRouter.get('/delete/page',Auth.is_login,category.categoryRecoveryPageRender)
+adminRouter.post('/deletepermanently/category',category.categoryDeletePermanently)
+
+
+// orders process
+adminRouter.get('/order',Auth.is_login,order.orderRenderPage)
+adminRouter.post('/veiwproduct',order.orderProductModalView)
+adminRouter.get('/details',Auth.is_login,order.viewOrderDetailsRender)
+adminRouter.post('/changeStatus',order.changeOrderStatus)
+adminRouter.post('/returnApprove',order.orderReturnApprove)
+
+
+// coupons process
+adminRouter.get('/Coupons',Coupons.Coupons)
+adminRouter.post('/loadCoupon',Coupons.loadCoupon)
+adminRouter.get('/couponEdit',Coupons.couponEdit)
+adminRouter.post('/loadCouponEdit',Coupons.loadCouponEdit)
+adminRouter.delete('/couponDelete',Coupons.couponDelete)
+adminRouter.post('/couponlist_unlist',Coupons.couponlist_unlist)
+ 
+
+// offers process
+adminRouter.get('/offers',offer.offerRender)
+adminRouter.post('/offers',offer.offerLoad)
+adminRouter.post('/showProductlist',offer.showProductlist)
+adminRouter.get('/editOffer',offer.editOffer)
+adminRouter.post('/loadEditOffer',offer.loadEditOffer)
+adminRouter.post('/offerDelete',offer.offerDelete)
+
+
+// salesreports process
+adminRouter.get('/salesReporst',salesReport.salesReporst)
+adminRouter.post('/sortListOfOrder',salesReport.sortListOfOrder)
 
 
 

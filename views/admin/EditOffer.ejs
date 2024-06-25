@@ -1,0 +1,302 @@
+<style>
+
+    .autocomplete-items {
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+    
+        position: absolute;
+        max-height: 200px; 
+        overflow-y: auto;
+    }
+    
+    .autocomplete-items li {
+        padding: 10px;
+        cursor: pointer;
+        background: #ffffff;
+        border-bottom: 1px solid #d4d4d4;
+        list-style-type: none;
+    }
+    
+    .autocomplete-items li:hover {
+        background-color: #ffffff;
+    }
+    
+        
+    
+    .offer-form {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+    }
+    
+    .offer-form .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .offer-form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .offer-form input[type="text"],
+    .offer-form input[type="date"],
+    .offer-form input[type="number"],
+    .offer-form select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    .ErroR{
+        color: red;
+    }
+    
+    </style>
+<%- include('../layouts/header')%>
+     <section class="content-main">
+                <div class="content-header">
+                    <%if(findOffer){%>
+                        
+                  
+                    <form action="/admin/loadEditOffer?id=<%=findOffer._id%>" method="post" class="offer-form" onsubmit="return validateForm()">
+                        <%if(findOffer.productId){%>
+                            <div class="form-group">
+                                <label for="OfferType">Offer Type:</label>
+                                <select name="OfferType" id="OfferType" onchange="TypeSelection(this)" >
+                                    <option value="Product" id="Product" selected>Product</option>
+                                    <option value="Category" id="Category">Category</option>  
+                                </select>
+                            </div>
+                            <%}else if(findOffer.categoryId){%>
+                                <div class="form-group">
+                                    <label for="OfferType">Offer Type:</label>
+                                    <select name="OfferType" id="OfferType" onchange="TypeSelection(this)" >
+                                        <option value="Product" id="Product">Product</option>
+                                        <option value="Category" id="Category" selected>Category</option>  
+                                    </select>
+                                </div>
+                        <%}%>  
+                       
+                        <div class="form-group">
+                            <label for="OfferName">Offer Name:</label>
+                            <label id="OfferName" class="ErroR"></label>
+                            <input type="text" name="OfferName" value="<%=findOffer.name%>">
+                        </div>
+                        <%if(findOffer.productId){%>
+                        <div class="form-group">
+                            <label for="name">Product Name:</label>
+                            <label id="nameError" class="ErroR"></label>
+                            <input type="text"  name="name" id="productName" value="<%=findOffer.productId.product_name%>"> 
+                            <div id="autocompleteBox" class="autocomplete-items"></div>
+                        </div>
+                        <%}else if(findOffer.categoryId){%>
+                            <div class="form-group">
+                                <label for="name">Category Name:</label>
+                                <label id="nameError" class="ErroR"></label>
+                                <input type="text"  name="name" id="productName" value="<%=findOffer.categoryId.name%>"> 
+                                <div id="autocompleteBox" class="autocomplete-items"></div>
+                            </div>
+                            
+                        <%}%>
+                        <div class="form-group">
+                            <label for="amount">Discount Percentage:</label>
+                            <label id="amountError" class="ErroR"></label>
+                            <input type="number" name="amount" value="<%=findOffer.offerPrecentage%>">
+                        </div>
+                        <div class="form-group">
+                            <label for="startDate">Starting Date:</label>
+                            <label id="startDateError" class="ErroR"></label>
+                            <input type="date" name="startDate" value="<%= new Date(findOffer.startingDate).toISOString().slice(0, 10) %>">
+                        </div>
+                        <div class="form-group">
+                            <label for="expireDate">Expire Date:</label>
+                           <label id="expireDateError" class="ErroR"></label>
+                            <input type="date" name="expireDate" value="<%=new Date(findOffer.expiryDate).toISOString().slice(0,10) %>">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-md rounded font-sm" >Add Offer</button>
+                        <a style="float: right;" class="btn btn-md rounded font-sm" href="/admin/offers" >Back to Offer</a>
+                    
+              
+                    </form>
+
+                    <%}%>
+
+                </div>
+     </section>
+     <script>
+        window.onload=function(){
+       const selectedOfferType= document.getElementById('OfferType').value
+       if(selectedOfferType=='Product'){
+        fetch('/admin/showProductlist?offerType='+selectedOfferType,{method:'post'})
+        .then(response=>response.json())
+        .then((data)=>{
+                productList(data)   
+        })
+    }
+    if('<%=msg%>'){
+        Swal.fire({
+        title: 'Not Exist',
+        text: '<%=msg%>',
+        icon: 'error'
+    })}
+    if('<%=msg1%>'){
+        Swal.fire({
+        title: 'Success',
+        text: '<%=msg1%>',
+        icon: 'success'
+    })}
+
+
+
+
+    
+    }
+        function TypeSelection(tag){
+        if(tag.value=='Product'){
+        fetch('/admin/showProductlist?offerType='+tag.value,{method:'post'})
+        .then(response=>response.json())
+        .then((data)=>{
+                productList(data)   
+        })
+    
+        }else if(tag.value=='Category'){
+            fetch('/admin/showProductlist?offerType='+tag.value,{method:'post'})
+        .then(response=>response.json())
+        .then((data)=>{
+                productList(data)   
+        })
+
+        }
+    }
+     </script>
+
+     <script>
+        function productList(data){
+        const productNameInput = document.getElementById('productName');
+const resultBox = document.getElementById('autocompleteBox');
+const suggestions = data
+productNameInput.onkeyup = (e) => {
+    let userData = e.target.value;
+    let emptyArray = [];
+    if (userData) {
+        emptyArray = suggestions.filter((data) => {
+
+            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
+        });
+        emptyArray = emptyArray.map((data) => {
+        
+            return '<li>' + data + '</li>';
+        });
+        productNameInput.classList.add("active"); 
+        showSuggestions(emptyArray);
+        let allList = resultBox.querySelectorAll("li");
+       
+        for (let i = 0; i < allList.length; i++) {
+       
+            allList[i].addEventListener("click", function() {
+                        selectOne(this);})
+        }
+    } else {
+        productNameInput.classList.remove("active");
+        resultBox.innerHTML = ''; 
+    }
+}
+
+function showSuggestions(list) {
+    let listData;
+    if (!list.length) {
+        let userValue = productNameInput.value;
+        listData = '<li>' + userValue + '</li>';
+    } else {
+        listData = list.join('');
+    }
+    resultBox.innerHTML = listData;
+}
+
+function selectOne(element) {
+    const Fselect=data.filter((value)=>{
+        return value==element.textContent
+    })
+        let selectData = element.textContent;
+        productNameInput.value = selectData;
+        productNameInput.classList.remove("active");
+        resultBox.innerHTML = ''; 
+}
+    }
+     </script>
+
+
+     <script>
+        function validateForm() {
+           
+            const offerType = document.querySelector('select[name="OfferType"]').value; 
+            const name = document.querySelector('input[name="name"]').value.trim();
+            const amount = document.querySelector('input[name="amount"]').value.trim(); 
+            const startDate = document.querySelector('input[name="startDate"]').value;
+            const expireDate = document.querySelector('input[name="expireDate"]').value;
+
+            
+            if (name === "") {
+                    document.getElementById('nameError').textContent = 'Enter the name';
+                    return false;
+                }
+                else{
+                    document.getElementById('nameError').textContent = '';
+                }
+            if (amount === "") {
+                    document.getElementById('amountError').textContent = 'Enter the percentage';
+                    return false;
+                }
+                else{
+                    document.getElementById('amountError').textContent = '';
+                }
+            if (startDate === "") {
+                    document.getElementById('startDateError').textContent = 'Select the starting date';
+                    return false;
+                }
+                else{
+                    document.getElementById('startDateError').textContent = '';
+                }
+            if (expireDate === "") {
+                            document.getElementById('expireDateError').textContent = 'Select the an expiry date';
+                    return false;
+                }else{
+                    document.getElementById('expireDateError').textContent = '';
+                }
+               
+        
+            const namePattern = /^[a-zA-Z0-9\s']+$/;
+            if (!namePattern.test(name)) {
+             
+                document.getElementById('nameError').textContent = 'Name should only contain alphanumeric characters and spaces';
+                return false;
+            }else{
+                document.getElementById('nameError').textContent = ''; 
+            }
+            if (amount < 1 || amount > 100) {
+                document.getElementById('amountError').textContent = 'Discount percentage must be between 1 and 100';
+               
+                return false;
+            }else{
+                document.getElementById('amountError').textContent = '';  
+            }
+            if (new Date(startDate) > new Date(expireDate)) {
+                document.getElementById('startDateError').textContent = 'Starting date must be before the expire date';
+               
+                return false;
+            }else {
+                document.getElementById('startDateError').textContent = '';
+            }
+            return true;
+        }
+    </script>
+<%- include('../layouts/footer')%>

@@ -1,0 +1,343 @@
+<%-include('../layouts/header')%> 
+<section class="content-main">
+      <div class="content-header">
+<div>
+            <h2 class="content-title card-title">Coupons</h2>
+           
+        </div>
+        <div>
+            <input type="text" placeholder="Search Categories" class="form-control bg-white" />
+        </div>
+    </div><!-- Button trigger modal -->
+   
+    
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content" style="padding: 3vh;">
+          <div>
+         
+          </div>
+          <div class="modal-body">
+             <form method="post" action="/admin/loadCoupon" onsubmit="return validationform()">
+                        
+                        <div class="mb-4">
+                            <label for="dress_name" class="form-label">Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="coupon_name"  name="coupon_name"/>
+                        </div>
+                        <div class="mb-4">
+                            <label for="dress_name" class="form-label">Code</label>
+                            <input type="text" placeholder="Type here" class="form-control" id="coupon_code"  name="coupon_code" maxlength="6"/>
+                        </div>
+                       
+                        <div class="mb-4">
+                            <label class="form-label">Minimun Amount</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="coupon_minAmount" id="coupon_minAmount"></input>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Maximum Amount</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="coupon_maxAmount" id="coupon_maxAmount"></input>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Discount percentage</label>
+                            <input type="number" placeholder="Type here" class="form-control" name="coupon_discount" id="coupon_discount"></input>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Expiration Date</label>
+                            <input type="date" placeholder="Type here" class="form-control" name="coupon_exDate" id="coupon_exDate"></input>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Usage Limit</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="coupon_usageLimit" id="coupon_usageLimit"></input>
+                        </div>
+                       
+                        
+                      <br>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="submit" >Create Coupon</button>
+                          </div>
+                    </form>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+   <!-- Modal -->
+    <div class="card">
+        
+        <div class="card-body">
+            <div class="row">
+                <!-- <div class="col-md-3">
+                    
+                   
+                </div> -->
+                <br>
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <br>
+                        <h3 style="display: inline-block;"> List of Coupons</h3>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="float: right; margin-right: 12vh; margin-bottom: 5vh;">
+                            Create Coupon
+                          </button>
+                          <%if(couponlist.length>0){%>
+                        <table class="table table-hover">
+                           
+                            <thead>
+                                <tr>
+                                    
+                                   
+                                    <th>Coupon Code</th>
+                                    <th> coupon Name</th>
+                                    <th>Descount Percentage</th>
+                                    <th>Used/Total</th>
+                                    <th>Starting Date</th>
+                                    <th>Expiry Date</th>
+                                 
+                                    <th>Status</th>
+                                    
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                          
+                                <%couponlist.forEach((coupon)=>{%>
+                                    
+                                <tr id="row<%=coupon._id%>">
+                                    
+                                    
+                                    
+                                    <td><b><%=coupon.code%></b></td>
+                                    <td><b><%=coupon.name%></b></td>
+                                    <td><%=coupon.discountAmount%> %</td>
+                                    <td><%=coupon.usageCount.length%>/<%=coupon.usageLimit%></td>
+                                    <td><%=coupon.createdAt.toISOString().split('T')[0]%> </td>
+                                    <td><%=coupon.expirationDate.toISOString().split('T')[0]%> </td>
+                                   
+                                    <%if(coupon.status==false){%>
+                                    <td id=status_id style="color: red; ">List</td>
+                                    <%}else if(coupon.status==true){%>
+                                    <td id=status_id style="color: red;font-weight:bolder;">Unlist</td>
+                                     <%}%>
+                                        
+                                            
+                                            
+                                           
+                                    <td class="text-end">
+                                        <div class="dropdown">
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item text-danger" onclick="deletedata('<%=coupon._id%>')">Delete</a>
+                                                <a class="dropdown-item" href="/admin/couponEdit?id=<%=coupon._id%>" >Edit info</a>
+                                                <%if(coupon.status==false){%>
+                                                <a class="dropdown-item text-danger" onclick="listChange(this,'<%=coupon._id%>')">List</a>
+                                                <%}else if(coupon.status==true){%>
+                                                <a class="dropdown-item text-danger" onclick="listChange(this,'<%=coupon._id%>')">Unlist</a>
+                                                    <%}%>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    
+                                </tr>
+                                
+                                <%})%>
+                           
+                               
+                            </tbody>
+                           
+                        </table>
+                        <%}else{%>
+                            <h5>No coupon found !!!</h5>
+                            <%}%>
+                        <br>
+                     
+
+                    </div>
+                </div>
+                <!-- .col// -->
+            </div>
+            <!-- .row // -->
+        </div>
+    
+        <!-- card body .// -->
+    </div>
+    <div class="pagination-area mt-15 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item">
+                    <a class="page-link" href="#"><i class="material-icons md-chevron_left"></i></a>
+                </li>
+                <%for(i=1;i<=totalPages;i++){%>
+                <li class="page-item active"><a class="page-link" href="/admin/Coupons?page=<%=i%>"><%=i%></a></li>
+                    <%}%>
+                <li class="page-item">
+                    <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    </div> 
+    
+    
+
+ 
+  
+
+  
+  
+  
+</section>
+
+<script>
+        function listChange(Atag,id){
+            let status=document.getElementById("status_id")
+        if(Atag.innerText=="List"){
+            Atag.innerText="Unlist"  
+            status.innerText="Unlist" 
+        }else{
+            Atag.innerText="List"
+            status.innerText="List" 
+        }
+        fetch("/admin/couponlist_unlist/?id="+id,{method:'POST'})
+        .then(Response=>{
+            if(!Response){
+                throw new Error('net work issue')
+            }
+        }).catch((error)=>{
+            console.log("Error",error)
+        })
+        
+        
+    }
+
+
+
+    function validationform() {
+        let isValid = true;
+        const couponName = document.getElementById('coupon_name');
+        const couponCode = document.getElementById('coupon_code');
+        const couponMinAmount = document.getElementById('coupon_minAmount');
+        const couponMaxAmount = document.getElementById('coupon_maxAmount');
+        const couponDiscount = document.getElementById('coupon_discount');
+        const couponExDate = document.getElementById('coupon_exDate');
+        const couponUsageLimit = document.getElementById('coupon_usageLimit');
+        
+
+
+
+
+        function setInvalid(field, message) {
+            field.classList.add('is-invalid');
+            field.value=''
+            field.setAttribute('placeholder', message);
+            isValid = false;
+        }
+
+        function resetField(field) {
+            field.classList.remove('is-invalid');
+            field.setAttribute('placeholder', 'Type here');
+        }
+        resetField(couponName);
+        resetField(couponCode);
+        resetField(couponMinAmount);
+        resetField(couponMaxAmount);
+        resetField(couponDiscount);
+        resetField(couponExDate);
+        resetField(couponUsageLimit);
+       
+        if (couponName.value.trim() === '') {
+            setInvalid(couponName, 'Coupon name is required');
+        }
+
+        if (couponCode.value.trim() === '') {
+            setInvalid(couponCode, 'Coupon code is required');
+        }
+
+        if (couponMinAmount.value.trim() === '' || isNaN(couponMinAmount.value) || Number(couponMinAmount.value) < 0) {
+            setInvalid(couponMinAmount, 'Valid minimum amount is required');
+        }
+       
+
+        if (couponMaxAmount.value.trim() === '' || isNaN(couponMaxAmount.value) || Number(couponMaxAmount.value) < 0) {
+            setInvalid(couponMaxAmount, 'Valid maximum amount is required');
+        }
+        if (couponMinAmount.value.trim()>couponMaxAmount.value.trim()) {
+            setInvalid(couponMinAmount, 'minimum amount is greaterthan maximum amount ');
+        }
+
+        if (couponDiscount.value.trim() === '' || isNaN(couponDiscount.value) || Number(couponDiscount.value) < 0) {
+            setInvalid(couponDiscount, 'Valid discount percentage is required');
+        }
+        if (Number(couponDiscount.value) >100) {
+            setInvalid(couponDiscount, 'Valid discount percentage required');
+        }
+
+        if (couponExDate.value.trim() === ''|| new Date(couponExDate.value)<=new Date()) {
+            setInvalid(couponExDate, 'Expiration date is required');
+        }
+
+        if (couponUsageLimit.value.trim() === '' || isNaN(couponUsageLimit.value) || Number(couponUsageLimit.value) < 0) {
+            setInvalid(couponUsageLimit, 'Valid usage limit is required');
+        }
+
+        
+
+        return isValid;
+    }
+</script>
+<script>
+    window.onload=function(){
+      
+
+        
+        if('<%=msg1%>'){
+            Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Coupon applied successfully!',
+                });
+        }
+ 
+    
+        if('<%=msg2%>'){
+            Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Coupon already exists!',
+                });
+        
+    }
+    }
+
+    function deletedata(id) {
+  Swal.fire({
+    title: 'Are you sure to delete this?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes sure ! '
+  }).then((result) => {
+    if (result.isConfirmed) {
+      
+      fetch(`/admin/couponDelete?id=${id}`, {method: 'DELETE'})
+      let row = document.getElementById(`row${id}`);
+          if (row) {
+            row.remove();
+          }
+          Swal.fire({
+                    icon: 'success',
+                    title: 'success!',
+                    text: 'Coupon deleted !',
+                });
+    }
+  });
+}
+
+</script>
+
+
+
+
+
+
+<%-include('../layouts/footer')%>

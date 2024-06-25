@@ -1,0 +1,482 @@
+<style>
+
+.autocomplete-items {
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+
+    position: absolute;
+    max-height: 200px; 
+    overflow-y: auto;
+}
+
+.autocomplete-items li {
+    padding: 10px;
+    cursor: pointer;
+    background: #ffffff;
+    border-bottom: 1px solid #d4d4d4;
+    list-style-type: none;
+}
+
+.autocomplete-items li:hover {
+    background-color: #ffffff;
+}
+
+    
+
+.offer-form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+}
+
+.offer-form .form-group {
+    margin-bottom: 15px;
+}
+
+.offer-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.offer-form input[type="text"],
+.offer-form input[type="date"],
+.offer-form input[type="number"],
+.offer-form select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.ErroR{
+    color: red;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<%- include('../layouts/header')%>
+            <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Offer List</h2>
+                        <p>Lorem ipsum dolor sit amet.</p>
+
+                    </div>
+                    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        Launch demo modal
+                      </button> -->
+                    <button class="btn btn-md rounded font-md"  data-toggle="modal" data-target="#exampleModal" style="float:right;" onclick="settingValues()">Add Offer &nbsp;<i class="icon material-icons md-add_circle"></i></button>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <header class="card-header">
+                                <div class="row gx-3">
+                                    <div class="col-lg-4 col-md-6 me-auto">
+                                        <input type="text" placeholder="Search..." class="form-control" />
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-6">
+                                        <select class="form-select">
+                                            <option>Status</option>
+                                            <option>Active</option>
+                                            <option>Disabled</option>
+                                            <option>Show all</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-6">
+                                        <select class="form-select">
+                                            <option>Show 20</option>
+                                            <option>Show 30</option>
+                                            <option>Show 40</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </header>
+                            <!-- card-header end// -->
+
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                             
+                                                <th>Offer Type</th>
+                                                <th>Category/Product Name</th>
+                                                <th>Offer Name</th>
+                                                <th>Discount Percentage</th>
+                                                <th>Staring Date</th>
+                                                <th>Ending Date</th>
+                                                <th class="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%if(offers){%>
+                                                <%offers.forEach((each)=>{%>
+                                                    
+                                                
+                                         
+                                            <tr><%if(each.productId){%>
+                                                <td>Product </td>
+                                                <td><%=each.productId.product_name%></td>
+                                                <%}else if(each.categoryId){%>
+                                                    <td>Category </td>
+                                                    <td><%=each.categoryId.name%></td>
+                                                    <%}%>
+                                                
+                                                
+                                                <td><%=each.name%></td>
+                                                <td><%=each.offerPrecentage%> %</td>
+                                                <td><%=new Date(each.startingDate).toLocaleDateString()%></td>
+                                                <td><%=new Date(each.expiryDate).toLocaleDateString()%></td>
+                                                <td class="text-end">
+                                                    
+                                                    <button class="btn btn-md rounded font-sm" data-toggle="modal" data-target="#exampleModalEdit" type="button" onclick="offerEdit('<%=each._id%>')">Edit</button>
+                                                    <%if(each.isList==false){%>
+                                                    <button style="width: 4rem; background-color:#3bb77e;"   class="btn btn-md rounded font-sm"onclick="offerDelete('<%=each._id%>',this)">Unlist</button>
+                                                        <%}else if(each.isList==true){%>
+                                                    <button style="width: 4rem;background-color: rgb(221, 67, 67);"  class="btn btn-md rounded font-sm"onclick="offerDelete('<%=each._id%>',this)">List</button>
+                                                    <%}%>
+                                                </td>
+                                               
+                                            </tr>
+                                            <%})%>
+                                                
+                                                <%}%>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- table-responsive //end -->
+                            </div>
+                            <!-- card-body end// -->
+                        </div>
+                        <!-- card end// -->
+                    </div>
+                    <!-- <div class="col-md-3">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="mb-3">Filter by</h5>
+                                <form>
+                                    <div class="mb-4">
+                                        <label for="order_id" class="form-label">Order ID</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_id" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_customer" class="form-label">Customer</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_customer" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Order Status</label>
+                                        <select class="form-select">
+                                            <option>Published</option>
+                                            <option>Draft</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_total" class="form-label">Total</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_total" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_created_date" class="form-label">Date Added</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_created_date" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_modified_date" class="form-label">Date Modified</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_modified_date" />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="order_customer_1" class="form-label">Customer</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="order_customer_1" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                      
+                    </div> -->
+                </div>
+                <div class="pagination-area mt-15 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                            <li class="page-item"><a class="page-link" href="#">02</a></li>
+                            <li class="page-item"><a class="page-link" href="#">03</a></li>
+                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                            <li class="page-item"><a class="page-link" href="#">16</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                
+            </section>
+            <!-- Button trigger modal -->
+
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel" >Add Offer</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"  id="closE">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form action="/admin/offers" method="post" class="offer-form" onsubmit="return validateForm()">
+            <div class="form-group">
+                <label for="OfferType">Offer Type:</label>
+                <select name="OfferType" id="OfferType" onchange="TypeSelection(this)">
+                    <option value="Product">Product</option>
+                    <option value="Category">Category</option>  
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="OfferName">Offer Name:</label>
+                <label id="OfferName" class="ErroR"></label>
+                <input type="text" name="OfferName">
+            </div>
+            
+            <div class="form-group">
+                <label for="name">Product Name:</label>
+                <label id="nameError" class="ErroR"></label>
+                <input type="text"  name="name" id="productName"> 
+                <div id="autocompleteBox" class="autocomplete-items"></div>
+            </div>
+            <div class="form-group">
+                <label for="amount">Discount Percentage:</label>
+                <label id="amountError" class="ErroR"></label>
+                <input type="number" name="amount">
+            </div>
+            <div class="form-group">
+                <label for="startDate">Starting Date:</label>
+                <label id="startDateError" class="ErroR"></label>
+                <input type="date" name="startDate">
+            </div>
+            <div class="form-group">
+                <label for="expireDate">Expire Date:</label>
+               <label id="expireDateError" class="ErroR"></label>
+                <input type="date" name="expireDate">
+            </div>
+            
+            <button type="submit" class="btn btn-md rounded font-sm" >Add Offer</button>
+        
+  
+        </form>
+        
+        
+      </div>
+    </div>
+  </div>
+  <!-- modal ends -->
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function validateForm() {
+       
+        const offerType = document.querySelector('select[name="OfferType"]').value; 
+        const name = document.querySelector('input[name="name"]').value.trim();
+        const amount = document.querySelector('input[name="amount"]').value.trim(); 
+        const startDate = document.querySelector('input[name="startDate"]').value;
+        const expireDate = document.querySelector('input[name="expireDate"]').value;
+       
+        
+        if (name === "") {
+                document.getElementById('nameError').textContent = 'Enter the name';
+                return false;
+            }
+            else{
+                document.getElementById('nameError').textContent = '';
+            }
+        if (amount === "") {
+                document.getElementById('amountError').textContent = 'Enter the percentage';
+                return false;
+            }
+            else{
+                document.getElementById('amountError').textContent = '';
+            }
+        if (startDate === "") {
+                document.getElementById('startDateError').textContent = 'Select the starting date';
+                return false;
+            }
+            else{
+                document.getElementById('startDateError').textContent = '';
+            }
+        if (expireDate === "") {
+                        document.getElementById('expireDateError').textContent = 'Select the an expiry date';
+                return false;
+            }else{
+                document.getElementById('expireDateError').textContent = '';
+            }
+           
+    
+        const namePattern = /^[a-zA-Z0-9\s']+$/;
+        if (!namePattern.test(name)) {
+         
+            document.getElementById('nameError').textContent = 'Name should only contain alphanumeric characters and spaces';
+            return false;
+        }else{
+            document.getElementById('nameError').textContent = ''; 
+        }
+        if (amount < 1 || amount > 100) {
+            document.getElementById('amountError').textContent = 'Discount percentage must be between 1 and 100';
+           
+            return false;
+        }else{
+            document.getElementById('amountError').textContent = '';  
+        }
+        if (new Date(startDate) > new Date(expireDate)) {
+            document.getElementById('startDateError').textContent = 'Starting date must be before the expire date';
+           
+            return false;
+        }else {
+            document.getElementById('startDateError').textContent = '';
+        }
+        return true;
+    }
+</script>
+ <script>
+//   when the page is load this will work
+    function settingValues(){
+      
+       const selectedOfferType= document.getElementById('OfferType').value
+       
+       if(selectedOfferType=='Product'){
+        fetch('/admin/showProductlist?offerType='+selectedOfferType,{method:'post'})
+        .then(response=>response.json())
+        .then((data)=>{
+                productList(data)   
+        })
+    }
+    }
+
+    // when user change the type of offer 
+
+    function TypeSelection(tag){
+        if(tag.value=='Product'){
+        fetch('/admin/showProductlist?offerType='+tag.value,{method:'post'})
+        .then(response=>response.json())
+        .then((data)=>{
+                productList(data)   
+        })
+    
+        }else if(tag.value=='Category'){
+            fetch('/admin/showProductlist?offerType='+tag.value,{method:'post'})
+        .then(response=>response.json())
+        .then((data)=>{
+                productList(data)   
+        })
+
+        }
+    }
+
+ </script>
+  <script>
+    function productList(data){
+        const productNameInput = document.getElementById('productName');
+const resultBox = document.getElementById('autocompleteBox');
+const suggestions = data
+productNameInput.onkeyup = (e) => {
+    let userData = e.target.value;
+    let emptyArray = [];
+    if (userData) {
+        emptyArray = suggestions.filter((data) => {
+
+            return data.toLocaleLowerCase().startsWith(userData.toLocaleLowerCase());
+        });
+        emptyArray = emptyArray.map((data) => {
+        
+            return '<li>' + data + '</li>';
+        });
+        productNameInput.classList.add("active"); 
+        showSuggestions(emptyArray);
+        let allList = resultBox.querySelectorAll("li");
+       
+        for (let i = 0; i < allList.length; i++) {
+       
+            allList[i].addEventListener("click", function() {
+                        selectOne(this);})
+        }
+    } else {
+        productNameInput.classList.remove("active");
+        resultBox.innerHTML = ''; 
+    }
+}
+
+function showSuggestions(list) {
+    let listData;
+    if (!list.length) {
+        let userValue = productNameInput.value;
+        listData = '<li>' + userValue + '</li>';
+    } else {
+        listData = list.join('');
+    }
+    resultBox.innerHTML = listData;
+}
+
+function selectOne(element) {
+    const Fselect=data.filter((value)=>{
+        return value==element.textContent
+    })
+        let selectData = element.textContent;
+        productNameInput.value = selectData;
+        productNameInput.classList.remove("active");
+        resultBox.innerHTML = ''; 
+  
+}
+    }
+  </script>
+
+  <script>
+    if('<%=msg%>'){
+        Swal.fire({
+        title: 'Not Exist',
+        text: '<%=msg%>',
+        icon: 'error'
+    })
+    
+    const modalElement = document.getElementById('exampleModal');
+    const closE = document.getElementById('closE');
+        modalElement.classList.add('modal', 'fade', 'show');
+        modalElement.style.display = 'block';
+        closE.addEventListener('click',()=>{
+            modalElement.classList.add('modal', 'fade');
+        modalElement.style.display = 'none';
+        })
+    }
+
+
+    function offerEdit(offerId){
+        window.location.href='/admin/editOffer?id='+offerId 
+    }
+    function offerDelete(id,tag){
+       
+       
+        
+        if(tag.innerHTML=='List'){
+            fetch('/admin/offerDelete?id='+id+"&status="+tag.innerHTML,{method:'post'})
+            tag.innerHTML="Unlist"
+            tag.style.backgroundColor ='#3bb77e' ;
+        }else if(tag.innerHTML=='Unlist'){
+            fetch('/admin/offerDelete?id='+id+"&status="+tag.innerHTML,{method:'post'})
+            tag.innerHTML="List"
+            tag.style.backgroundColor = 'rgb(221, 67, 67)';
+        }
+       
+    }
+
+    
+  </script>
+
+          
+   
+<%-include("../layouts/footer")%>

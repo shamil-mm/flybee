@@ -1,0 +1,113 @@
+<%-include('../layouts/userheader')%>
+        <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title">Wishlist<span>Shop</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/homePage">Home</a></li>
+                        
+                        <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	<div class="container">
+					
+							<%if(wishlist){%>
+                               
+                                <%if(wishListData.length>0){%>
+                                
+                                <table class="table table-wishlist table-mobile">
+                                    <thead>
+                                       
+                                        <tr>
+                                            <th>Product</th>
+                                           
+                                            <th>Price</th>
+                                            <th>Stock Status</th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                        
+                                        <%wishListData.forEach((value)=>{%>
+                                        <tr id="row<%=value._id%>">
+                                            <td class="product-col">
+                                                <div class="product">
+                                                    <figure class="product-media">
+                                                        <a href="#">
+                                                            <img src="/proimgs/<%=value.items.image[2]%>" alt="Product image">
+                                                        </a>
+                                                    </figure>
+            
+                                                    <h3 class="product-title">
+                                                        <a href="#"><%=value.items.product_name%></a>
+                                                    </h3><!-- End .product-title -->
+                                                </div><!-- End .product -->
+                                            </td>
+                                            <td class="price-col">₹ <%=value.items.price%></td>
+                                            <%if(value.items.stock>0){%>
+                                                <td class="stock-col"><span class="in-stock">In stock</span></td>
+                                                <td class="action-col">
+                                                    <a href="/cart/add?id=<%=value.items._id%>" class="btn btn-block btn-outline-primary-2" onclick="removeWishList('<%=value._id%>')"><span><i class="icon-cart-plus"></i>add to cart</span></a>
+                                                    
+                                                </td>
+                                               
+                                                <%}else{%>
+                                                    <td class="stock-col"><span class="out-of-stock">Out of stock</span></td>
+                                            <td class="action-col">
+                                                <button class="btn btn-block btn-outline-primary-2 disabled">Out of Stock</button>
+                                            </td>
+                                            
+            
+                                                    <%}%>
+                                            <td class="remove-col"><button class="btn-remove" onclick="removeWishList('<%=value._id%>')"><i class="icon-close"></i></button></td>
+                                            
+                                            
+                                        </tr>
+
+
+
+
+
+                                       
+
+
+
+
+
+
+
+                                        <%})%>
+                                       
+                                    </thead>
+            
+                                    <tbody>  
+                            	
+                                    </tbody>
+                                </table><!-- End .table table-wishlist -->
+                                <%}else{%>
+                                    <p>NO PRODUCTS IN WISHLIST...!!!</p>
+                                <%}%>
+                            <%}else{%>
+                            <p>NO PRODUCTS IN WISHLIST...!!!</p>
+                            <%}%>
+						
+	            	
+            	</div><!-- End .container -->
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+        <script>
+            function removeWishList(id){
+               fetch('/removeWishList?id='+id,{method:'delete'})
+               document.getElementById("row"+id).remove()
+
+            } 
+        </script>
+
+        <%-include('../layouts/userfooter')%>
+       

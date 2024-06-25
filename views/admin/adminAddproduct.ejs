@@ -1,4 +1,12 @@
 <style>
+    .cropper-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999; /* Make sure it's above the image */
+}
     .preview-container {
       display: inline-block;
       position: relative;
@@ -29,6 +37,9 @@
         font-size: small;
     }
   </style>
+  <!-- Add these lines inside the <head> tag of your HTML file -->
+
+
 <%-include ('../layouts/header')%>
             <section class="content-main">
                 <form action="/admin/add_pro"  method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
@@ -92,8 +103,25 @@
                             <div class="card-body">
                                 <div>
                                     <label class="form-label">Images</label>
-                                    <input class="form-control" type="file" name="images" style="float: left;" id="image" onchange="previewImage(event)" accept="image/*" multiple maxlength="3" required/>
-                                    <div id="imagePreview" ></div>
+                                    <div style="text-align: center;">
+                                    <input class="form-control imglist" type="file" name="images" style="float: left;" id="image1" onchange="validateAndPreviewImage(event,'imagePreview1','removePrivew1')"  accept="image/png,image/jpeg"/>
+                                    <img id="imagePreview1" style="display: none;height: 250px; width:250 px;" onclick="imageCrope(this,saveButton1,removePrivew1)"></img>
+                                    <button class="btn btn-md rounded font-sm " style="display: none;" type="button" id="saveButton1">save crop imgae</button>
+                                    <!-- <button class="btn btn-md rounded font-sm " style="display: none;" type="button" id="resetButton1">reset image</button> -->
+                                    <button id="removePrivew1" type="button" style="display:none;" onclick=" return removeImage(this,imagePreview1,image1)" class="btn btn-md rounded font-sm "> remove</button>
+                                   </div>
+                                   <div style="text-align: center;">
+                                    <input class="form-control imglist" type="file" name="images" style="float: left;" id="image2" onchange="validateAndPreviewImage(event,'imagePreview2','removePrivew2')"  accept="image/png,image/jpeg"/>
+                                    <img id="imagePreview2" style="display: none;height: 250px; width:250 px;" onclick="imageCrope(this,saveButton2,removePrivew2)"></img>
+                                    <button class="btn btn-md rounded font-sm " style="display: none;" type="button" id="saveButton2">save crop imgae</button>
+                                    <button id="removePrivew2" style="display:none;" onclick="return removeImage(this,imagePreview2,image2)" class="btn btn-md rounded font-sm" type="button"> remove</button>
+                                    </div>
+                                   <div style="text-align: center;">
+                                    <input class="form-control imglist" type="file" name="images" style="float: left;" id="image3" onchange="validateAndPreviewImage(event,'imagePreview3','removePrivew3')"  accept="image/png,image/jpeg"/>
+                                    <img id="imagePreview3" style="display: none;height: 250px; width:250 px;" onclick="imageCrope(this,saveButton3,removePrivew3)"></img>
+                                    <button class="btn btn-md rounded font-sm " style="display: none;" type="button" id="saveButton3">save crop imgae</button>
+                                    <button id="removePrivew3" style="display:none;" onclick="return removeImage(this,imagePreview3,image3)" class="btn btn-md rounded font-sm" type="button"> remove</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -125,7 +153,7 @@
                             </div>
                         </div>
                         <div>
-                            <input class="btn btn-md rounded font-sm hover-up" type="submit"></input>
+                            <input class="btn btn-md rounded font-sm" type="submit"></input>
                         </div>
                     
                     </div>
@@ -135,83 +163,129 @@
             </form>  
             </section>
             <script>
-var count = 0;
-var images = [];
-var buttons = [];
-function previewImage(event) {
-    var files = event.target.files;
-    var total_files = files.length;
-    if (total_files + count > 3) {
-        Swal.fire({
-    icon: 'warning',
-    title: 'Oops...',
-    text: 'You can only upload 3 images...',
-});
 
-        return;
-    }
-    if (count<3) {
-        for (var i=0;i<total_files;i++) {
-            if (count < 3) {
-                 var image = URL.createObjectURL(files[i]);
-                 var newimage = document.createElement('img');
-                 var previewDiv = document.getElementById('imagePreview');
-                 newimage.src = image;
-                  newimage.width = 200;
-                 newimage.height = 200;
-                previewDiv.appendChild(newimage);
-                   images.push(newimage);
-                 var button1 = document.createElement('button');
-                button1.textContent = "remove";
-                 button1.style.display = 'block';
-                   button1.style.backgroundColor = "#3BB77E";
-                 button1.style.border = "none";
-                   button1.style.borderRadius = '3px';
-                   button1.style.marginLeft = '8vh';
-                 button1.style.padding = "8px 15px";
-                             button1.style.color = "white";
+function imageCrope(imagePreview, saveButton, removeButton) {
+    saveButton.style.display = 'inline-block';
+    removeButton.style.display = 'none';
 
-                (function (i) {
-                    button1.onclick = function () {
-                        removeImage(i);
-                    };
-                })(count);
-
-                previewDiv.appendChild(button1);
-                buttons.push(button1);
-                count++;
-            } else {
-                break;
-            }
+    const cropper = new Cropper(imagePreview, {
+        aspectRatio: 9 / 12,
+        zoomable: false,
+        crop: function(event) {
+           
         }
-    } else {
-        Swal.fire({
-    icon: 'warning',
-    title: 'Oops...',
-    text: 'You can upload only 3 images.',
-});
+    });
 
-    }
+    saveButton.addEventListener('click', function() {
+        const croppedCanvas = cropper.getCroppedCanvas();
+        if (croppedCanvas) {
+            const croppedImageDataURL = croppedCanvas.toDataURL('image/jpeg');
+            imagePreview.src = croppedImageDataURL;
+            croppedCanvas.toBlob(function(blob) {
+                // Here you can upload the Blob to a server or manipulate it as needed
+                console.log('Cropped image Blob:', blob);
+                // Example: upload the blob to the server
+                uploadCroppedImage(blob);
+            }, 'image/jpeg');
+            imagePreview.style.display = 'inline-block';
+            saveButton.style.display = 'none';
+            removeButton.style.display = 'block';
+            removeButton.style.marginLeft = '13rem';
+            cropper.destroy();
+        } else {
+            console.error('Failed to get cropped canvas.');
+        }
+    });
+}
+function uploadCroppedImage(blob) {
+    const formData = new FormData();
+    formData.append('croppedImage', blob, `croppedImage.jpg`);
+
+    fetch('/admin/upload', {
+        method: 'POST',
+        body:formData
+    })
+    .then(response => response.json())
+    .then(data => console.log('Success:', data))
+    .catch(error => console.error('Error:', error));
 }
 
-function removeImage(i) {
-    images[i].remove()
-    buttons[i].remove()
-    count--
-    console.log(count)
-}
+                
 
-function validateForm() {
+                
+
+
+
+
+
          
-      
 
-       var checkboxes=document.getElementsByClassName('procheck')
+
+
+
+  
+       function validateAndPreviewImage(event, previewId,removePrivew1) {
+        
+    const file = event.target.files[0];
+    const validImageTypes = ["image/jpeg", "image/png"];
+    if (!file) {
+        Swal.fire({
+        icon: 'info',
+        text: 'No file selected.'
+    });
+        return false;
+    }
+    if (!validImageTypes.includes(file.type)) {
+        Swal.fire({
+        icon: 'info',
+        text: 'Please upload a valid image file (PNG or JPEG)'
+    });
+        event.target.value = ""; 
+        return false;
+    }
+    const reader = new FileReader();
+    reader.onload = function () {
+        const output = document.getElementById(previewId);
+        document.getElementById(removePrivew1).style.display='block'
+        document.getElementById(removePrivew1).style.marginLeft='13rem'
+        output.src = reader.result;
+        output.style.display = 'inline-block'; 
+        
+    }
+    reader.readAsDataURL(file);
+    return true 
+}
+function removeImage(tag,image,image1){
+    image.style.display='none'
+    image.src=''
+    tag.style.display='none'
+    image1.value=''
+}
+// =================================================================================================
+function isAnyCheckboxChecked() {
+ 
+    let checkboxes = document.getElementsByClassName('procheck');
+    
+    for (let checkbox of checkboxes) {
+         if (checkbox.checked) {
+            return true;
+        }
+    }
+    return false;
+}
+function validateForm() {
+
         var title = document.getElementById('product_title').value.trim()
         var brand = document.getElementById('product_brand').value.trim()
         var description = document.getElementById('product_description').value.trim()
         var price = document.getElementById('product_price').value.trim()
         var quantity = document.getElementById('product_quantity').value.trim()
-        
+        const image1 = document.getElementById('image1').files.length > 0;
+        const image2 = document.getElementById('image2').files.length > 0;
+        const image3 = document.getElementById('image3').files.length > 0;
+
+    
+    
         
         if (title===''||brand==='' ||description===''||price ===''||quantity==='') {
         Swal.fire({
@@ -221,6 +295,14 @@ function validateForm() {
     });
             return false
         }
+        if (!image1 || !image2 || !image3) {
+        Swal.fire({
+        icon: 'info',
+        text: 'Please select an image for all three inputs'
+    });
+       
+        return false; 
+    }
         
         if (isNaN(parseFloat(price))) {
         Swal.fire({
@@ -254,27 +336,32 @@ function validateForm() {
     });
             return  false
         }
-        
-    for (let checkbox of checkboxes) {
-		if(checkbox.checked==false){
-         Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-            text: 'selcet category',
-        });
-        return false	
-        }else{
-            return true
+
+        if (isAnyCheckboxChecked()) {
+             return true
+        } else {
+             Swal.fire({
+         icon: 'error',
+         title: 'Oops...',
+         text: 'Select at one category',
+             });
+             return false
         }
-         
-    }
+
+        
+    
      return true
     }
+
+
+    
     function tick(id){
 			const checkboxes=document.getElementsByClassName('procheck')
+          
 			for (let checkbox of checkboxes) {
 					if(checkbox.value==id){
 						checkbox.checked=true
+          
 					}else{
 						checkbox.checked=false
 					}

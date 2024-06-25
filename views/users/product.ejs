@@ -43,36 +43,48 @@
                     <div class="products">
                         
                         <div class="row">
-                        
-                            <%product.forEach((product)=>{%>  
+                          
+                            <%product.forEach((product)=>{%>
                             <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
                                 <div class="product">
                                     <figure class="product-media" style="max-height: 23em;">
+                                        <%if(product.stock<=0){%>
+                                        <span class="product-label label-out">Out of Stock</span>
+                                        <%}%>
                                         <div class="image_div" >
-                                            <a href="/productView?id=<%=product.id%>">
-                                                <img  src="/proimgs/<%=product.image[2]%>" alt="Product image" class="product-image">
+                                            <a href="/productView?id=<%=product._id%>">
+                                                <img  src="/proimgs/<%=product.image[2]%>" alt="Product image" class="product-image" height="10rem">
                                             </a>
                                         </div>
-
-                                        <div class="product-action-vertical">
-                                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                        </div><!-- End .product-action -->
-
                                         <div class="product-action action-icon-top">
-                                            <a href="/cart/add?id=<%=product.id%>" class="btn-product btn-cart"><span>add to cart</span></a>
+                                            <a href="/cart/add?id=<%=product._id%>" class="btn-product btn-cart" title="add to cart"><span>add to cart</span></a>
                                             <a href="popup/quickView.html" class="btn-product btn-quickview" title="Quick view"><span>quick view</span></a>
-                                            <a href="#" class="btn-product btn-compare" title="Compare"><span>compare</span></a>
+                                            <!-- <a href="#" class="btn-product btn-compare" title="Compare"><span>compare</span></a> -->
+                                           
+                                                <a href="/addWishlist?id=<%=product._id%>"class="btn-product btn-wishlist " title="wishlist"><span>wishlist</span></a>
+                                           
                                         </div><!-- End .product-action -->
                                     </figure><!-- End .product-media -->
 
                                     <div class="product-body" style="text-align: center;">
                                         <div class="product-cat">
-                                            
+                                        
                                             <a href="#"><%=product.category.name%></a>
                                         </div><!-- End .product-cat -->
                                         <h3 class="product-title"><a href="product.html"><%=product.product_name%></a></h3><!-- End .product-title -->
                                         <p style="max-height: 8vh;overflow:scroll; scrollbar-width:none;"><%=product.Description%></p>
-                                        <div  style="text-align: center;">Price: ₹ <%=product.price%></div><!-- End .product-price -->
+                                        <%if(product.finalPercentage && product.finalPercentage!==product.price){%>
+                                            <div  style="text-align: center;"> Price : <del>₹ <%=product.price%></del> <br><span style="color: #c69c61;">OFFER(<%=product.finalPercentage%>%) <br>New Offer Price :<%=product.price-product.price*product.finalPercentage/100%></span>  </div><!-- End .product-price -->
+                                            
+                                                
+
+                                                <%}else{%>
+                                                    <div  style="text-align: center;">Price : ₹ <%=product.price%></div><!-- End .product-price -->
+                                                    
+                                                    <%}%>
+
+
+
                                         <div class="ratings-container" style="padding-left: 3.5rem;">
                                             <div class="ratings">
                                                 <div class="ratings-val" style="width: 0%;"></div><!-- End .ratings-val -->
@@ -215,8 +227,8 @@
 				if('<%=msg%>'){
 					Swal.fire({
 						icon: 'warning',
-						title: 'Product Already Added',
-						text: 'This product is already in your cart.',
+						title: '<%=msg%>',
+						
 						confirmButtonText: 'OK'
 					});
 				}
@@ -260,17 +272,149 @@
                    }
                 </script>
                 <script>
-            function catagoryFilter(id){
+             function catagoryFilter(id){
+                
                         let checkedValues = []
                         let checkboxes = document.querySelectorAll('.custom-control-input')
                                  checkboxes.forEach(function(checkbox) {
                                 if (checkbox.checked) {  
                                     checkedValues.push(checkbox.id)
                                 }
-                            });
-                            
-                        fetch('/filteredProduct?id='+checkedValues,{method:'post'})
+                            })
+                           
+                           
+                        fetch('/filteredProduct?cateid='+checkedValues,{method:'post'})
+                        .then(response=>response.json())
+                        .then(data => {
+        const productsContainer = document.querySelector('.products .row');
+        productsContainer.innerHTML = ''; 
 
+        data.updatedFilterData.forEach(product => {
+            const productHTML = `
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="product">
+                        <figure class="product-media" style="max-height: 23em;">
+                            <div class="image_div">
+                                <a href="/productView?id=${product._id}">
+                                    <img src="/proimgs/${product.image[2]}" alt="Product image" class="product-image">
+                                </a>
+                            </div>
+
+                            <div class="product-action-vertical">
+                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                            </div>
+
+                            <div class="product-action action-icon-top">
+                                <a href="/cart/add?id=${product._id}" class="btn-product btn-cart"><span>add to cart</span></a>
+                                <a href="popup/quickView.html" class="btn-product btn-quickview" title="Quick view"><span>quick view</span></a>
+                                <a href="#" class="btn-product btn-compare" title="Compare"><span>compare</span></a>
+                            </div>
+                        </figure>
+
+                        <div class="product-body" style="text-align: center;">
+                            <div class="product-cat">
+                                <a href="#">${product.category.name}</a>
+                            </div>
+                            <h3 class="product-title"><a href="product.html">${product.product_name}</a></h3>
+                            <p style="max-height: 8vh;overflow:scroll; scrollbar-width:none;">${product.Description}</p>
+                            <div style="text-align:center;">${product.price}</div>
+                            <div class="ratings-container" style="padding-left: 3.5rem;">
+                                <div class="ratings">
+                                    <div class="ratings-val" style="width: 0%;"></div>
+                                </div>
+                                <span class="ratings-text">( 0 Reviews )</span>
+                            </div>
+                            <div class="product-brand" style="text-align: center;">Brand:${product.brand}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            productsContainer.insertAdjacentHTML('beforeend', productHTML);
+        });
+
+
+        const paginationContainer = document.querySelector('.load-more-container');
+        paginationContainer.innerHTML = ''; 
+       
+
+        for (let i = 1; i <= data.pagecount; i++) {
+            const pageLink = document.createElement('a');
+            // pageLink.href = `/filteredProduct?pages=${i}`;
+            pageLink.textContent = i;
+            pageLink.style.border = 'solid 0.2rem #c69c61';
+            pageLink.style.padding = '1rem';
+            console.log(data.search)
+            pageLink.addEventListener('click', () =>
+             fetch('/filteredProduct?search='+data.search+'cateid='+checkedValues+'&page='+i,{method:'post'})
+             .then(response=>response.json())
+                        .then(data => {
+        const productsContainer = document.querySelector('.products .row');
+        productsContainer.innerHTML = ''; 
+          console.log(data.updatedFilterData.length)
+        data.updatedFilterData.forEach(product => {
+            const productHTML = `
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="product">
+                        <figure class="product-media" style="max-height: 23em;">
+                            <div class="image_div">
+                                <a href="/productView?id=${product._id}">
+                                    <img src="/proimgs/${product.image[2]}" alt="Product image" class="product-image">
+                                </a>
+                            </div>
+
+                            <div class="product-action-vertical">
+                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                            </div>
+
+                            <div class="product-action action-icon-top">
+                                <a href="/cart/add?id=${product._id}" class="btn-product btn-cart"><span>add to cart</span></a>
+                                <a href="popup/quickView.html" class="btn-product btn-quickview" title="Quick view"><span>quick view</span></a>
+                                <a href="#" class="btn-product btn-compare" title="Compare"><span>compare</span></a>
+                            </div>
+                        </figure>
+
+                        <div class="product-body" style="text-align: center;">
+                            <div class="product-cat">
+                                <a href="#">${product.category.name}</a>
+                            </div>
+                            <h3 class="product-title"><a href="product.html">${product.product_name}</a></h3>
+                            <p style="max-height: 8vh;overflow:scroll; scrollbar-width:none;">${product.Description}</p>
+                            <div style="text-align:center;">${product.price}</div>
+                            <div class="ratings-container" style="padding-left: 3.5rem;">
+                                <div class="ratings">
+                                    <div class="ratings-val" style="width: 0%;"></div>
+                                </div>
+                                <span class="ratings-text">( 0 Reviews )</span>
+                            </div>
+                            <div class="product-brand" style="text-align: center;">Brand:${product.brand}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            productsContainer.insertAdjacentHTML('beforeend', productHTML);
+        });
+
+
+        const paginationContainer = document.querySelector('.load-more-container');
+        paginationContainer.innerHTML = ''; 
+       
+
+        for (let i = 1; i <= data.pagecount; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.href = `?page=${i}&search=${data.search}`;
+            pageLink.textContent = i;
+            pageLink.style.border = 'solid 0.2rem #c69c61';
+            pageLink.style.padding = '1rem';
+            paginationContainer.appendChild(pageLink);
+        }
+    })
+            
+            );
+            paginationContainer.appendChild(pageLink);
+        }
+    })
+
+    
                     }
 
                 </script>

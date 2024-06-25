@@ -53,18 +53,21 @@
                     
                     <%if(data){%> 
                         <%data.forEach((product)=>{%>
-                    <div class="col-xl-3 col-lg-4 col-md-6" id="onecolumn<%=product._id%>">
+                    <div class="col-xl-3 col-lg-4 col-md-6" id="onecolumn<%=product._id%>" >
                         <div class="card card-product-grid" >
                             <br>
-                                <a href="#" class="img-wrap"> <img style="max-height: 16em;"  src="/proimgs/<%=product.image[2]%>" alt="Product" /> </a>
+                                <a href="#" class="img-wrap"> <img style="max-height:16em;"  src="/proimgs/<%=product.image[2]%>" alt="Product" /> </a>
                                 <br>
                         
                             <div class="info-wrap text-center">
+                                <div style="font-weight:900;" >
+
+                                <%=product.product_name%>
+                                </div>
+                                <div style="max-height: 9vh;overflow:scroll; scrollbar-width:none;"><small><%=product.Description%></small></div>
                                 
-                                <h4> <%=product.product_name%></h4>
-                                <p style="max-height: 4vh;overflow:scroll; scrollbar-width:none;"><%=product.Description%></p>
-                                
-                                <div class="price mt-1"> <%=product.price%></div>
+                                <div class="price mt-1">Price : <%=product.price%></div>
+                                <div class="price mt-1">Stock : <%=product.stock%></div>
              
                                 <br>
                                 
@@ -92,11 +95,12 @@
                 <div class="pagination-area mt-15 mb-50">
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-start">
-                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                            <li class="page-item"><a class="page-link" href="#">02</a></li>
-                            <li class="page-item"><a class="page-link" href="#">03</a></li>
-                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                            <li class="page-item"><a class="page-link" href="#">16</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#"><i class="material-icons md-chevron_left"></i></a>
+                            </li>
+                            <%for(i=1;i<=totalPages;i++){%>
+                            <li class="page-item active"><a class="page-link" href="/admin/products?page=<%=i%>"><%=i%></a></li>
+                                <%}%>
                             <li class="page-item">
                                 <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
                             </li>
@@ -127,8 +131,30 @@ Swal.fire({
   }).then((result) => {
     if (result.isConfirmed) {
         fetch('/admin/delete_pro/?id='+id,{method:'post'})
-        let x= document.getElementById('onecolumn'+id)
+        .then(response=>response.json())
+        .then((data)=>{
+            if(data.success){
+                Swal.fire({
+                    text: data.success,
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+                let x= document.getElementById('onecolumn'+id)
                x.remove()
+
+            }else if(data.fail){
+                Swal.fire({
+                    text: data.fail,
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+
+            }
+           
+
+        })
+
+        
     }
   });
 

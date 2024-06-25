@@ -39,6 +39,7 @@
                                             <tr>
                                                 <th>ID</th>
                                                 <th>Customer name</th>
+                                                <th>Name</th>
                                                 <th>Price</th>
                                                 <th>Quantity</th>
                                                 <th>Status</th>
@@ -48,42 +49,78 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <%for(let key of all){%>   
-                                            <tr>
-                                                <td><%=key._id.toString().substr(-5)%></td>
-                                                <td><b><%=key.shippingAddress.name%></b></td>
-                                                <td><%=key.productId.price%></td>
-                                                <td><%=key.quantity%></td>
-                                                <td>
-                                                    
-                                                      
-                                                        <select id="drop<%=key.id%>" class="badge rounded-pill alert-dark selects" onclick="uniqueAvoid('<%=key.id%>','<%=key.orderStatus%>')" onchange="changevalue('<%=key._id%>')">
-                                                        <option id="selected<%=key.id%>" selected value="Pending"><%=key.orderStatus%></option>
-                                                        <option value="Pending">Pending</option>
-                                                        <option value="Shipping">Shipping</option>
-                                                        <option value="Delivered">Delivered</option>
-                                                        <option value="Canceled">Canceled</option>
-                                                        <option value="Processing">Processing</option>
-                                                        <option value="Return">Return</option>
-                                                        </select>
-                                                    
-                                                    
-                                                   
-                                                
-                                                
-                                                </td>
-                                                
-                                                <td id="dt"><%=key.orderDate.toDateString()%></td>
-                                                <td><%=key.quantity*key.productId.price%></td>
-                                                <td class="text-end">
-                                                    
-                                                    <button class="btn btn-md rounded font-sm"  data-toggle="modal" data-target="#exampleModalCenter" onclick="datafetch('<%=key._id%>')">Detail </button>
-                                                </td>
+                                            
+                                            <%all.results.forEach((value)=>{%>
+                                               <%value.OrderedProducts.forEach((Nvalue)=>{%>
+
                                                
-                                            </tr>
-                                            <%}%>
+                                              
+                                                 
+                                                    <tr>
+                                                        <td><%=Math.floor(Math.random() * 100000)%></td>
+                                                        <td ><%=Nvalue.shippingAddress.name%></td>
+                                                        <td style="width: 8rem;"> <%=Nvalue.productId.product_name%></td>
+                                                        <td><%=Nvalue.productId.price%></td>
+                                                        <td><%=Nvalue.quantity%></td>
+                                                        <td>
+                                                            
+                                                            <%if(Nvalue.returnRequest!==true){%>
+                                                                <%if(Nvalue.orderStatus=="Delivered"){%>
+                                                                    <select id="drop<%=Nvalue._id%>" class="badge rounded-pill alert-dark selects" onclick="uniqueAvoid('<%=Nvalue._id%>','<%=Nvalue.orderStatus%>')" onchange="changevalue('<%=Nvalue._id%>')">
+                                                                        <option id="selected <%=Nvalue._id%>" selected value="Pending"><%=Nvalue.orderStatus%></option>    
+                                                                       </select>
+
+
+
+
+                                                               
+                                                                <%}else{%>
+                                                                    <select id="drop<%=Nvalue._id%>" class="badge rounded-pill alert-dark selects" onclick="uniqueAvoid('<%=Nvalue._id%>','<%=Nvalue.orderStatus%>')" onchange="changevalue('<%=Nvalue._id%>')">
+                                                                        <option id="selected <%=Nvalue._id%>" selected value="Pending"><%=Nvalue.orderStatus%></option>    
+                                                                        <option value="Pending">Pending</option>
+                                                                        <option value="Shipping">Shipping</option>
+                                                                        <option value="Delivered">Delivered</option>
+                                                                        <option value="Canceled">Canceled</option>
+                                                                        <option value="Processing">Processing</option>
+                                                                        <option value="Return">Return</option>
+                                                                        </select>
+                                                                    
+                                                                    
+                                                                    <%}%>
+                                                                <%}else{%>
+                                                                    <%if(Nvalue.returnRequest==true&& Nvalue.orderStatus!=='Return'){%>
+                                                                    <button class="badge rounded-pill alert-danger btn" onclick="returnPermission(this,'<%=Nvalue._id%>')" id="returnButton<%=Nvalue._id%>">Return Requested</button>
+                                                                    <%}else{%>
+                                                                        <button style="background-color:rgb(156, 236, 156); border:rgb(156, 236, 156);" class="badge rounded-pill alert-dark" disabled>Request Approved</button>
+                                                                        <%}%>
+                                                                    <%}%>
+                                                            
+                                                            
+                                                           
+                                                        
+                                                        
+                                                        </td>
+                                                        
+                                                        <td id="dt<%=Nvalue._id%>"><%=Nvalue.orderDate.toLocaleDateString()%></td>
+                                                      
+                                                         
+                                                        <td><%=value.TotalAmount%></td>
+                                                     
+                                                        <td class="text-end">
+                                                            
+                                                            <button class="btn btn-md rounded font-sm"  data-toggle="modal" data-target="#exampleModalCenter" onclick="datafetch('<%=Nvalue._id%>')">Detail </button>
+                                                        </td>
+                                                       
+                                                    </tr>
+                                                    <%})%>
+
+
+
+                                            <%})%>
+                                            
                                         </tbody>
                                     </table>
+                                   
                                 </div>
                                 <!-- table-responsive //end -->
                             </div>
@@ -136,13 +173,14 @@
                 <div class="pagination-area mt-15 mb-50">
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-start">
-                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                            <li class="page-item"><a class="page-link" href="#">02</a></li>
-                            <li class="page-item"><a class="page-link" href="#">03</a></li>
-                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                            <li class="page-item"><a class="page-link" href="#">16</a></li>
                             <li class="page-item">
-                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                                <a  href="#"><i class="material-icons md-chevron_left"></i></a>
+                            </li>
+                            <%for(i=1;i<=all.totalPages;i++){%>
+                            <li class="page-item active"><a class="page-link" href="/admin/order?page=<%=i%>"><%=i%></a></li>
+                                <%}%>
+                            <li class="page-item">
+                                <a href="#"><i class="material-icons md-chevron_right"></i></a>
                             </li>
                         </ul>
                     </nav>
@@ -163,7 +201,7 @@
          
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button  type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
 
@@ -231,6 +269,15 @@
                 })
         }
 
-      </script>        
+      </script>  
+      <script>
+        function returnPermission(tag,id){
+            console.log(id)
+            tag.style.backgroundColor='rgb(156, 236, 156)'
+            tag.style.border='rgb(156, 236, 156)'
+            tag.innerHTML='Request Approved'
+            fetch('/admin/returnApprove?id='+id,{method:'post'})
+        }
+      </script>      
    
 <%-include("../layouts/footer")%>

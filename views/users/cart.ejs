@@ -10,19 +10,23 @@
             <nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item"><a href="/homePage">Home</a></li>
+                      
                         <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
                     </ol>
                 </div><!-- End .container -->
             </nav><!-- End .breadcrumb-nav -->
 
             <div class="page-content">
-            	<div class="cart">
-	                <div class="container">
+
+				<div class="cart">
+					<div class="container">
+						<%if(data.length!==0){%>
 						<%if(productsFound){%>	
+							<p id="noProductmessage"></p>
 	                	<div class="row">
-	                		<div class="col-lg-9">
+	                		<div class="col-lg-9" id="hideData1">
+								
 	                			<table class="table table-cart table-mobile">
 									<thead>
 										<tr>
@@ -33,13 +37,12 @@
 											<th></th>
 										</tr>
 									</thead>
-									<!-- product starts here================================================ -->
-									
-									
-								
-									<tbody >
+								<tbody >
 										
 
+									
+										
+										
 											
 										
 										<%data.forEach((value)=>{%>
@@ -58,23 +61,39 @@
 													</h3><!-- End .product-title -->
 												</div><!-- End .product -->
 											</td>
-											<td class="price-col"><%=value.productId.price%></td>
+											<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
+												<td class="price-col"><%=value.productId.price-value.productId.price*value.productId.offerPercentage/100 %></td>
+												<%}else{%>
+													<td class="price-col"><%=value.productId.price%></td>
+												<%}%>
+									
 											<td class="quantity-col">
                                                 <div class="cart-product-quantity">
-                                                    <input class="numberTag" type="number" value="<%=value.quantity%>" min="1" max="5" onchange="datachange(this,'<%=value.productId._id%>','<%=value.productId.price%>','<%=value.productId.quantity%>')" step="1" data-decimals="0"  required >
+													<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
+														
+                                                    <input class="numberTag" id="numberTag" type="number" value="<%=value.quantity%>" min="1" max="5" onchange="datachange(this,'<%=value.productId._id%>','<%=(value.productId.price-value.productId.price*value.productId.offerPercentage/100)*value.quantity%>')" step="1" data-decimals="0"  required >
 													
+													<%}else{%>
+														<input class="numberTag" id="numberTag" type="number" value="<%=value.quantity%>" min="1" max="5" onchange="datachange(this,'<%=value.productId._id%>','<%=value.productId.price*value.quantity%>')" step="1" data-decimals="0"  required >
+														<%}%>
                                                 </div><!-- End .cart-product-quantity -->
                                             </td>
-											<td class="total-col cart_total"  id="total<%=value.productId._id%>"><%=value.productId.price*value.quantity%></td>
+											<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
+											<td class="total-col cart_total"  id="total<%=value.productId._id%>"><%=(value.productId.price-value.productId.price*value.productId.offerPercentage/100)*value.quantity%></td>
+											<%}else{%>
+												<td class="total-col cart_total"  id="total<%=value.productId._id%>"><%=value.productId.price*value.quantity%></td>
+												<%}%>
 										<td class="remove-col"><button class="btn-remove" onclick="return removeRow('<%=value.productId._id%>','<%=value.productId.price%>')"><i class="icon-close"></i></button></td>
 										</tr>
 										<%})%>
+
 										
 									</tbody>
 									
 					<!-- product ends here================================================ -->
 					
 								</table ><!-- End .table table-wishlist -->
+								
 
 	                			<div class="cart-bottom">
 			            			
@@ -98,34 +117,9 @@
 	                							<td id="carttotal"></td>
 	                						</tr>
 	                						<tr class="summary-shipping">
-	                							<td>Shipping:</td>
+	                							<td>Shipping: Free</td>
 	                							<td>&nbsp;</td>
 	                						</tr>
-
-	                						<tr class="summary-shipping-row">
-	                							<td>
-													<div class="custom-control custom-radio">
-														<input type="radio" id="free-shipping" name="shipping" class="custom-control-input">
-														<label class="custom-control-label" for="free-shipping">Free Shipping</label>
-													</div><!-- End .custom-control -->
-	                							</td>
-	                							<td>0.00</td>
-	                						</tr><!-- End .summary-shipping-row -->
-
-	                						
-
-	                						<tr class="summary-shipping-row">
-	                							<td>
-	                								<div class="custom-control custom-radio">
-														<input type="radio" id="express-shipping" name="shipping" class="custom-control-input">
-														<label class="custom-control-label" for="express-shipping">Shipping cost:</label>
-													</div><!-- End .custom-control -->
-	                							</td>
-	                							<td>100.00</td>
-	                						</tr><!-- End .summary-shipping-row -->
-
-	                						
-
 	                						<tr class="summary-total">
 	                							<td>Total:</td>
 	                							<td id="grandtotal"></td>
@@ -139,9 +133,10 @@
 		            			<a href="/product" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
 	                		</aside><!-- End .col-lg-3 -->
 	                	</div><!-- End .row -->
-						<%}else{%>
-								<%=message%>
-							<%}%>
+						<%}%>
+							<%}else{%>
+								<p>YOUR CART IS EMPTY ...</p>
+								<%}%>
 	                </div><!-- End .container -->
                 </div><!-- End .cart -->
             </div><!-- End .page-content -->
@@ -150,8 +145,6 @@
 		<script>
 			
 window.onload=function(){
-					
-
 				var ft=0
 				const totalamount=document.getElementsByClassName('cart_total')
 				const total=document.getElementById('carttotal')
@@ -161,44 +154,35 @@ window.onload=function(){
 				})
 			total.innerHTML=ft
 			Gtotal.innerHTML=ft
-			const radioButton=document.getElementById('express-shipping')
-			
-			if(ft>=50000){
-		const radioButton1=document.getElementById('free-shipping')
-		radioButton1.checked = true;
-	          }else{
-				const radioButton2=document.getElementById('express-shipping')
-		radioButton2.checked = true;
-		Gtotal.innerHTML=ft+100
-			  }
-			  if('<%=cart%>'){
-				
-				Swal.fire({
-            
+			 if('<%=cart%>'){
+			    Swal.fire({
             text: '<%=cart%>',
-            icon: 'success',
-            
+            icon: 'success'  
         })
 			  }
 
 			  
 			}
 			
-function datachange(tag,id,price,quantity){
+function datachange(tag,id,price){
+
+	// console.log(price)	
 			const countValue=tag.value
-			totalPrice=countValue*price
 			const totaltag=document.getElementById('total'+id)
-			totaltag.innerHTML=Math.round(totalPrice)
-			if(countValue==5){
+			totaltag.innerHTML=Math.round(countValue*price)
+			
+		
+			if(countValue>=5){
 				Swal.fire({
             icon: 'error',
             title: 'Product Limit Exceeded',
             text: `You have reached the maximum limit of products.`,
         });
 			}
+			
 // =============================================================================
  
- const totalamount = document.getElementsByClassName('cart_total');
+ const totalamount = document.getElementsByClassName('cart_total')
     finalTotal = 0; 
     Array.from(totalamount).forEach((element) => {
         finalTotal += parseInt(element.textContent);
@@ -207,18 +191,24 @@ function datachange(tag,id,price,quantity){
     const Gtotal = document.getElementById('grandtotal');
     total.innerHTML = finalTotal;
     Gtotal.innerHTML = finalTotal;
-	if(finalTotal>50000){
-		const radioButton1=document.getElementById('free-shipping')
-		radioButton1.checked = true;
-	}else{
-		const radioButton2=document.getElementById('express-shipping')
-		radioButton2.checked = true;
-		Gtotal.innerHTML=finalTotal+100
-
-			  }
 // =============================================================================	
-			fetch(`/cartdynamic?id=${id}&value=${countValue}&price=${price}&quantity=${quantity}`,{method:'post'})
-			}
+			fetch(`/cartdynamic?id=${id}&value=${countValue}`,{method:'post'})
+			.then(response=>response.json())
+			.then((data)=>{
+				
+				document.getElementById("numberTag").setAttribute('max',data.stock)
+				// console.log(document.getElementById('numberTag'))
+				Swal.fire({
+            title: 'Limit',
+            text: data.msg,
+            icon: 'info'})
+			})
+	}
+
+
+
+
+
 		function removeRow(id,price){
 			
 				Swal.fire({
@@ -235,14 +225,12 @@ function datachange(tag,id,price,quantity){
 				let rowof=document.getElementsByClassName('rowsof')
 				if(rowof.length<=0){
 					document.getElementById("hideData").remove()
+					document.getElementById("hideData1").remove()
+					document.getElementById("noProductmessage").innerHTML="YOUR CART IS EMPTY..."
+
 				}
 			const total=document.getElementById('carttotal')
 			const Gtotal=document.getElementById('grandtotal')
-			
-			
-			
-			
-			
 			
 				fetch('/removeCartProduct?id='+id,{method:'post'})
 				const totalprice=total.textContent-price
@@ -250,7 +238,7 @@ function datachange(tag,id,price,quantity){
 				total.innerHTML=totalprice
 			Gtotal.innerHTML=Grandtotal
 			
-				
+				window.location.reload()
             }
         });
 				

@@ -2,8 +2,8 @@
 <section class="content-main">
     <div class="content-header">
         <div>
-            <h2 class="content-title card-title">User Management</h2>
-            <p>Lorem ipsum dolor sit amet.</p>
+            <h2 class="content-title card-title">Users Management</h2>
+            <p></p>
         </div>
     </div>
     <div class="row">
@@ -44,7 +44,7 @@
                                 <%if(message){%>
                                     <%for(let i=0;i<message.length;i++){%>  
                                         <tr>
-                                            <td><%= i+1 %></td>
+                                            <td><%=  String(message[i]._id).slice(-4) %></td>
                                             <td><%=message[i].User_name%></td>
                                             <td><%=message[i].User_email%></td> 
                                             <td><%=message[i].createdate.toLocaleDateString() %></td>
@@ -82,10 +82,21 @@
     <div class="pagination-area mt-15 mb-50">
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-start">
+                <li class="page-item">
+                    <a class="page-link" href="#"><i class="material-icons md-chevron_left"></i></a>
+                </li>
+               
+                <%for(i=1;i<=totalPages;i++){%>
+                    <li class="page-item"><a class="page-link" href="/admin/users?page=<%=i%>"><%=i%></a></li>
+                    <%}%>
+                
               
+                <li class="page-item"> 
+                    <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+          </li>
             </ul>
         </nav>
-    </div>
+    </div> 
 </section>
 <!-- content-main end// -->
 <script>

@@ -1,0 +1,420 @@
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.2/xlsx.full.min.js"></script>
+
+
+<%- include('../layouts/header')%>
+            <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Sales Report</h2>
+                        <p>Lorem ipsum dolor sit amet.</p>
+                    </div>
+                    
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card mb-4">
+                            <header class="card-header">
+                                <div class="row gx-3">
+                                    <div class="col-lg-4 col-md-6 me-auto">
+                                        <input type="text" placeholder="Search..." class="form-control" />
+                                    </div>
+                                    <div class="col-lg-2 col-md-3 col-6">
+                                       
+                                        <select class="form-select" onchange="sortList(this)">
+                                            <option>Full Report</option>
+                                            <option>daily</option>
+                                            <option>monthly</option>
+                                            <option>yearly</option>
+                                            <option>Custom</option>
+                                            <input class="form-select" type="text" id="datePicker" placeholder="Select date range" style="display: none;">
+                                        </select>
+                                                                            </div>
+                                    <div class="col-lg-2 col-md-3 ">
+                                        <button id="pdfButton" class="btn" style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-pdf"></i>PDF</button>
+                                        <button id="excelButton"class="btn " style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-excel"></i>EXCEL</button>
+
+                                      
+                                    </div>
+
+                                    
+                                </div>
+                            </header>
+                            <!-- card-header end// -->
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Order Date</th>
+                                                <th>Product</th>
+                                                <th>Customer</th>
+                                                <th>Payment Method</th>
+                                                <th>Offer Discount</th>
+                                                <th>Coupon Discount</th>
+                                                <th>Final Cart Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tBody"> 
+                                            
+                                            <%
+                                            let totalSalesCount = 0;
+                                            let totalOrderAmount = 0;
+                                            let totalOfferDiscount = 0;
+                                            let totalCouponDiscount = 0; 
+                                            %>
+                                            
+                                           
+                                              <% deliveredOrders.forEach((value)=>{%>
+                                                <%value.OrderedProducts.forEach((order)=>{%>
+
+                                                    
+                                                   <%
+                                                    totalSalesCount++;
+                                                    totalOrderAmount += value.TotalAmount;
+                                                    totalOfferDiscount += (order.productId.price * order.productId.offerPercentage / 100);
+                                                    totalCouponDiscount += (order.productId.price * value.couponPercentage / 100);
+        
+                                                    %>
+                                                    
+                                               
+                                                 
+                                                    <tr>
+                                                        <td><%=order._id.toString().slice(-4)%></td>
+                                                        <td ><%=new Date(order.orderDate).toLocaleDateString('en-GB', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: 'numeric'
+                                                        })%></td>
+                                                        <td><%=order.productId.product_name%></td>
+                                                        <td ><%=order.shippingAddress.name%> <br>
+                                                            <%=order.shippingAddress.address%> 
+                                                        </td>
+                                                        <td><%=order.paymentMethod%></td>
+                                                        <%if(order.productId.offerPercentage==0){%>
+                                                            <td>No Offer Applied</td>
+                                                        <%}else{%>
+                                                            <td><%=order.productId.price*order.productId.offerPercentage/100%></td>
+                                                        <%}%>
+                                                        <%if(value.couponPercentage==0){%>
+                                                            <td>No Coupon Applied</td>
+                                                        <%}else{%>
+                                                            <td><%=order.productId.price*value.couponPercentage/100%></td>
+                                                        <%}%>
+                                                       
+                                                        <td><%=value.TotalAmount%></td>
+                                                        
+                                                        
+                                                      
+                                                    </tr>
+                                          
+
+                                                    <%})%>
+                                                    <%})%>
+
+                                   
+                                            
+                                        
+                                      
+                                            <tr>
+                                                <th colspan="5"><h6>Totals</h6></th>
+                                                <th><h6><%= totalOfferDiscount %></h6></th>
+                                                <th><h6><%= totalCouponDiscount%></h6></th>
+                                                <th><h6><%= totalOrderAmount%></h6></th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="6"></th>
+                                                <th colspan="2"><h6>Overall Sales Count:  <%= totalSalesCount %></h6></th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- table-responsive //end -->
+                            </div>
+                            <!-- card-body end// -->
+                        </div>
+                        <!-- card end// -->
+                    </div>
+                   
+                </div>
+                <div class="pagination-area mt-15 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                            <li class="page-item"><a class="page-link" href="#">02</a></li>
+                            <li class="page-item"><a class="page-link" href="#">03</a></li>
+                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                            <li class="page-item"><a class="page-link" href="#">16</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                
+            </section>
+            
+         <!-- Button trigger modal -->
+
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        
+        <div class="modal-body">
+         <div id="fetchdata" style="padding-left: 10vh;" ></div>   
+         
+        </div>
+        <div class="modal-footer">
+          <button  type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+ 
+  
+  <script>
+    document.getElementById('excelButton').addEventListener('click',async()=>{
+        const table = document.getElementById('table');
+            const tableData = [['Sales Report']]; // Add your heading here
+            const rows = table.querySelectorAll('tr');
+
+             rows.forEach((row, rowIndex) => {
+                const rowData = [];
+                row.querySelectorAll('th, td').forEach(cell => {
+                    rowData.push(cell.innerText);
+                });
+                tableData.push(rowData);
+            });
+
+            const worksheet = XLSX.utils.aoa_to_sheet(tableData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+            XLSX.writeFile(workbook, 'sales_report.xlsx');
+           
+    })
+
+
+     document.getElementById('pdfButton').addEventListener('click', async () => {
+        try {
+            const response = await fetch('/admin/sortListOfOrder?downloadPDF=true', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+    
+            if (response.ok) {
+                // Convert the response to a Blob
+                const pdfBlob = await response.blob();
+
+                // Create a URL for the Blob
+                const url = window.URL.createObjectURL(pdfBlob);
+
+                // Create a link element and trigger a click to download the PDF
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'sales_report.pdf'; // Specify the filename for the downloaded file
+                document.body.appendChild(link);
+                link.click();
+
+                // Cleanup
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(link);
+            } else {
+                // Handle error response
+                console.error('Error:', response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+        }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function sortList(tag){
+       
+        if(tag.value=='Custom'){
+          
+            document.getElementById('datePicker').style.display='block'
+             // Initialize Flatpickr
+    const datePicker = flatpickr("#datePicker", {
+        dateFormat: "d-m-Y",
+        maxDate: "today",
+        mode: "range",
+        minDate: "2024-01-01",
+        onClose: [function(selectedDates, dateStr, instance) {
+           
+            const startDate = selectedDates[0];
+            const endDate = selectedDates[1];
+            
+            fetch('/admin/sortListOfOrder?value='+tag.value+'&startDate='+startDate+'&endDate='+endDate,{method:'post'})
+            .then(response=>response.json())
+      .then((data)=>{
+        let tableBody= document.getElementById('tBody')
+        tableBody.innerHTML=''
+        
+        if (data.deliveredOrders.length === 0) {
+           
+                tableBody.innerHTML = '<tr><td colspan="8">No delivered orders found</td></tr>';
+            } else {
+                let totalOfferDiscount = 0;
+                let totalCouponDiscount = 0;
+                let totalOrderAmount = 0;
+                let totalSalesCount = 0
+
+
+                data.deliveredOrders.forEach(order => {
+                    
+                    order.OrderedProducts.forEach(product => {
+                        totalSalesCount++
+                        totalOfferDiscount += product.productId.offerPercentage === 0 ? 0 : (product.productId.price * product.productId.offerPercentage / 100);
+                        totalCouponDiscount += order.couponPercentage === 0 ? 0 : (product.productId.price * order.couponPercentage / 100);
+                        totalOrderAmount += order.TotalAmount;
+                       
+                        const row = document.createElement('tr');
+                        const orderDate = new Date(product.orderDate).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                        row.innerHTML = `
+                            <td>${product._id}</td>
+                            <td>${orderDate}</td>
+                            <td>${product.productId.product_name}</td>
+                            <td>
+                                ${product.shippingAddress.name} <br>
+                                ${product.shippingAddress.address}
+                            </td>
+                            <td>${product.paymentMethod}</td>
+                            <td>${product.productId.offerPercentage === 0 ? 'No Offer Applied' : (product.productId.price * product.productId.offerPercentage / 100)}</td>
+                            <td>${order.couponPercentage === 0 ? 'No Coupon Applied' : (product.productId.price * order.couponPercentage / 100)}</td>
+                            <td>${order.TotalAmount}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+                // Append totals row
+let totalsRow = document.createElement('tr');
+totalsRow.innerHTML = `
+    <th colspan="5"><h6>Totals</h6></th>
+    <th><h6>${totalOfferDiscount}</h6></th>
+    <th><h6>${totalCouponDiscount}</h6></th>
+    <th><h6>${totalOrderAmount}</h6></th>
+`;
+tableBody.appendChild(totalsRow);
+
+// Append overall sales count row
+let salesCountRow = document.createElement('tr');
+salesCountRow.innerHTML = `
+    <th colspan="6"></th>
+    <th colspan="2"><h6>Overall Sales Count: ${totalSalesCount}</h6></th>
+`;
+tableBody.appendChild(salesCountRow);
+            }
+      }) 
+           
+        }]
+    });
+
+    // Call open() method when Flatpickr is ready
+    datePicker.calendarContainer.addEventListener("ready", function() {
+        datePicker.open();
+    });
+          
+        }else{
+            document.getElementById('datePicker').style.display='none'
+        }
+      fetch('/admin/sortListOfOrder?value='+tag.value,{method:'post'}) 
+      .then(response=>response.json())
+      .then((data)=>{
+        let tableBody= document.getElementById('tBody')
+        tableBody.innerHTML=''
+        
+        if (data.deliveredOrders.length === 0) {
+           
+                tableBody.innerHTML = '<tr><td colspan="8">No delivered orders found</td></tr>';
+            } else {
+                let totalOfferDiscount = 0;
+                let totalCouponDiscount = 0;
+                let totalOrderAmount = 0;
+                let totalSalesCount = 0
+
+
+                data.deliveredOrders.forEach(order => {
+                    
+                    order.OrderedProducts.forEach(product => {
+                        totalSalesCount++
+                        totalOfferDiscount += product.productId.offerPercentage === 0 ? 0 : (product.productId.price * product.productId.offerPercentage / 100);
+                        totalCouponDiscount += order.couponPercentage === 0 ? 0 : (product.productId.price * order.couponPercentage / 100);
+                        totalOrderAmount += order.TotalAmount;
+                       
+                        const row = document.createElement('tr');
+                        const orderDate = new Date(product.orderDate).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                        row.innerHTML = `
+                            <td>${product._id}</td>
+                            <td>${orderDate}</td>
+                            <td>${product.productId.product_name}</td>
+                            <td>
+                                ${product.shippingAddress.name} <br>
+                                ${product.shippingAddress.address}
+                            </td>
+                            <td>${product.paymentMethod}</td>
+                            <td>${product.productId.offerPercentage === 0 ? 'No Offer Applied' : (product.productId.price * product.productId.offerPercentage / 100)}</td>
+                            <td>${order.couponPercentage === 0 ? 'No Coupon Applied' : (product.productId.price * order.couponPercentage / 100)}</td>
+                            <td>${order.TotalAmount}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+                // Append totals row
+let totalsRow = document.createElement('tr');
+totalsRow.innerHTML = `
+    <th colspan="5"><h6>Totals</h6></th>
+    <th><h6>${totalOfferDiscount}</h6></th>
+    <th><h6>${totalCouponDiscount}</h6></th>
+    <th><h6>${totalOrderAmount}</h6></th>
+`;
+tableBody.appendChild(totalsRow);
+
+// Append overall sales count row
+let salesCountRow = document.createElement('tr');
+salesCountRow.innerHTML = `
+    <th colspan="6"></th>
+    <th colspan="2"><h6>Overall Sales Count: ${totalSalesCount}</h6></th>
+`;
+tableBody.appendChild(salesCountRow);
+            }
+      })
+      
+    }
+  </script>
+  
+     
+<%-include("../layouts/footer")%>

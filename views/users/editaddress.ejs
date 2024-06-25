@@ -98,9 +98,9 @@
                     document.getElementById('pincode_label').innerText='Please enter a valid pincode';
                     return false;
                 }
-                var phonePattern = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/;
+                var phonePattern =/^(\+91[\-\s]?)?[789]\d{9}$/;
                 if (!phonePattern.test(phone)) {
-                    document.getElementById('phone_label').innerText='Please enter a valid phone number';
+                    document.getElementById('phone_label').innerText='Please enter a valid INR phone number';
                     return false;
                 }
                 if (hasRepeatedCharacters(name)==false ||hasRepeatedCharacters(country)==false ||hasRepeatedCharacters(address)==false ||hasRepeatedCharacters(city)==false) {

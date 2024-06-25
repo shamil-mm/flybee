@@ -1,3 +1,11 @@
+<style>
+	.coupons{
+		padding: 2rem;
+	}
+	.codeds:hover{
+	   cursor: pointer;
+	}
+</style>
 
 <%-include('../layouts/userheader')%>
 
@@ -10,8 +18,8 @@
             <nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+						<li class="breadcrumb-item"><a href="/homePage">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/cart">Shopping Cart</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Checkout</li>
                     </ol>
                 </div><!-- End .container -->
@@ -19,36 +27,49 @@
 
             <div class="page-content">
             	<div class="checkout">
-					<%if(product.length>0){%>
+					<%if(product.length>=1){%>
+						
 	                <div class="container">
             			<div class="checkout-discount">
             				<div class="cart-discount">
-                                <form action="#">
+                                <form action="/couponVerifiction"  method="post" id="couponVerifiction">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" required placeholder="coupon code">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-primary-2" type="submit"  style="height: fit-content;"><i class="icon-long-arrow-right"></i></button>
-                                        </div><!-- .End .input-group-append -->
+										
+										
+										
+                                        <%console.log(couponStatus)%>
+                                        <%if(!couponStatus){%>
+											<input type="text" id="couponInput" class="form-control" required placeholder="coupon code" name="coupon_code">	
+											<!-- <select id="couponInput" placeholder="coupon code" class="form-control" required name="coupon_code">
+												
+											</select>										 -->
+											<div class="input-group-append">
+											<button class="btn btn-outline-primary-2" type="submit"  style="height:4rem;"><i class="icon-long-arrow-right"></i></button>	
+											</div><!-- .End .input-group-append -->
+											<%}else{%>
+											<input type="text" class="form-control" required placeholder="code appied" name="coupon_code"disabled >
+											<div class="input-group-append">
+											<button class="btn btn-outline-primary-2" type="button" onclick="reCoupon('<%=couponStatus._id%>')"  style="height: fit-content; width: 8rem;">REMOVE</button>	
+											</div><!-- .End .input-group-append -->
+											<%}%>
+										
                                     </div><!-- End .input-group -->
                                 </form>
                             </div><!-- End .cart-discount -->
             			</div><!-- End .checkout-discount -->
-            			<form method="post" id="orderAddress">
 						
-		                	<div class="row">
-		                		<div class="col-lg-9">
+            		
+						<div class="row">
+							<div class="col-lg-9">
+									<%if(addressFound){%>
                                     <!-- render the address details -->
                                     <div class="row">
 										
-										<%if(addressFound){%>
-											
+										
 										<%datas.addresses.forEach((value)=>{%>
-											
 								    		<div class="col-lg-6" id="<%=value._id%>">
 								    			<div class="card card-dashboard">
-								    				<div class="card-body">
-														
-								    					<h3 class="card-title">Address</h3>
+								    				<div class="card-body"><h3 class="card-title">Address</h3>
 														<p class="addressdetails">name: <%=value.name%> <br>
 															address: <%=value.address%> <br>
 															email: <%=value.email%> <br>
@@ -57,7 +78,7 @@
 															state: <%=value.state%> <br>
 															pincode: <%=value.pincode%> <br>
 															phone: <%=value.phone%> <br>
-                                                           select address for delivery &nbsp; <input class="Allcheckbox" id="inputBox" type="checkbox" style="margin:3vh;"  value="<%=value._id%>" onclick="checkfunction('<%=value._id%>')"> 
+                                                           select address for delivery &nbsp; <input class="Allcheckbox" id="inputBox" type="checkbox" style="margin:3vh;" required value="<%=value._id%>" onclick="checkfunction('<%=value._id%>')"> 
 														</p>
 														
 														<a href="/editAddressrender?id=<%=value._id%>">Edit<i class="icon-edit"></i></a> &nbsp; &nbsp;
@@ -67,13 +88,17 @@
 								    			</div><!-- End .card-dashboard -->
 								    		</div><!-- End .col-lg-6 -->
 											<%})%>
-											<%}else{%>
-												<p>address not fount on cart <a href="/personalInfo">click </a>here to set address</p>
-											<%}%>	
-								    	</div><!-- End .row -->
+											
+										</div><!-- End .row -->
+										<%}%> 
                                         
+										<a href="/EditAddress" id="clickone" class="btn btn-outline-primary-2">
+											<span>Add Address</span>
+											<i class="icon-long-arrow-right"></i>
+										</a>
+	
 		                			</div><!-- End .col-lg-9 -->
-                                    
+                                  
 		                		<aside class="col-lg-3">
 									
 		                			<div class="summary">
@@ -95,31 +120,39 @@
 										
 												<%product.forEach((value)=>{%>
 											
-												
-												
 		                						<tr>
 		                							<td><a href="#"></a><%=value.productId.product_name%></td>
-
 		                							<td class="quantity" style="text-align: center;"><%=value.quantity%></td>
+													<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
+														<td class="price"><%=value.productId.price-value.productId.price*value.productId.offerPercentage/100%></td>
+														<%}else{%>
+															<td class="price"><%=value.productId.price%></td>
+															<%}%>
 		                							
-		                							<td class="price"><%=value.productId.price%></td>
 		                						</tr>
 												
 												<%})%>
-		                						<tr class="summary-subtotal">
+												
+		                						<tr class="summary-total">
+													
 		                							<td >Subtotal:</td>
 		                							<td id="sub"><%=total%></td>
 		                						</tr><!-- End .summary-subtotal -->
+												<%if(couponStatus){%>
+													
+		                						<tr class="summary-total">
+													<h6></h6>
+		                							<td >Discount:</td>
+		                							<td><%=couponStatus.discountAmount%>%</td>
+													
+		                						</tr><!-- End .summary-subtotal -->
 												
-		                						<tr>
-		                							<td>Shipping:</td>
-		                							<td id="shippingstatus"></td>
-		                						</tr>
+		                						
 												<tr class="summary-total">
 		                							<td>Total:</td>
-		                							<td id="gtotal"></td>
+		                							<td><%=total-(couponStatus.discountAmount*total/100)%></td>
 		                						</tr><!-- End .summary-total -->
-												
+												<%}%>
 												
 		                					</tbody>
 		                				</table><!-- End .table table-summary -->
@@ -127,44 +160,130 @@
 		                				<div class="accordion-summary" id="accordion-payment">
 										    
 
-										   
+												<!-- 										   
 											<div>
 												<input type="radio" class="collapsed checkAnchor" name="pMethod" value="Cash_on_delivery">Cash on delivery</input>
 											</div>
 											<div>
 												<input  type="radio" class="collapsed checkAnchor" name="pMethod" value="Razorpay">Razorpay</input>
+												
 											</div>
 										           
-											
+											 -->
+											 <div class="card">
+										        <div class="card-header" id="heading-1">
+										            <h2 class="card-title">
+										                <a class="checkAnchor" role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
+										                    Cash on delivery
+										                </a>
+										            </h2>
+										        </div><!-- End .card-header -->
+										        <div id="collapse-1" class="collapse show" aria-labelledby="heading-1" data-parent="#accordion-payment">
+										            <div class="card-body">
+														Cash on Delivery (COD) is a payment method where the customer pays for products upon delivery.										        </div><!-- End .collapse -->
+										    </div><!-- End .card -->
+
+										    <div class="card">
+										        <div class="card-header" id="heading-2">
+										            <h2 class="card-title">
+										                <a class="collapsed checkAnchor" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
+										                    Razorpay
+										                </a>
+										            </h2>
+										        </div><!-- End .card-header -->
+										        <div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion-payment">
+										            <div class="card-body">
+														Razorpay is provides online payment solutions.										            </div><!-- End .card-body -->
+										        </div><!-- End .collapse -->
+										    </div><!-- End .card -->
+
 										    
 										            
 
 										    
 										</div><!-- End .accordion -->
 
-		                				<button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+										<%if(addressFound && datas.addresses.length>0){%>
+											
+												
+												
+										<%if(couponStatus){%>
+
+											<button onclick="return Place_Order('<%=couponStatus._id%>','<%=couponStatus.discountAmount%>')" class="btn btn-outline-primary-2 btn-order btn-block">
+												<span class="btn-text">Place Order</span>
+												<span class="btn-hover-text">Proceed to Checkout</span>
+											</button>
+											
+											<%}else{%>
+		                				<button onclick="return Place_Order()" class="btn btn-outline-primary-2 btn-order btn-block">
 		                					<span class="btn-text">Place Order</span>
 		                					<span class="btn-hover-text">Proceed to Checkout</span>
 		                				</button>
+										<%}%>
+
+									
+
+										<%}else{%>
+											<br>
+											<button onclick="return Place_Order()" class="btn btn-outline-primary-2 btn-order btn-block" disabled>
+												<span class="btn-text">Place Order</span>
+												<span class="btn-hover-text">Add  Address to Proceed</span>
+											</button>
+											
+											
+											<%}%>
 		                			</div><!-- End .summary -->
 									
 		                		</aside><!-- End .col-lg-3 -->
 		                	</div><!-- End .row -->
-            			</form>
-	                </div><!-- End .container -->
-					<%}else{%>
-						<div class="container" style="text-align: center;">
-							<div id="cart">
-								<h2 >No products in your cart</h2>
-							
-								<a href="/product">Add Product</a>
+            			
+					    </div><!-- End .container -->
+						
+
+					
+
+							<%}else{%>
+							<div class="container" style="text-align: center;">
+								<div id="cart">
+									<h2 >No products in your cart</h2>
+								
+									<a href="/product">Add Product</a>
+								</div>
 							</div>
-						</div>
 						
 						<%}%>
-                </div><!-- End .checkout -->
-            </div><!-- End .page-content -->
-        </main><!-- End .main -->
+									</div><!-- End .checkout -->
+							</div><!-- End .page-content -->
+						</main><!-- End .main -->
+
+
+
+
+
+						<!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+	Launch demo modal
+  </button> -->
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="padding: 1rem; width: 40rem;">
+            <div class="modal-header "  >
+                <h5 style="padding-left: 8rem;" id="exampleModalLongTitle" >Available Coupons</h5>
+                <button type="button" class="close text-black" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+			
+			<div id="couponsContainer" style="text-align: center;"></div>
+            <div class="modal-footer">
+                <button  type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 		
 
 
@@ -174,9 +293,75 @@
 
 
 
-
+		<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+		
         <script>
+			document.getElementById('couponInput').addEventListener('click', () => {
+
+				$('#exampleModalCenter').modal('show');
+    const product = `<%- JSON.stringify(product) %>`;
+    
+    fetch('/fetchAvaliableCoupon', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ datas: product })
+    })
+    .then(response => response.json())
+    .then(data => {
+		const couponsContainer = document.getElementById('couponsContainer');
+        couponsContainer.innerHTML = '';  
+
+        if (data && data.length > 0) {
+            data.forEach(coupon => {
+				const couponElement = document.createElement('div');
+                couponElement.className = 'coupons';
+                
+                couponElement.innerHTML = `
+            <h6>${coupon.name} 
+                <span onclick="copyCoupon('${coupon._id}')" id="code${coupon._id}" class="bg-primary codeds" data-toggle="tooltip" title="Copy">${coupon.code}</span>
+                (${coupon.discountAmount}% OFF)
+            </h6>`;
+
+                couponsContainer.appendChild(couponElement);
+            });
+        } else {
+            couponsContainer.innerHTML = '<p>No available coupons.</p>';
+        }
+		
+    
+    
+
+	
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+function copyCoupon(couponId) {
+    const couponCode = document.getElementById(`code${couponId}`).textContent;
+    navigator.clipboard.writeText(couponCode)
+        .then(() => {
+         
+			document.getElementById('couponInput').value=couponCode
+			$('#exampleModalCenter').modal('hide');
+        })
+        .catch(err => {
+            console.error('Failed to copy coupon code: ', err);
+            alert('Failed to copy coupon code. Please try again.');
+        });
+}
+
+
+
+
+
+
+
+
             function deletefn(id){
                 Swal.fire({
                     title: 'Are you sure?',
@@ -189,6 +374,7 @@
                         fetch('/deleteAddress?id='+id,{method:'delete'})
                         const row=document.getElementById(id)
                         row.style.display='none';
+						window.location.reload()
                         return true
                         
                     }else{
@@ -204,7 +390,6 @@
 		
 		 function checkfunction(id){
 			const addressform=document.getElementById('orderAddress')
-			addressform.setAttribute('action','/Order?id='+id+'&total='+'<%=total%>')
 			const checkboxes=document.getElementsByClassName('Allcheckbox')
 			for (let checkbox of checkboxes) {
 					if(checkbox.value==id){
@@ -212,71 +397,252 @@
 					}else{
 						checkbox.checked=false
 					}
-				
-       
             }
-			
-			
-			
-				
-			
 		 }
-		 if('<%=order%>'){
-			Swal.fire({
-  icon: 'success',
-  title: 'Order Saved!',
-  text: 'Your order has been successfully saved.',
-  showCancelButton: true,  
-  confirmButtonText: 'Purchase More Products',
-}).then((result) => {
- 
-  if (result.isConfirmed) {
-	 window.location.href = '/product';  
-  } else {
-    window.location.href = '/personalInfo'; 
-  }
-});
-
-		 }
+		 </script>
+		 <script>
+		 
 		 window.onload=function(){
-			
-			
-		
-		
 			const id=document.getElementById('inputBox').value
 			const addressform=document.getElementById('orderAddress')
 			const checkboxes=document.getElementsByClassName('Allcheckbox')
+			const couponVerifiction=document.getElementById('couponVerifiction')
+		
 			if(checkboxes.length==1){
 				for (let checkbox of checkboxes) {
 					checkbox.checked=true
-					const checkAnchor=document.querySelectorAll('.checkAnchor')
-					checkAnchor.forEach((element) => {
-            element.addEventListener('click', () => {
-				if(element.value=="Cash_on_delivery"){
-					addressform.setAttribute('action','/Order?id='+id+'&total='+'<%=total%>'&'payment='+element.value)
-				}else if(element.value=="Razorpay"){
-					console.log(element.value)
-				}
-                    });
-			
-		            })
-					
-					// addressform.setAttribute('action','/Order?id='+id+'&total='+'<%=total%>')
 				}
 			}
 
-		const sub= document.getElementById('sub').innerText
-		if(sub>50000){
-		document.getElementById('shippingstatus').innerText="Free shipping"
-		document.getElementById('gtotal').innerText='<%=total%>'
-		}else{
-			document.getElementById('shippingstatus').innerText="100₹"
-			document.getElementById('gtotal').innerText=parseInt('<%=total%>')+100
+if('<%=Cmsg%>'){
+			Swal.fire({
+                    title: 'ERROR',
+                    text: '<%=Cmsg%>',
+                    icon: 'error',
+                    
+                })
+		}
+		if('<%=Csmsg%>'){
+			Swal.fire({
+                    title: 'Success',
+                    text: '<%=Csmsg%>',
+                    icon: 'success',
+                    
+                })
 		}
 
 
 
 		 }
+		
+
+		 function Place_Order(couponId,discount){
+
+		
+					
+			        const id=document.getElementById('inputBox').value
+					const checkAnchor=document.querySelectorAll('.checkAnchor')
+					
+					
+					checkAnchor.forEach((element) => {
+						if (element.ariaExpanded === "true") {
+							if(element.innerHTML.trim()=="Cash on delivery"){
+								if(couponId==undefined && discount==undefined){
+									
+									fetch('/Order?id='+id+'&total='+'<%=total%>',{method:'post'})
+									.then(response=>response.json())
+									.then(data=>{
+										
+										Swal.fire({
+										icon: data.icon,
+										title: data.title,
+										text: data.text,
+										showCancelButton: true,  
+										confirmButtonText: 'Purchase More',
+										}).then((result) => {
+										
+										if (result.isConfirmed) {
+											window.location.href = '/product';  
+										} else {
+											window.location.href = '/personalInfo'
+										}
+								});
+									})
+									
+								}else{
+									
+									
+									const discoundAmd='<%=total%>'-(discount*'<%=total%>'/100)
+									fetch('/Order?id='+id+'&total='+discoundAmd+'&couponId='+couponId+'&couponpercentage='+discount,{method:'post'})
+									.then(response=>response.json())
+									.then(data=>{
+										
+										Swal.fire({
+										icon: data.icon,
+										title: data.title,
+										text: data.text,
+										showCancelButton: true,  
+										confirmButtonText: 'Purchase More',
+										}).then((result) => {
+										
+										if (result.isConfirmed) {
+											window.location.href = '/product';  
+										} else {
+											window.location.href = '/personalInfo'
+										}
+								});
+									})
+
+
+								}
+
+		 
+
+							}
+							// cod======================================================================================================
+							else if(element.innerHTML.trim()=="Razorpay"){
+								
+								if(couponId==undefined && discount==undefined){
+									// console.log("enter undefinder")
+								
+									fetch('/razorpay?total=<%=total%>',{method:"post", headers: {'Content-Type': 'application/json'}})
+									.then(response => response.json())
+									.then(res => {
+									if (res.success) {
+									var options = {
+										"key": res.key_id,
+										"amount": res.amount,
+
+										"currency": "INR",
+										"name": res.product_name,
+										"description": res.description,
+										"image": "https://dummyimage.com/600x400/000/fff",
+										"order_id": res.order_id,
+										"handler": function (response){
+											fetch('/Order?id='+id+'&total='+'<%=total%>'+'&payment='+"razorpay",{method:'post'})
+											
+											window.location.href = '/razorpayError?status=success';		
+														// 		Swal.fire({
+														// 				icon: 'success',
+														// 				title: 'Order Saved!',
+														// 				text: 'Your order has been successfully saved.',
+														// 				showCancelButton: true,  
+														// 				confirmButtonText: 'Purchase More Products',
+														// }).then((result) => {
+														
+														// if (result.isConfirmed) {
+														// 	window.location.href = '/product';  
+														// } else {
+														// 	window.location.href = '/personalInfo'
+														// }
+														// 		});
+                           
+													},
+													"prefill": {
+														"contact": res.contact,
+														"name": res.name,
+														"email": res.email
+													},
+													"notes" : {
+														"description": res.description
+													},
+													"theme": {
+														"color": "#2300a3"
+													}
+												};
+												var razorpayObject = new Razorpay(options);
+												razorpayObject.on('payment.failed', function (response){
+												
+													razorpayObject.close();
+													window.location.href = '/razorpayError?status=faile';
+													
+
+												});
+												razorpayObject.open();
+											}
+									})
+									.catch((error) => {
+										console.error('Error:', error);
+									});
+								}
+								else{
+									
+									
+									const discoundAmd='<%=total%>'-(discount*'<%=total%>'/100)
+									
+
+								fetch('/razorpay?total='+discoundAmd,{method:"post", headers: {'Content-Type': 'application/json'}})
+								.then(response => response.json())
+								.then(res => {
+									if (res.success) {
+								var options = {
+								"key": res.key_id,
+								"amount": res.amount,
+								"currency": "INR",
+								"name": res.product_name,
+								"description": res.description,
+								"image": "https://dummyimage.com/600x400/000/fff",
+								"order_id": res.order_id,
+								"handler": function (response){
+									fetch('/Order?id='+id+'&total='+discoundAmd+'&couponId='+couponId+'&couponpercentage='+discount+'&payment='+"razorpay",{method:'post'})
+									
+
+								Swal.fire({
+									icon: 'success',
+									title: 'Order Saved!',
+									text: 'Your order has been successfully saved.',
+									showCancelButton: true,  
+									confirmButtonText: 'Purchase More Products',
+									}).then((result) => {
+									
+									if (result.isConfirmed) {
+										window.location.href = '/product';  
+									} else {
+										window.location.href = '/personalInfo'
+									}
+								});
+
+								},
+								"prefill": {
+								"contact": res.contact,
+								"name": res.name,
+								"email": res.email
+								},
+								"notes" : {
+								"description": res.description
+								},
+								"theme": {
+								"color": "#2300a3"
+								}
+								};
+								var razorpayObject = new Razorpay(options);
+								razorpayObject.on('payment.failed', function (response){
+								alert("Payment Failed");
+								});
+								razorpayObject.open();
+								}
+								})
+								.catch((error) => {
+									console.error('Error:', error);
+								});
+								}
+							}
+						}
+					})
+							
+
+		 }
+
+
+
+
+		function reCoupon(id){
+			fetch('/removeCoupon?id='+id,{method:'post'})
+		
+			location.reload();
+			
+			
+		}
 		 
 		</script>
 

@@ -1,4 +1,81 @@
 
+<style>
+	* {
+    animation: none !important;
+    transition: none !important;
+}
+
+	/* .modal-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+} */
+
+.container {
+    padding-left: 20px;
+    width: 100%;
+}
+
+.container > .pl-5 {
+    padding-left: 20px;
+    width: calc(100% - 40px);
+}
+	.coupon-card {
+		
+		background-color: black;
+		border: 8px solid hwb(20 65% 33%);
+		border-radius: 2px;
+		padding: 10px;
+		margin: 10px;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	}
+	.coupon-card h3 {
+		margin-bottom: 20px;
+	}
+	.coupon-details p {
+		margin: 5px 0;
+	}
+
+	.wallet-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 50rem;
+            text-align: center;
+        }
+        .wallet-container h1 {
+            margin-bottom: 20px;
+        }
+        .wallet-balance {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .transaction-history {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .transaction-history p {
+            margin: 5px 0;
+        }
+        .wallet-container button {
+            padding: 10px 20px;
+            background-color: #c69c61;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+            width: calc(100% - 22px);
+        }
+        .wallet-container button:hover {
+            background-color: #c69c61;
+        }
+</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <%-include('../layouts/userheader')%>
@@ -32,10 +109,13 @@
 								        <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-orders" role="tab" aria-controls="tab-orders" aria-selected="false">Orders</a>
 								    </li>
 								    <li class="nav-item">
-								        <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads" role="tab" aria-controls="tab-downloads" aria-selected="false">Downloads</a>
+								        <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads" role="tab" aria-controls="tab-downloads" aria-selected="false">Coupons</a>
 								    </li>
 								    <li class="nav-item">
 								        <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Adresses</a>
+								    </li>
+								    <li class="nav-item">
+								        <a class="nav-link" id="tab-wallet-link" data-toggle="tab" href="#tab-wallet" role="tab" aria-controls="tab-wallet" aria-selected="false">Wallet</a>
 								    </li>
 								   
 								    <li class="nav-item">
@@ -145,7 +225,7 @@
   </div>
   <div class="tab-pane fade" id="tab-orders" role="tabpanel" aria-labelledby="tab-orders-link">
     <div class="table-responsive"> 
-		<%if(orderfound){%>
+		<%if(orderfound && order.length>0){%>
         <table class="table table-bordered table-striped">
             <thead class="thead-dark" style="text-align: center; ">
                 <tr>
@@ -160,27 +240,101 @@
 			
             <tbody>
 				
-				<% order.OrderedProducts.forEach((value) => { %>
+				<%order.reverse().forEach((valueOne)=>{%>
+		
+					<%if(valueOne.OrderedProducts.length>1){%>
+
+						
+						<%valueOne.OrderedProducts.forEach((value)=>{%>
 					
-                <tr  style="text-align: center; background-color: rgb(250, 250, 250);">
+							<tr  style="text-align: center; background-color: rgb(250, 250, 250); ">
+					   
+					   <td><img src="/proimgs/<%=value.productId.image[2]%>" alt="User Image"></td>
+					   <td><%= value.productId.product_name %></td>
+					   <%if(value.orderStatus=='Canceled'){%>
+						   <td>00.0</td>
+						   <%}else{%>
+							<%if(valueOne.couponPercentage){%>
+								<td>Offer Price <br> <%= value.productId.price-value.productId.price*(valueOne.couponPercentage/100)%></td>
+								<%}else{%>
+									<td><%= valueOne.TotalAmount%></td>
+								<%}%>
+							   
+						   <%}%>
+					   <%if(value.returnRequest==true && value.orderStatus!=='Return'){%>
+						   <td id="req<%=value._id%>">Requested return</td>
+						   <%}else{%>
+							 <td id="ROW<%=value._id%>"><%=value.orderStatus%></td>
+						   <%}%>
+						   
+							   
+							   
+					   
+					   
+					   <td class="dateData" id="<%=value._id%>" value="'<%=value.orderDate%>'"></td>
+					   <td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>')">view details</a></td>
+					   
+				   
+						   </tr>
+						
+					   <%})%>
 					
-                    <td><img src="/proimgs/<%=value.productId.image[2]%>" alt="User Image"></td>
-                    <td><%= value.productId.product_name %></td>
-                    <td><%= value.productId.price %></td>
-                    <td id="ROW<%=value._id%>"><%=value.orderStatus%></td>
-                    <td class="dateData" id="<%=value._id%>" value="'<%=value.orderDate%>'"></td>
-					<td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>')">view details</a> </td>
-                    
 				
-                </tr>
-				<% }) %>
+
+
+						<%}else{%>
+							<%valueOne.OrderedProducts.forEach((value)=>{%>
+								<%console.log(valueOne.couponPercentage)%>
+								<tr  style="text-align: center; background-color: rgb(250, 250, 250);">
+						   
+						   <td><img src="/proimgs/<%=value.productId.image[2]%>" alt="User Image"></td>
+						   <td><%= value.productId.product_name %></td>
+						   <%if(value.orderStatus=='Canceled'){%>
+							   <td>00.0</td>
+							   <%}else{%>
+								<%if(valueOne.couponPercentage){%>
+									<td>Offer Price <br><%= value.productId.price-value.productId.price*(valueOne.couponPercentage/100)%></td>
+									<%}else{%>
+										<td id="p<%=value._id%>"><%=valueOne.TotalAmount%></td>
+									<%}%>
+
+
+
+
+								
+							   <%}%>
+						   <%if(value.returnRequest==true && value.orderStatus!=='Return'){%>
+							   <td id="req<%=value._id%>">Requested return</td>
+							   <%}else{%>
+								   <td id="ROW<%=value._id%>"><%=value.orderStatus%></td>
+							   <%}%>
+							   
+				
+						   <td class="dateData" id="<%=value._id%>" value="'<%=value.orderDate%>'"></td>
+						   <%if(value.returnRequest==true){%>
+							<td id='button<%=value._id%>'>view details</td>
+							<%}else{%>
+								<td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>')">view details</a></td>
+								<%}%>
+						   
+					   
+							   </tr>
+						   <%})%>
+						
+						
+						
+						<%}%>
+					
+				<%})%>
+					
+               
 				
             </tbody>
 			
         </table>
 		
 				<%}else{%>
-					<p>Order not found... make order please <a href="/product">click</a></p><%}%>
+					<p>Order not found...    Please make orders  <a href="/product">click</a></p><%}%>
     </div>
 
    
@@ -225,6 +379,84 @@
 											<i class="icon-long-arrow-right"></i>
 										</a>
 								    </div><!-- .End .tab-pane -->
+									<div class="tab-pane fade" id="tab-downloads" role="tabpanel" aria-labelledby="tab-downloads-link">
+										<div class="row">
+										
+								    <%if(coupon){%>
+										<%coupon.forEach((value)=>{%>
+											
+											
+								    		<div class="col-lg-6" >
+								    		
+								    				
+														<div class="coupon-card" >
+															<div class="card-body" style="text-align: center;">
+																<h3 class="card-title" style="color: hwb(35 38% 22%);"><%=value.name%></h3>
+																<div class="coupon-details">
+																	
+																	<p  style="color: hwb(35 38% 22%);"><strong>Code:</strong><span style="background-color: hwb(35 38% 22%);color: black;cursor: pointer;" onclick="copyData('<%=value._id%>')" id="copyData<%=value._id%>"><%=value.code%></span>  <span id="copied<%=value._id%>"></span></p>
+																	<p style="color: hwb(35 38% 22%);"><strong>Minimum Amount:</strong> <%=value.minAmount%></p>
+																	<p style="color: hwb(35 38% 22%);"><strong>Maximum Amount:</strong><%=value.maxAmount%></p>
+																	<p style="color: hwb(35 38% 22%);"><strong>Discount Percentage:</strong> <%=value.discountAmount%> %</p>
+																</div>
+															</div><!-- End .card-body -->
+														</div><!-- End .col-lg-6 -->			
+											</div>
+												
+											<%})%>
+											<%}else{%>
+												<p>No  coupon available</p>
+												<%}%>
+											
+								    	</div><!-- End .row -->
+										
+										
+								    </div><!-- .End .tab-pane -->
+									<div class="tab-pane fade" id="tab-wallet" role="tabpanel" aria-labelledby="tab-wallet-link">
+										<div class="col-lg-6" >
+											
+											<%if(fullData){%>
+												
+											<div class="wallet-container">
+												<h3>Wallet</h3>
+												<div class="wallet-balance">
+													Balance: <span id="walletBalance"><%=fullData.totalAmount%></span>
+												</div>
+												<div class="transaction-history">
+													<h6 style="text-align: center ;">Transaction History</h6>
+													<%fullData.transactions.forEach((value)=>{%>
+														
+														<%if(value.type=='CREDIT'){%>
+															<p style="text-align: center;"><span><%=value.timeStamp.toLocaleDateString()%></span>&nbsp; &nbsp; &nbsp;<span><%=value.type%></span>&nbsp; &nbsp; &nbsp;<span>+<%=value.amount%></span>&nbsp; &nbsp; &nbsp;<span> <%=value.description%> </span></p>
+															<%}else{%>
+																<p><span>DEBIT </span><span style="margin-left: 10rem;"> - <%=value.amount%></span></p>
+																
+																<%}%>
+													<%})%>
+													
+													
+													
+												</div>
+												<div class="pagination-area mt-50 mb-50" >
+													
+														<ul class="pagination justify-content-center" >
+															
+															<%for(i=1;i<=fullData.totalPages;i++){%>
+															<li class="page-item active"><a class="page-link" href="/personalInfo?page=<%=i%>#tab-wallet"><%=i%></a></li>
+																<%}%>
+															
+														</ul>
+												
+												</div> 
+												<button id="addMoney">Add Money</button>
+												<!-- <button id="withdrawMoney">Withdraw Money</button> -->
+											</div>
+											<%}else{%>
+												<p>Wallet not found</p>
+												<%}%>
+										</div>
+
+									</div>
 
 								   
 									
@@ -281,8 +513,10 @@
 				<span ></span><br>
 				<span ></span><br>
 				<span ></span><br> 
-				<button  class="btn btn-outline-primary-2" style="margin-top: 5vh;margin-bottom: 5vh;">cancel order</button>
-				
+				<div style="display: flex; flex-direction: row; ">
+				<a  class="btn btn-outline-primary-2" >Return</a> &nbsp;
+				<button  class="btn btn-outline-primary-2" >Cancel order</button>
+			</div>
 				<br>
 			</div>
 			
@@ -300,8 +534,72 @@
   </div>
 
 	</div>
+<!-- reason modal starts -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Open modal for @mdo</button> -->
+
+
+<div class="modal fade" id="exampleModal111" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" >
+    <div class="modal-content" style="padding:2rem">
+      <div class="modal-header">
+       <h4>REASON</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    
+        <form  id="reason" method="post">
+          <div class="form-group">
+            <label for="message-text" class="col-form-label">Message:</label>
+            <textarea class="form-control" id="message-text" name="reason"></textarea>
+          </div>
+       
+   
+      <div class="modal-footer">
+        
+        <button type="submit" class="btn btn-outline-primary-2"  id="subButton">Send message</button>
+      </div>
+	</form>
+    </div>
+  </div>
+</div>
+<!-- reason modal ends-->
+
+
+
+
+
+
+
+
+
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
+		window.onload=function(){
+		const dateTags=document.getElementsByClassName('dateData')
+		console.log(dateTags.value)
+		for(i=0;i<dateTags.length;i++){
+			const date=new Date(dateTags[i].getAttribute('value'))
+			const id=dateTags[i].getAttribute('id')
+			const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+			document.getElementById(id).innerHTML=formattedDate
+			
+		}
+
+		
+		if(window.location.hash=='#tab-wallet'){
+			document.getElementById('tab-wallet-link').click()
+		}
+		
+		
+
+		
+		}
+
+
+
+
+
 
 
 
@@ -329,23 +627,114 @@
         document.querySelector('.pl-5 span:nth-of-type(12)').textContent = `PRODUCT SIZE : ${userInfo.productId.size}`;
         document.querySelector('.pl-5 span:nth-of-type(13)').textContent = `BRAND : ${userInfo.productId.brand}`;
         document.querySelector('.pl-5 span:nth-of-type(14)').textContent = `DESCRIPTION : ${userInfo.productId.Description}`;
-        document.querySelector('.pl-5 span:nth-of-type(15)').textContent = `PRICE : ${userInfo.productId.price}`;
+        document.querySelector('.pl-5 span:nth-of-type(15)').textContent = `PRODUCT PRICE : ${userInfo.productId.price}`;
 		document.querySelector('.pl-5 button').setAttribute('onclick',`cancelproduct( '${status}','${userInfo._id}')`)
 		document.querySelector('.pl-5 button').setAttribute('id',`b${rowid}`)
+		document.querySelector('.pl-5 a').setAttribute('onclick',`returnProduct( '${status}','${userInfo._id}')`)
+		document.querySelector('.pl-5 a').setAttribute('id',`rs${rowid}`)
+
 		if(status=="Canceled"){
-				console.log("hello beee")
-				document.getElementById("b"+rowid).remove()
+		
+			document.getElementById("b"+rowid).setAttribute('disabled', 'true');
+			document.getElementById("b"+rowid).innerHTML='Canceled'	
+			document.getElementById("rs"+rowid).style.display='none'
+			}else if(status=="Placed"){
+				document.getElementById("b"+rowid).removeAttribute('disabled');
+				document.getElementById("b"+rowid).innerHTML='Cancel Order'
 				
+				document.getElementById("rs"+rowid).style.display='none'
 			}
+			else if(status=="Delivered"){
+				document.getElementById("rs"+rowid).removeAttribute('disabled');
+				document.getElementById("b"+rowid).style.display='none'
+			}
+			else if(status=="Pending"){
+				document.getElementById("rs"+rowid).style.display='none'
+				document.getElementById("b"+rowid).style.display='block'
+			}
+			else if(status=="Processing"){
+				document.getElementById("rs"+rowid).style.display='none'
+				document.getElementById("b"+rowid).style.display='block'
+			}
+			else if(status=="Return"){
+				document.getElementById("rs"+rowid).removeAttribute('disabled');
+				document.getElementById("b"+rowid).style.display='none'
+				document.getElementById("rs"+rowid).innerHTML='Returned'
+			}
+			else if(status=="Shipping"){
+				document.getElementById("rs"+rowid).style.display='none'
+				document.getElementById("b"+rowid).style.display='block'
+			}
+		// if(document.getElementById('req'+rowid).innerHTML=='Requested return'){
+		// 	document.querySelector('.pl-5 a').innerHTML='Requested return';
+		// 	document.querySelector('.pl-5 a').style.marginBottom="5vh"
+		// 	document.querySelector('.pl-5 a').classList.add('disabled');
+		// 	document.querySelector('.pl-5 button').style.display='none'
+		// }
 		
 	
 	})
+
 	
 }
+function returnProduct(status,rowid){
+			
+		// document.getElementById('subButton').setAttribute('data-dismiss','modal')
+		$('#exampleModalCenter000').modal('hide')
+	swal.fire({
+        title: "Are you sure?",
+    text: "Do you want to return this product?",
+    icon: "warning",
+    showCancelButton: true, 
+    confirmButtonText: "Yes, return it", 
+    cancelButtonText: "No, keep it",
+    confirmButtonColor: "#c69c61",
+    cancelButtonColor: "#c69c61",
+    })
+    .then((result) => {
+    if (result.value) {
+	
+		console.log("showing modal")
+		document.getElementById('reason').setAttribute('action','/reasonSubmit?orderId='+rowid)
+		var reasonmodal=document.getElementById('exampleModal111')
+		var modal = new bootstrap.Modal(reasonmodal)
+		modal.show();
+		document.getElementById('subButton').addEventListener('click',()=>{
+		
+			reasonSub(`${rowid}`)
+		})
+		
+	
+    } else{
+		swal.fire({
+    title: "Cancelled",
+    text: "Product is not returned.",
+    icon: "info",
+    timer: 1000, 
+    showConfirmButton: false
+});
+        
+    }
+});
+
+}
+function reasonSub(rowid){
+	console.log("reason sub")
+	
+		fetch('/returnProduct?id='+rowid,{method:'post'}) 
+		if(document.getElementById('req'+rowid)){
+			document.getElementById("rs"+rowid).innerHTML="Return Requested";
+		if(document.getElementById('req'+rowid).innerHTML=='Return Requested'){
+			document.querySelector('.pl-5 a').innerHTML='Return Requested';
+			document.querySelector('.pl-5 a').style.marginBottom="5vh"
+			document.querySelector('.pl-5 a').classList.add('disabled');
+			document.querySelector('.pl-5 button').style.display='none'
+		}
+		}
+    }
 
 
  function cancelproduct(status,rowid){
-	
 	swal.fire({
         title: "Are you sure?",
     text: "Do you want to remove this product from your order?",
@@ -358,9 +747,17 @@
     })
     .then((result) => {
     if (result.value) {
-		
+
+	
         fetch('/removeproductorder?id='+rowid,{method:'post'})
-				$('#exampleModalCenter000').modal('hide');
+		document.getElementById("b"+rowid).innerHTML='Canceled'	
+		document.getElementById("b"+rowid).setAttribute('disabled', 'true');
+		document.getElementById("p"+rowid).innerHTML='00.0'	
+		document.getElementById("rs"+rowid).style.display='none'
+		
+				
+				
+				
     } else{
 		swal.fire({
     title: "Cancelled",
@@ -375,10 +772,7 @@
 const rowone=document.getElementById("ROW"+rowid).innerHTML="Canceled"
 }
 
-
-		
-
-		function deletefn(id){
+function deletefn(id){
 			Swal.fire({
                 title: 'Are you sure?',
                 text: `Do you want to delete ?`,
@@ -401,20 +795,7 @@ const rowone=document.getElementById("ROW"+rowid).innerHTML="Canceled"
 		}
 	</script>
 	<script>
-		window.onload=function(){
-		const dateTags=document.getElementsByClassName('dateData')
-		console.log(dateTags.value)
-		for(i=0;i<dateTags.length;i++){
-			const date=new Date(dateTags[i].getAttribute('value'))
-			const id=dateTags[i].getAttribute('id')
-			const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-			document.getElementById(id).innerHTML=formattedDate
-			
-		}
 		
-
-		
-		}
 		function validateForm() {
 			
 			const name = document.getElementById('name').value.trim();
@@ -513,9 +894,44 @@ const rowone=document.getElementById("ROW"+rowid).innerHTML="Canceled"
         }
         return true;
     }
+
+
+
+	function copyData(id){
+		const copied=document.getElementById('copied'+id)
+		const copyText=document.getElementById('copyData'+id)
+         navigator.clipboard.writeText(copyText.innerHTML).then(function() {
+		
+	     copied.textContent = 'Copied!';
+      setTimeout(() => {
+        copied.style.display='none'
+      }, 1000); 
+
+
+    }).catch(function(error) {
+        console.error("Error copying text: ", error);
+    });
+	}
 </script>
+<script>
+	document.getElementById('reason').addEventListener('submit', function(event) {
+		var messageText = document.getElementById('message-text').value.trim();
 	
+		if (messageText === '') {
+			swal.fire({
+        title: "Please enter a reason?",
+        icon: "warning"
+    })
+			event.preventDefault();
+		}else{
+			var reasonmodal=document.getElementById('exampleModal111')
+		var modal = new bootstrap.Modal(reasonmodal)
+		modal.hide();
+		}
+	});
+	</script>
 	
+
 
 	
 

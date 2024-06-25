@@ -1,6 +1,6 @@
 const passport=require('passport')
 const googleStrategy=require('passport-google-oauth2')
-const userSchema=require('./models/user_model')
+const userSchema=require('./models/userSchema')
 require('dotenv').config();
 passport.use(new googleStrategy({
     clientID:process.env.CLIENT_ID,

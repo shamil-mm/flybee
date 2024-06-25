@@ -2,83 +2,105 @@ const google_pass=require('../passport')
 const express=require('express')
 const userRouter=express();
 userRouter.set('view engine','ejs')
-const mid_user=require('../middleware/userAuth')
+const userAuth=require('../middleware/userAuth')
 userRouter.set('views','views/users')
 userRouter.use(express.static('public/users'))
-const loadHome=require('../controller/User/loadHome')
-const loadSI=require('../controller/User/loadSI')
-const loadRG=require('../controller/User/loadRG')
-const loadOTP=require('../controller/User/loadOTP')
-const loadResentotp=require('../controller/User/loadResentotp')
-const reset_password=require('../controller/User/reset_password')
-const otp=require('../controller/User/otp')
-const repassword=require('../controller/User/repassword')
-const loadRepassword=require('../controller/User/loadRepassword')
+
+
+// controllers
+const user=require('../controller/User/user')
 const logOut=require('../controller/User/logOut')
-const render_Product=require('../controller/User/render_Product')
-const productView=require('../controller/User/productView')
-const render_women=require('../controller/User/render_women')
-const render_men=require('../controller/User/render_men')
-const homesearch=require('../controller/User/homesearch')
-const personalInfo=require('../controller/User/personalInfo')
-const EditAddress=require('../controller/User/EditAddress')
-const AddorUpdateAddress=require('../controller/User/AddorUpdateAddress')
-const EditAddressrender=require('../controller/User/EditAddressrender')
-const updateAddress=require('../controller/User/updateAddress')
-const deleteAddress=require('../controller/User/deleteAddress')
-const cartRender=require('../controller/User/cartRender')
-const addToCart=require('../controller/User/addToCart')
-const cartdynamic=require('../controller/User/cartdynamic')
-const removeCartProduct=require('../controller/User/removeCartProduct')
-const checkoutRender=require('../controller/User/checkoutRender')
-const edituser=require('../controller/User/edituser')
-const userPassword=require('../controller/User/userPassword')
-const order=require('../controller/User/order')
+const product=require('../controller/User/product')
+const profileInfo=require('../controller/User/profileInfo')
+const cart=require('../controller/User/cart')
 const removeproductorder=require('../controller/User/removeproductorder')
-const productDetailsInOrder=require('../controller/User/productDetailsInOrder')
+const couponController=require('../controller/User/couponVerifiction')
+const wishlist=require('../controller/User/wishlist')
+const checkoutRender=require('../controller/User/checkoutRender')
+const order=require('../controller/User/order')
+
 const sortProduct=require('../controller/User/sortProduct')
-const filteredProduct=require('../controller/User/filteredProduct')
+const filteredProduct=require('../controller/User/filteredProduct');
+const Razorpay = require('razorpay')
+const razorpay=require('../controller/User/razorpay');
 
 
-
-
-
-
-userRouter.get('/homePage',loadHome) 
-userRouter.get('/homesearch',homesearch)
-userRouter.post('/loadEP',loadSI)
-userRouter.post('/loadRG',loadRG)
-userRouter.post('/loadOTP',loadOTP)
-userRouter.get('/otp',otp)
-userRouter.get('/resentOTP',loadResentotp)
-userRouter.post('/reset_password',reset_password)
-userRouter.post('/loadOTP/repassword',repassword)
-userRouter.post('/loadrepassword',loadRepassword)
+// homePage,login and register process
+userRouter.get('/homePage',user.homePageRender) 
+userRouter.post('/loadEP',user.loadSignin)
+userRouter.post('/loadRG',user.loadRegister)
+userRouter.post('/loadOTP',user.loadOTP)
+userRouter.get('/otp',user.otpPageRender)
+userRouter.get('/resentOTP',user.loadResentOtp)
+userRouter.post('/reset_password',user.resetPassword)
+userRouter.post('/loadOTP/repassword',user.loadOtpRepassword)
+userRouter.post('/loadrepassword',user.loadRepassword)
 userRouter.get('/auth/google',google_pass.googleAuth);
 userRouter.get("/auth/google/callback",google_pass.googleCallback,google_pass.setupSession);
-userRouter.get('/product',render_Product)
-userRouter.get('/men',render_men)
-userRouter.get('/women',render_women)
-userRouter.get('/productView',productView)
-userRouter.get('/personalInfo',personalInfo)
-userRouter.post('/edituser',edituser)
-userRouter.post('/userPassword',userPassword)
-userRouter.get('/EditAddress',EditAddress)
-userRouter.post('/addorupdateaddress',AddorUpdateAddress)
-userRouter.get('/editAddressrender',EditAddressrender)
-userRouter.get('/cart/add',addToCart)
-userRouter.get('/cart',cartRender)
-userRouter.post('/cartdynamic',cartdynamic)
-userRouter.post('/removeCartProduct',removeCartProduct)
-userRouter.get('/checkout',checkoutRender)
-userRouter.post('/order',order)
-userRouter.post('/removeproductorder',removeproductorder)
-userRouter.post('/productDetailsInOrder',productDetailsInOrder)
-userRouter.post('/updateaddress',updateAddress)
-userRouter.delete('/deleteAddress',deleteAddress)
+
+
+// logout
 userRouter.get("/logout",logOut)
+
+
+// product
+userRouter.get('/product',product.productPageRender)
+userRouter.get('/men',product.mensPageRender)
+userRouter.get('/women',product.womensPageRender)
+userRouter.get('/productView',product.productViewPage)
+
+
+// profileInfo
+userRouter.get('/personalInfo',profileInfo.personalInfo)
+userRouter.post('/edituser',profileInfo.editUserPresonalInfo)
+userRouter.post('/userPassword',profileInfo.changeUserPassword)
+userRouter.get('/EditAddress',profileInfo.AddnewAddressRender)
+userRouter.post('/addorupdateaddress',profileInfo.AddorUpdateAddress)
+userRouter.get('/editAddressrender',profileInfo.EditAddressPageRender)
+
+
+// cart
+userRouter.get('/cart/add',cart.addToCart)
+userRouter.get('/cart',cart.cartRender)
+userRouter.post('/cartdynamic',cart.cartQuantityDynamic)
+userRouter.post('/removeCartProduct',cart.removeCartProduct)
+
+
+// checkout
+userRouter.get('/checkout',checkoutRender)
+
+
+// order
+userRouter.post('/order',order.orderCreation)
+userRouter.post('/removeproductorder',removeproductorder.removeproductorder)
+userRouter.post('/returnProduct',removeproductorder.returnProduct)
+userRouter.post('/productDetailsInOrder',order.productDetailsInOrder)
+userRouter.post('/updateaddress',order.orderTimeUpdateAddress)
+userRouter.delete('/deleteAddress',order.orderTimeDeleteAddress)
+userRouter.post('/reasonSubmit',order.reasonSubmit)
+
+
+// sort filter in separate
 userRouter.post('/sortProduct',sortProduct)
 userRouter.post('/filteredProduct',filteredProduct)
+
+
+// coupons
+userRouter.post('/couponVerifiction',couponController.couponVerifiction)
+userRouter.post('/removeCoupon',couponController.removeCoupon)
+userRouter.post('/fetchAvaliableCoupon',couponController.fetchAvaliableCoupon)
+ 
+
+// wishlist
+userRouter.get('/wishlist',wishlist.wishlistRender)
+userRouter.get('/addWishlist',wishlist.addWishlist)
+userRouter.delete('/removeWishList',wishlist.removeWishList)
+
+
+// razorpay
+userRouter.post('/razorpay',razorpay.razorpay)
+userRouter.get('/razorpayError',razorpay.razorpayErrorPage)
+
 
 
 module.exports={userRouter}

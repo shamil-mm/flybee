@@ -1,16 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-
-<!-- molla/index-6.html  22 Nov 2019 09:56:18 GMT -->
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Molla - Bootstrap eCommerce Template</title>
-    <meta name="keywords" content="HTML5 Template">
-    <meta name="description" content="Molla - Bootstrap eCommerce Template">
-    <meta name="author" content="p-themes">
+<%-include('../layouts/userheader')%>
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
@@ -38,153 +26,6 @@
 
 <body>
     <div class="page-wrapper">
-        <header class="header header-6">
-           
-            <div class="header-middle ">
-                <div class="container">
-                    <div class="header-left">
-                        <div class="header-search header-search-extended header-search-visible d-none d-lg-block">
-                            <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
-                            <form action="/homesearch" method="get" >
-                                <div class="header-search-wrapper search-wrapper-wide">
-                                    <label for="q" class="sr-only">Search</label>
-                                   
-                                    <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
-                                 
-                                        <input type="search" class="form-control" name="search" id="q" placeholder="Search product ..." required >
-                                           
-                                  
-                                </div><!-- End .header-search-wrapper -->
-                            </form>
-                        </div><!-- End .header-search -->
-                    </div>
-                    <div class="header-center">
-                        <a href="index.html" class="logo">
-                            <img src="assets/images/demos/demo-6/logo.png" alt="Molla Logo" width="82" height="20">
-                        </a>
-                    </div><!-- End .header-left -->
-
-                    <div class="header-right">
-                        <a href="wishlist.html" class="wishlist-link">
-                            <i class="icon-heart-o"></i>
-                            <!-- <span class="wishlist-count">3</span> -->
-                            <span class="wishlist-txt">My Wishlist</span>
-                        </a>
-
-                        <div class="dropdown cart-dropdown">
-                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                <i class="icon-shopping-cart"></i>
-                                <!-- <span class="cart-count">2</span> -->
-                                <span class="cart-txt" style="font-weight: 400; padding-top: 0.4rem;">Cart</span>
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <div class="dropdown-cart-products">
-                                    <div class="product">
-                                        <div class="product-cart-details">
-                                            <h4 class="product-title">
-                                                <a href="product.html">Beige knitted elastic runner shoes</a>
-                                            </h4>
-
-                                            <span class="cart-product-info">
-                                                <span class="cart-product-qty">1</span>
-                                                x $84.00
-                                            </span>
-                                        </div><!-- End .product-cart-details -->
-
-                                        <figure class="product-image-container">
-                                            <a href="product.html" class="product-image">
-                                                <img src="assets/images/products/cart/product-1.jpg" alt="product">
-                                            </a>
-                                        </figure>
-                                        <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                                    </div><!-- End .product -->
-
-                                    <div class="product">
-                                        <div class="product-cart-details">
-                                            <h4 class="product-title">
-                                                <a href="product.html">Blue utility pinafore denim dress</a>
-                                            </h4>
-
-                                            <span class="cart-product-info">
-                                                <span class="cart-product-qty">1</span>
-                                                x $76.00
-                                            </span>
-                                        </div><!-- End .product-cart-details -->
-
-                                        <figure class="product-image-container">
-                                            <a href="product.html" class="product-image">
-                                                <img src="assets/images/products/cart/product-2.jpg" alt="product">
-                                            </a>
-                                        </figure>
-                                        <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                                    </div><!-- End .product -->
-                                </div><!-- End .cart-product -->
-
-                                <div class="dropdown-cart-total">
-                                    <span>Total</span>
-
-                                    <span class="cart-total-price">$160.00</span>
-                                </div><!-- End .dropdown-cart-total -->
-
-                                <div class="dropdown-cart-action">
-                                    <a href="/cart" class="btn btn-primary">View Cart</a>
-                                    <a href="/checkout" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
-                                </div><!-- End .dropdown-cart-total -->
-                            </div><!-- End .dropdown-menu -->
-                        </div><!-- End .cart-dropdown -->
-                    </div>
-                   <%if(!user){%>
-                    <a href="#signin-modal" data-toggle="modal" class="wishlist-link" data-toggle="tooltip" data-placement="right" title="login">
-                        <i class="fa-solid fa-right-to-bracket"></i>
-                      </a>
-                    <%}else{%>
-                        <a class="wishlist-link" href="/logout" data-toggle="tooltip" data-placement="right" title="logout">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                        </a>
-                    <%}%>
-                        
-                              
-                    
-                  
-                   
-                </div><!-- End .container -->
-            </div><!-- End .header-middle -->
-
-            <div class="header-bottom sticky-header">
-                <div class="container">
-                    <div class="header-left">
-                        <nav class="main-nav">
-                            <ul class="menu ">
-                                <li class="megamenu-container active">
-                                    <a href="/homePage">HOME</a>  
-                                </li>
-                                <li >
-                                    <a href="/product">PRODUCT</a>  
-                                </li>
-                                <li>
-                                    <a href="#" >About</a>
-                                </li>
-                                <li>
-                                    <a href="#" >CONTACT</a>
-                                </li>
-                                <li>
-                                    <a href="/personalInfo" >PROFILE</a>
-                                </li>
-                            </ul>
-                        </nav>
-
-                        <button class="mobile-menu-toggler">
-                            <span class="sr-only"></span>
-                            <i class="icon-bars"></i>
-                        </button>
-                    </div><!-- End .header-left -->
-
-                    
-                </div><!-- End .container -->
-            </div><!-- End .header-bottom -->
-        </header><!-- End .header -->
-
         <main class="main">
             <div class="intro-slider-container">
                 <div class="intro-slider owl-carousel owl-theme owl-nav-inside owl-light" data-toggle="owl" data-owl-options='{
@@ -196,6 +37,16 @@
                             }
                         }
                     }'>
+                    <div class="intro-slide" style="background-image: url(assets/images/demos/demo-6/slider/slide-2.jpg);">
+                        <div class="container intro-content text-center">
+                            <h3 class="intro-subtitle text-white">Don’t Miss</h3><!-- End .h3 intro-subtitle -->
+                            <h1 class="intro-title text-white">Mysrety Deals</h1><!-- End .intro-title -->
+
+                            <a href="category.html" class="btn btn-outline-white-4">
+                                <span>Discover More</span>
+                            </a>
+                        </div><!-- End .intro-content -->
+                    </div><!-- End .intro-slide -->
                     <div class="intro-slide" style="background-image: url(assets/images/demos/demo-6/slider/slide-1.jpg);">
                         <div class="container intro-content text-center">
                             <h3 class="intro-subtitle text-white">You're Looking Good</h3><!-- End .h3 intro-subtitle -->
@@ -207,16 +58,7 @@
                         </div><!-- End .intro-content -->
                     </div><!-- End .intro-slide -->
 
-                    <div class="intro-slide" style="background-image: url(assets/images/demos/demo-6/slider/slide-2.jpg);">
-                        <div class="container intro-content text-center">
-                            <h3 class="intro-subtitle text-white">Don’t Miss</h3><!-- End .h3 intro-subtitle -->
-                            <h1 class="intro-title text-white">Mysrety Deals</h1><!-- End .intro-title -->
-
-                            <a href="category.html" class="btn btn-outline-white-4">
-                                <span>Discover More</span>
-                            </a>
-                        </div><!-- End .intro-content -->
-                    </div><!-- End .intro-slide -->
+                   
                 </div><!-- End .intro-slider owl-carousel owl-theme -->
 
                 <span class="slider-loader"></span><!-- End .slider-loader -->
@@ -1250,7 +1092,7 @@
                                     <p class="text-center">or sign in with</p>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <a href="#" class="btn btn-login btn-g">
+                                            <a href="/auth/google" class="btn btn-login btn-g">
                                                 <i class="icon-google"></i>
                                                 Login With Google
                                             </a>

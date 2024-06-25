@@ -1,4 +1,4 @@
-const product=require('../models/admin_pro_schema')
+const product=require('../models/productSchema')
 async function getSortedProducts(sortBy) {
    
   

@@ -11,6 +11,8 @@ app.use(session({
     saveUninitialized:true
 }))
 const flash=require('connect-flash')
+const commonData=require('./middleware/commonData')
+app.use(commonData)
 
 const adminRouter=require('./routes/adminRouter')
 const userRouter=require('./routes/userRouter')
