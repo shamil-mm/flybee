@@ -1,6 +1,3 @@
-
-
-
 const paginate = async (model, page, limit, query = {}) => {
     const startIndex = (page - 1) * limit;
     const totalDocuments = await model.countDocuments(query);

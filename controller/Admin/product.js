@@ -69,17 +69,22 @@ const addProductPageRender=async(req,res)=>{
 const addProductLoad=async(req,res)=>{
     try {
 
-        let imgs=[]
+        var imgs=[]
         
-        
-        if(croppedimages){
+    //    console.log(croppedimages)
+    //    console.log(croppedimages.length)
+
+
+        if(croppedimages.length>0){
             imgs=croppedimages
-            croppedimages=null
+            croppedimages=[]
         }else{
+           
             for(i=0;i<req.files.length;i++){
-                imgs.push(req.files[i].filename)
+                imgs.push(req.files[i].filename)  
             }
         }
+        
         const{title,size,brand,description,price,quantity}=req.body
         
         const product=new productSchema.add_pro_model({
@@ -113,7 +118,8 @@ const addProductLoad=async(req,res)=>{
 const imageUpload=async(req,res)=>{
     try {
         croppedimages.push(req.file.filename) 
-        console.log(croppedimages)
+        // console.log(req.file.filename)
+        // console.log(croppedimages)
     } catch (error) {
         console.log(error)
     }
@@ -135,9 +141,9 @@ const editProductLoad=async(req,res)=>{
             return res.redirect('/admin/products');
         }
         let newImages = [];
-if (croppedimages) {
+if (croppedimages.length>0) {
     newImages = croppedimages;
-    croppedimages=null
+    croppedimages=[]
 } else if (req.files) {
     newImages = req.files.map(file => file.filename);
 }

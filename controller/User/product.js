@@ -1,10 +1,11 @@
+
 const productSchema=require('../../models/productSchema')
 const category=require('../../models/categorySchema')
 const Offer=require('../../models/offerSchema')
 const offerHelper=require('../../functions/offerCalculations')
 
 
-const productPageRender=async(req,res)=>{
+const productPageRender=async(req,res,next)=>{
     try {
         const limit=8;
         const page=Number(req.query.page)||1
@@ -21,7 +22,6 @@ const productPageRender=async(req,res)=>{
        const cate_list=await category.category_schema_model.find({is_delete:false,is_list:false})
 
 
-        // ---------------------------------------------------------------------
         
         const productWithOffer= await Promise.all(product.map(async(product)=>{
           let finalPercentage=0
@@ -36,7 +36,7 @@ const productPageRender=async(req,res)=>{
               activeProductOffers.forEach((offer)=>{
                 const offerAmount =offer.offerPrecentage;
                 productOffer = Math.max(productOffer, offerAmount);
-               })
+              })
             }
 
 
@@ -49,33 +49,33 @@ const productPageRender=async(req,res)=>{
             }
             finalPercentage=productOffer>categoryOffer?productOffer:categoryOffer
             const updated_data=await productSchema.add_pro_model.findByIdAndUpdate(product._id, {offerPercentage:finalPercentage}, {new: true});
-         return {...product.toObject(),finalPercentage}
+            return {...product.toObject(),finalPercentage}
 
         }))
-        // ---------------------------------------------------------------------
+      
         res.render('product',{product:productWithOffer,msg:req.flash('msg'),pages,currentPage:page,cate_list})
       }
       
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
 
 
-const mensPageRender=async(req,res)=>{
+const mensPageRender=async(req,res,next)=>{
     try {
       const data= await productSchema.add_pro_model.find({}).populate("category")
-    const menProducts=data.filter((product)=>{
+      const menProducts=data.filter((product)=>{
         return product.category.name=="Men's"
     })
     
        res.render('mens',{men:menProducts}) 
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 }
-const womensPageRender=async(req,res)=>{
+const womensPageRender=async(req,res,next)=>{
   try {
       const data=await productSchema.add_pro_model.find({}).populate('category')
       const womensproduct=data.filter((product)=>{
@@ -84,18 +84,18 @@ const womensPageRender=async(req,res)=>{
      
       res.render('womens',{women:womensproduct})
   } catch (error) {
-      console.log(error);
+      next(error);
   }
 }
 
 
-const productViewPage=async(req,res)=>{
+const productViewPage=async(req,res,next)=>{
     try {
         const id =req.query.id
-       const singleData= await productSchema.add_pro_model.findOne({_id:id}).populate('category')
+        const singleData= await productSchema.add_pro_model.findOne({_id:id}).populate('category')
      res.render('productView',{singleData})
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 }
 

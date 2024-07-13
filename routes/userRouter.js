@@ -18,11 +18,17 @@ const couponController=require('../controller/User/couponVerifiction')
 const wishlist=require('../controller/User/wishlist')
 const checkoutRender=require('../controller/User/checkoutRender')
 const order=require('../controller/User/order')
+const invoice=require('../controller/User/invoice')
+const wallet=require('../controller/User/wallet')
 
 const sortProduct=require('../controller/User/sortProduct')
 const filteredProduct=require('../controller/User/filteredProduct');
 const Razorpay = require('razorpay')
 const razorpay=require('../controller/User/razorpay');
+const about=require('../controller/User/about')
+
+
+
 
 
 // homePage,login and register process
@@ -33,10 +39,10 @@ userRouter.post('/loadOTP',user.loadOTP)
 userRouter.get('/otp',user.otpPageRender)
 userRouter.get('/resentOTP',user.loadResentOtp)
 userRouter.post('/reset_password',user.resetPassword)
-userRouter.post('/loadOTP/repassword',user.loadOtpRepassword)
 userRouter.post('/loadrepassword',user.loadRepassword)
 userRouter.get('/auth/google',google_pass.googleAuth);
-userRouter.get("/auth/google/callback",google_pass.googleCallback,google_pass.setupSession);
+userRouter.get("/auth/google/callback",google_pass.googleCallback,google_pass.setupSession)
+userRouter.get('/error',user.error) 
 
 
 // logout
@@ -78,6 +84,15 @@ userRouter.post('/productDetailsInOrder',order.productDetailsInOrder)
 userRouter.post('/updateaddress',order.orderTimeUpdateAddress)
 userRouter.delete('/deleteAddress',order.orderTimeDeleteAddress)
 userRouter.post('/reasonSubmit',order.reasonSubmit)
+userRouter.post('/failedPayNow',order.failedPayNow)
+userRouter.post('/failedPaymentRetry',order.failedPaymentRetry)
+
+// invoice
+
+userRouter.get('/invoiceRender',invoice.invoiceRender)
+userRouter.get('/downloadInvoice',invoice.downloadInvoice)
+
+
 
 
 // sort filter in separate
@@ -100,6 +115,16 @@ userRouter.delete('/removeWishList',wishlist.removeWishList)
 // razorpay
 userRouter.post('/razorpay',razorpay.razorpay)
 userRouter.get('/razorpayError',razorpay.razorpayErrorPage)
+
+//wallet
+userRouter.post('/addMoneyToWallet',wallet.addMoneyToWallet)
+
+// about 
+userRouter.get('/about',about)
+
+userRouter.use((err, req, res, next) => {
+    res.status(500).render('error', { error: err.message }); // Render the error page with the error message
+});
 
 
 

@@ -7,7 +7,7 @@ const bcrypt=require('bcrypt')
 
 
 
-const personalInfo=async(req,res)=>{
+const personalInfo=async(req,res,next)=>{
     try {
        let user=req.session.user_id
        if (user){
@@ -22,46 +22,36 @@ const personalInfo=async(req,res)=>{
 
        
              const page = parseInt(req.query.page) || 1;
-             const limit = parseInt(req.query.limit) || 5; 
+             const limit = parseInt(req.query.limit) || 4; 
              const skip = (page - 1) * limit;
-            
-       
-            
-          
-          const Wallet=await wallet.findOne({userId:req.session.user_id}).populate('userId')
-         
+
+             const Wallet = await wallet.findOne({ userId: req.session.user_id }).populate('userId');
+
            const totalPages = Math.ceil(Wallet.transferHistory.length/limit)
-           const transactions =Wallet.transferHistory.slice(skip, skip + limit);
+           const transactions =Wallet.transferHistory.reverse().slice(skip, skip + limit);
           const fullData={transactions,totalPages,page,totalAmount:Wallet.userBalance}
           
-         
-           
            if(datas&& datas.addresses!==null){
-            const order=await Order.find({userId:req.session.user_id}).populate('OrderedProducts.productId')
-            
-         
+            const order=await Order.find({userId:req.session.user_id}).populate('OrderedProducts.productId').populate({path: 'OrderedProducts.productId',populate: { path: 'category' }});
+
             if(order){
-            
                 res.render('userinfo' ,{data:data,datas:datas,addressFound:true,orderfound:true,order:order,edit:req.flash('edit'),form:req.flash('form'),pass:req.flash('pass'),coupon:couponfount,fullData})
             }else{
                 res.render('userinfo' ,{data:data,datas:datas,addressFound:true,orderfound:false,edit:req.flash('edit'),form:req.flash('form'),pass:req.flash('pass'),coupon:couponfount,Wallet,fullData})
-          
             }
            }else{
             let text='No user adderss fount'
             res.render('userinfo', { data: data, datas: datas, addressFound:false,orderfound:false, message: text, edit: req.flash('edit'),form:req.flash('form'),pass:req.flash('pass'),coupon:couponfount,Wallet,fullData});
            }
         }else{
-            res.redirect('/homePage')
+            res.redirect('/homePage#signin-modal')
         }
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 }
 
-
-
-const editUserPresonalInfo=async(req,res)=>{
+const editUserPresonalInfo=async(req,res,next)=>{
     try {
         let user=req.session.user_id
         if(user){
@@ -82,67 +72,64 @@ const editUserPresonalInfo=async(req,res)=>{
         }
         
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
-
-
-const changeUserPassword=async(req,res)=>{
+const changeUserPassword=async(req,res,next)=>{
     try {
         let user=req.session.user_id
         if(user){
             const {password,re_password}=req.body
       if(password==re_password){
-       const b_pass=await bcrypt.hash(password,10)
-        console.log(b_pass)
+        const b_pass=await bcrypt.hash(password,10)
         const data=await userSchema.userRegister.findByIdAndUpdate({_id:user},{$set:{User_password:b_pass}})
         req.flash("pass","password changed")
         res.redirect('/personalInfo')
 
-      }
+        }
 
         }else{
             res.redirect('/homePage')
         }
       
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
-const AddnewAddressRender=async(req,res)=>{
+const AddnewAddressRender=async(req,res,next)=>{
     try {
         res.render('editaddress')
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
-const EditAddressPageRender=async(req,res)=>{
+const EditAddressPageRender=async(req,res,next)=>{
     try {
         const data=await Address.findOne({userId:req.session.user_id})
         if(!data ||!data.addresses || data.addresses.length===0){
             res.render('AddressEdit',{data:[]})  
         }else{
             const single =data.addresses.filter((value)=>{
-                return  value._id==req.query.id
-              })
-              res.render('AddressEdit',{data:single})
+            return  value._id==req.query.id
+            })
+            res.render('AddressEdit',{data:single})
         }
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
 
 
-const AddorUpdateAddress=async(req,res)=>{
+const AddorUpdateAddress=async(req,res,next)=>{
     try {
        const {name,country,address,city,state,pincode,phone,email}=req.body
        if(req.session.user_id){
        const user=await Address.findOne({userId:req.session.user_id})
        if(!user){
-      const user_address=new Address({
+       const user_address=new Address({
         userId:req.session.user_id,
         addresses:{
             name:name,
@@ -178,12 +165,12 @@ const AddorUpdateAddress=async(req,res)=>{
    
    res.redirect('/personalInfo')
 }else{
-console.log('session cleared')
+
 res.redirect('/homePage')
 }
 
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 } 
 

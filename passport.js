@@ -8,15 +8,16 @@ passport.use(new googleStrategy({
     callbackURL:"http://localhost:3000/auth/google/callback"
      },
      async(accessToken,refreshToken,profile,done)=>{
-        console.log(profile)
+        // console.log(profile)
         try {
             const{id:googleId,email:User_email,displayName:User_name}=profile
             
-            let user = await userSchema.userRegister.findOne({User_email:profile._json.email});
+            
+            let user = await userSchema.userRegister.findOne({User_email:User_email});
             if(!user){
                 user=await userSchema.userRegister.create({
                     googleId,
-                    email:profile._json.email,
+                    User_email:User_email,
                     User_name,
                     password:googleId
                 })
@@ -52,9 +53,9 @@ passport.use(new googleStrategy({
             if (req.isAuthenticated()) {
          
                 req.session.user_id = req.user._id;
-                console.log(req.session.user_id);
+                // console.log(req.session.user_id);
             } 
-            console.log(req.session.user_id);
+            // console.log(req.session.user_id);
             res.redirect('/homePage');
             
         }

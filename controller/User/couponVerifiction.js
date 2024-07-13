@@ -1,6 +1,6 @@
 const coupon=require('../../models/couponSchema')
 const Order=require('../../models/orderSchema')
-const couponVerifiction=async(req,res)=>{
+const couponVerifiction=async(req,res,next)=>{
     try {
         const inputCode=req.body.coupon_code
         const purchaseAmount= req.query.total
@@ -56,19 +56,19 @@ const couponVerifiction=async(req,res)=>{
       
         
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
-const removeCoupon=async(req,res)=>{
+const removeCoupon=async(req,res,next)=>{
     try {
         const couponId=req.query.id
         await coupon.updateOne({_id:couponId},{$pull:{usageCount:{userId:req.session.user_id}}});
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
-const fetchAvaliableCoupon=async(req,res)=>{
+const fetchAvaliableCoupon=async(req,res,next)=>{
     try {
         const { datas } = req.body;
         const productArray=JSON.parse(datas)
@@ -91,7 +91,7 @@ const fetchAvaliableCoupon=async(req,res)=>{
 
        
     } catch (error) {
-       console.log(error) 
+       next(error) 
     }
 }
 module.exports={couponVerifiction,removeCoupon,fetchAvaliableCoupon}

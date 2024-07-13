@@ -1,5 +1,5 @@
 const productSchema=require('../../models/productSchema')
-const filteredProduct=async(req,res)=>{
+const filteredProduct=async(req,res,next)=>{
     try {
         let page=req.query.page ||1
         
@@ -14,13 +14,13 @@ const filteredProduct=async(req,res)=>{
         if(page==1){
         const searchProduct = await productSchema.add_pro_model.find({
            is_list:false,
+           Is_block:false,
            $or: [
                 { product_name: { $regex:`.*${search}.*`, $options: 'i' } },
                 { Description: { $regex:`.*${search}.*`, $options: 'i' } }
             ]
        
         }).populate('category')
-
         const updatedFilterData= searchProduct.filter((value)=>{
            return value.category._id==categoryId
         })
@@ -37,7 +37,7 @@ const filteredProduct=async(req,res)=>{
          res.json({updatedFilterData:paginatedData,pagecount,search})
     }
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 module.exports=filteredProduct

@@ -4,16 +4,21 @@ const productSchema=require('../../models/productSchema')
 const Address=require('../../models/addressSchema')
 const Order=require('../../models/orderSchema')
 const coupon=require('../../models/couponSchema')
+const Category=require('../../models/categorySchema')
 
 
-const orderCreation=async(req,res)=>{
+const orderCreation=async(req,res,next)=>{
     try {
        
-      const amountTotal=req.query.total
-      const userId=req.session.user_id
-      const couponId=req.query.couponId
-      const couponpercentage=req.query.couponpercentage
-        const userfind=await Cart.findOne({userId:userId}).populate('userId').populate("items.productId")
+       
+       const amountTotal=req.query.total
+       const userId=req.session.user_id
+       const couponId=req.query.couponId
+       const couponpercentage=req.query.couponpercentage
+       const userfind=await Cart.findOne({userId:userId}).populate('userId').populate("items.productId")
+       if(!userfind.items){
+            res.status(400).json({ title: "info",text:"product not found" ,icon:'error'});
+        }
         const products=userfind.items
         const orderproducts=[]
         const addressId=req.query.id
@@ -24,12 +29,12 @@ const orderCreation=async(req,res)=>{
         const find_result=find_user.addresses.find((value)=>{
             return value._id.equals(addressId)
           })
-          let stockOut=false
+        let stockOut=false
            
 
-          if(req.query.payment){
-            products.forEach((product)=>{
-              const data =   productdata.find((value)=>{
+        if(req.query.payment){
+            for (const product of products) {
+                    const data =   productdata.find((value)=>{
                     return value._id.equals(product.productId._id)
                 })
                
@@ -38,36 +43,97 @@ const orderCreation=async(req,res)=>{
                 if(data.stock!==0 && data.stock>product.quantity){
                   data.stock = data.stock - product.quantity
                 }else{  
-                    stockOut=true 
-                    // data.stock=0;
+                    stockOut=true     
                 }
+
+                const cate= await Category.category_schema_model.findOne({_id:data.category})
+                const copyProduct={ 
+                  _id:data._id,
+                  product_name:data.product_name,
+                  size:data.size,
+                  brand:data.brand,
+                  Description:data.Description,
+                  image:data.image,
+                  price:data.price,
+                  stock:data.stock,
+                  category:cate,
+                  offerPercentage:data.offerPercentage
+               
+               }
+
                 data.save();
-               orderproducts.push({productId:data._id,quantity:product.quantity,shippingAddress:find_result,paymentMethod:"Rasorpay",paymentStatus:'Paid'})
-            })
-            
+                if(!req.query.paymentStatus){
+                    orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result,paymentMethod:"Rasorpay",paymentStatus:'Paid'})
+                }else{
+                    orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result,paymentMethod:"Rasorpay",paymentStatus:'Failed',orderStatus:'Pending'})
+                }
+            }  
+           }else if(req.query.Wallet){
+            for (const product of products) {
+                const data =   productdata.find((value)=>{
+                return value._id.equals(product.productId._id)
+                })
+                  if(data.stock!==0 && data.stock>product.quantity){
+                    data.stock = data.stock - product.quantity
+                  }else{  
+                      stockOut=true                      
+                  }
+  
+                  const cate= await Category.category_schema_model.findOne({_id:data.category})
+                  const copyProduct={ 
+                    _id:data._id,
+                    product_name:data.product_name,
+                    size:data.size,
+                    brand:data.brand,
+                    Description:data.Description,
+                    image:data.image,
+                    price:data.price,
+                    stock:data.stock,
+                    category:cate,
+                    offerPercentage:data.offerPercentage
+                 
+                 }
+  
+                  data.save();
+                   orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result,paymentMethod:"Wallet",paymentStatus:'Paid'})
+                 
+              }
+              
+             
+
+
            }else{
            
-            products.forEach((product)=>{
+            for (const product of products) {
               const data =   productdata.find((value)=>{
                     return value._id.equals(product.productId._id)
                 })
-            
-                  
-                // console.log(data.stock!==0 && data.stock>product.quantity)
                 if(data.stock!==0 && data.stock>product.quantity){
                  
                 data.stock = data.stock - product.quantity
               }else{
                 stockOut=true 
-                //  data.stock=0;
+                
               }
-
-
-
+              const cate= await Category.category_schema_model.findOne({_id:data.category})
+              const copyProduct={ 
+                _id:data._id,
+                product_name:data.product_name,
+                size:data.size,
+                brand:data.brand,
+                Description:data.Description,
+                image:data.image,
+                price:data.price,
+                stock:data.stock,
+                category:cate,
+                offerPercentage:data.offerPercentage
+             
+             }
               data.save();
-               orderproducts.push({productId:data._id,quantity:product.quantity,shippingAddress:find_result})
-            }) 
+               orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result})
+            }
            }
+
            if(stockOut==false){
             const order=new Order({
                 userId:req.session.user_id,
@@ -90,16 +156,15 @@ const orderCreation=async(req,res)=>{
     
     
 } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
-const productDetailsInOrder=async(req,res)=>{
-    try {
-       
+const productDetailsInOrder=async(req,res,next)=>{
+    try { 
      const objId=req.query.id
+     const data= await Order.find({userId:req.session.user_id}).populate('OrderedProducts.productId')
    
-    const data= await Order.find({userId:req.session.user_id}).populate('OrderedProducts.productId')
    
     if(data){
         let result
@@ -107,28 +172,27 @@ const productDetailsInOrder=async(req,res)=>{
            result=value.OrderedProducts.filter((value)=>{
             return value._id==objId
         })
+       
         if(result.length==1){
             res.send({result}) 
         }
         })
         
-    }else{
-        console.log("not found from productdetailsorder")
     }
        
       
       
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
 
-const orderTimeUpdateAddress=async(req,res)=>{
+const orderTimeUpdateAddress=async(req,res,next)=>{
     try {
         const{name,country,address,city,state,pincode,phone,email}=req.body
         const data=await Address.findOne({userId:req.session.user_id})
-       const data1= data.addresses.find((value)=>{
+        const data1= data.addresses.find((value)=>{
             return value._id.equals(req.query.id)
         })
   
@@ -143,35 +207,68 @@ const orderTimeUpdateAddress=async(req,res)=>{
         data.save()
         res.redirect('/personalInfo')
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 }
 
 
 
-const orderTimeDeleteAddress=async(req,res)=>{
+const orderTimeDeleteAddress=async(req,res,next)=>{
     try {
        await Address.findOneAndUpdate({userId:req.session.user_id},{$pull:{addresses:{_id:req.query.id}}})
        res.redirect('/personalInfo')
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
-const reasonSubmit=async(req,res)=>{
+const reasonSubmit=async(req,res,next)=>{
     try {
-      console.log("HELLO ORDER")
+     
        const reason=req.body.reason
        const orderId=req.query.orderId
        
         await Order.findOneAndUpdate({userId:req.session.user_id,"OrderedProducts._id":orderId},{$set:{'OrderedProducts.$.cancellationReason':reason}})
-       req.flash('pass','Return Requested to the admin')
+        req.flash('pass','Return Requested to the admin')
         res.redirect('/personalInfo')
     } catch (error) {
-        console.log(error)
+        next(error)
+    }
+}
+const failedPayNow=async(req,res,next)=>{
+    try {
+        const orderId=req.query.id
+        const data= await Order.findOne({userId:req.session.user_id,"OrderedProducts._id":orderId})
+        res.json({data})  
+    } catch (error) {
+        next(error)
+    }
+}
+const failedPaymentRetry=async(req,res,next)=>{
+    try {
+        const orderId=req.query.id
+        const data= await Order.findOne({userId:req.session.user_id,"OrderedProducts._id":orderId})
+        if (data){
+            const productsPay=data.OrderedProducts
+            if(productsPay){
+                for(products of productsPay){
+                    products.orderStatus='Placed'
+                    products.paymentStatus='Paid'
+                    await data.save()
+                    res.json({status:"Payment Success"});
+                }
+            }else{
+                res.status(404).send("Product not found.");
+            }
+        }else{
+            res.status(404).send("order not found.");
+        }
+        
+    } catch (error) {
+        next(error)
     }
 }
 
 
 
-module.exports={orderCreation,productDetailsInOrder,orderTimeUpdateAddress,orderTimeDeleteAddress,reasonSubmit}
+module.exports={orderCreation,productDetailsInOrder,orderTimeUpdateAddress,orderTimeDeleteAddress,reasonSubmit,failedPayNow,failedPaymentRetry}

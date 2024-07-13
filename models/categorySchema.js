@@ -5,7 +5,8 @@ const category_schema=new mongoose.Schema({
     is_list:{type:Boolean,default:false},
     is_delete:{type:Boolean,default:false},
     createdAat:{type:Date,default:Date.now},
-    updatedAt:{type:Date,default:Date.now}
+    updatedAt:{type:Date,default:Date.now},
+    offerPercentage:{type:Number,default:0}
 })
 
 const category_schema_model=mongoose.model("cate_schema",category_schema)

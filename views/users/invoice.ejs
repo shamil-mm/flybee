@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        .btn {
+            
+            margin: 2rem;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: 2px solid #ca9f63; /* Primary color */
+    background-color: transparent;
+    color: #ca9f63;
+    cursor: pointer;
+    transition: all 0.3s ease;
+   
+}
+
+/* .btn:hover {
+    background-color: #ca9f63;
+    color: white;
+} */
+
+.btn:active {
+    background-color:#ca9f63;
+    border-color: #ca9f63;
+}
+
+.btn-outline-primary-2 {
+    border: 2px solid #ca9f63; /* Secondary outline color */
+    color: #ca9f63;
+}
+
+/* .btn-outline-primary-2:hover {
+    background-color: #ca9f63;;
+    color: white;
+} */
+
+.btn-outline-primary-2:active {
+    background-color: #ca9f63;
+    border-color: #ca9f63;
+}
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0px;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            padding-left: 2rem;
+            padding-right: 2rem;
+            height: auto;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        .header img {
+            max-width: 100%;
+            height: auto;
+            margin-left: 10px;
+        }
+        .details {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .details p {
+            padding: 0 2rem;
+            font-size: 14px;
+        }
+        table {
+            
+            width: 95%;
+            border-collapse: collapse;
+            margin-top: 40px;
+            margin-left: 35px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            padding-left: 1rem;
+            padding-right: 2rem;
+            margin-top: 15px;
+            text-align: right;
+        }
+        .total p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        .address-block {
+            margin-top: 2rem;
+            border: 2px solid red;
+            background-color: #f2f2f2;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        @media screen and (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .details {
+                flex-direction: column;
+                align-items: center;
+            }
+            .details p {
+                padding: 0;
+                text-align: center;
+            }
+        }
+    </style>
+     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
+     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
+     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icons/favicon-16x16.png">
+     <link rel="manifest" href="assets/images/icons/site.html">
+     <link rel="mask-icon" href="assets/images/icons/safari-pinned-tab.svg" color="#666666">
+     <link rel="shortcut icon" href="assets/images/icons/favicon.ico">
+     <meta name="apple-mobile-web-app-title" content="FlyBee">
+     <meta name="application-name" content="FlyBee">
+     <meta name="msapplication-TileColor" content="#cc9966">
+     <meta name="msapplication-config" content="assets/images/icons/browserconfig.xml">
+     <meta name="theme-color" content="#ffffff">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+        <script src="https://kit.fontawesome.com/dbad7a6aaf.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div style="text-align: right;">
+        <button onclick="downloadPDF()" class="btn btn-outline-primary-2"><i class="fa-solid fa-download"></i> Download</button>
+      
+    </div>
+    <div class="container" >
+        
+        <div class="header">
+            <h1><span>FLY</span><img src="assets/images/logo.png" alt="FlyBee Logo" width="100" height="65"><span>BEE</span></h1>
+            <h1>INVOICE</h1>
+        </div>
+        <div class="details">
+            <div>
+                <p><strong>Invoice Number : <%=order.OrderedProducts[0]._id.toString().slice(-5) %></p>
+
+                <p><strong>Date : <%=order.OrderedProducts[0].orderDate.toLocaleDateString()%></strong></p>
+            </div>
+            <div>
+                <p><strong>Bill from:</strong> FLYBEE.Inc , 333 Main Street , San Francisco , CA 94111 , USA</p>
+                <p><strong>Bill to:</strong> <%=address.name%> , <%=address.address%> , <%=address.state%> , <%=address.pincode%> , <%=address.country%> </p>
+            </div>
+        </div>
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Standard Price</th>
+                <th>Subtotal</th>
+            </tr>
+            <% let subtotal = 0; %>
+            <% let totalFinalPrice = 0; %> <!-- To keep track of the total final price -->
+            <% let offer = 0; %>
+          
+            <% let coupon = 0; %>
+            
+            <!-- To keep track of the total final price -->
+            <% order.OrderedProducts.forEach((value) => { %>
+                <% 
+                    let price = value.productId.price;
+                    let productOffer = value.productId.offerPercentage || 0;
+                    let categoryOffer = value.productId.category.offerPercentage || 0;
+                    let couponOffer = order.couponPercentage || 0;
+                    let finalPrice = price;
+        
+                    // Calculate the maximum of product or category offer
+                    if (productOffer && categoryOffer) {
+                        finalPrice -= finalPrice * (Math.max(productOffer, categoryOffer) / 100);
+                        offer= price-finalPrice
+                    } else if (productOffer) {
+                        finalPrice -= finalPrice * (productOffer / 100);
+                        offer= price-finalPrice
+                    } else if (categoryOffer) {
+                        finalPrice -= finalPrice * (categoryOffer / 100);
+                        offer= price-finalPrice
+                    }
+        
+                    // Apply coupon offer
+                    if(couponOffer>0){
+
+                        finalPrice -= finalPrice * (couponOffer / 100);
+                        coupon=-finalPrice * (couponOffer / 100)
+
+                    }
+                    
+        
+                    // Calculate the subtotal for the current product
+                    let productSubtotal = finalPrice * value.quantity;
+                    subtotal += productSubtotal;
+                
+        
+                    // Accumulate the total final price
+                    totalFinalPrice += productSubtotal;
+
+                   
+                   
+                   
+                %>
+                <tr style="font-size: small;">
+                    <td><%= value.productId.product_name %></td>
+                    <td><%= value.quantity %></td>
+                    <td><%= value.productId.price %> ₹ </td>
+                    <td><%= subtotal %> ₹</td>
+                </tr>
+            <% }) %>
+        </table>
+        <div class="total">
+            <p><strong>Subtotal:</strong> <%= subtotal %> ₹</p>
+          
+                
+                 
+                
+          
+                
+              
+            
+            <p><strong>Discount:</strong> <%=offer %> ₹</p>
+           <% if(coupon>0){%>
+            <p><strong>Coupon Applied :</strong> <%=coupon %> ₹</p>
+            <%}%>
+            
+            <p><strong>Total Amount: <%= totalFinalPrice %> </strong> ₹</p>
+            <p><strong>Paid:</strong> <%= totalFinalPrice %> ₹</p>
+    </div>
+</div> 
+
+
+<script>
+    function downloadPDF() {
+        
+        var element = document.querySelector('.container');
+        
+       
+        var opt = {
+            filename:     'invoice.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale:3 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().from(element).set(opt).save();
+    }
+    </script>
+    
+</body>
+</html>

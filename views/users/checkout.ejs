@@ -37,7 +37,7 @@
 										
 										
 										
-                                        <%console.log(couponStatus)%>
+                                        
                                         <%if(!couponStatus){%>
 											<input type="text" id="couponInput" class="form-control" required placeholder="coupon code" name="coupon_code">	
 											<!-- <select id="couponInput" placeholder="coupon code" class="form-control" required name="coupon_code">
@@ -117,7 +117,7 @@
 		                					<tbody>
 												
 										
-										
+										<% let ftotal=0%>
 												<%product.forEach((value)=>{%>
 											
 		                						<tr>
@@ -125,8 +125,10 @@
 		                							<td class="quantity" style="text-align: center;"><%=value.quantity%></td>
 													<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
 														<td class="price"><%=value.productId.price-value.productId.price*value.productId.offerPercentage/100%></td>
+														<%ftotal+=value.productId.price-value.productId.price*value.productId.offerPercentage/100%>
 														<%}else{%>
 															<td class="price"><%=value.productId.price%></td>
+															<%ftotal+=value.productId.price%>
 															<%}%>
 		                							
 		                						</tr>
@@ -141,7 +143,7 @@
 												<%if(couponStatus){%>
 													
 		                						<tr class="summary-total">
-													<h6></h6>
+													<h6>coupon applied</h6>
 		                							<td >Discount:</td>
 		                							<td><%=couponStatus.discountAmount%>%</td>
 													
@@ -151,6 +153,7 @@
 												<tr class="summary-total">
 		                							<td>Total:</td>
 		                							<td><%=total-(couponStatus.discountAmount*total/100)%></td>
+													<%ftotal-=(couponStatus.discountAmount*total/100)%>
 		                						</tr><!-- End .summary-total -->
 												<%}%>
 												
@@ -171,31 +174,81 @@
 										           
 											 -->
 											 <div class="card">
-										        <div class="card-header" id="heading-1">
-										            <h2 class="card-title">
-										                <a class="checkAnchor" role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
-										                    Cash on delivery
-										                </a>
-										            </h2>
-										        </div><!-- End .card-header -->
-										        <div id="collapse-1" class="collapse show" aria-labelledby="heading-1" data-parent="#accordion-payment">
-										            <div class="card-body">
-														Cash on Delivery (COD) is a payment method where the customer pays for products upon delivery.										        </div><!-- End .collapse -->
-										    </div><!-- End .card -->
+												<% if (ftotal <= 2000) { %>
+												<div class="card-header" id="heading-1">
+													<h2 class="card-title">
+															<a id="Cash on delivery" class="checkAnchor" role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
+																Cash on delivery
+															</a>
+													</h2>
+												</div>
+												<div id="collapse-1" class="collapse show" aria-labelledby="heading-1" data-parent="#accordion-payment">
+													<div class="card-body">
+														Cash on Delivery (COD) you can pay for products upon delivery (up to 2000 ₹).
+													</div>
+												</div>
+												<% } else { %>
+													<div class="card-header" id="heading-1">
+														<h2 class="card-title">
+															<a id="Cash on delivery" style="pointer-events: none;" class="collapsed checkAnchor" role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="false" aria-controls="collapse-1">
+																Cash on delivery
+															</a>
+														</h2>
+													</div>
+													<div id="collapse-1" class="collapse" aria-labelledby="heading-1" data-parent="#accordion-payment">
+														<div class="card-body">
+															Cash on Delivery (COD) you can pay for products upon delivery (up to 2000 ₹).
+														</div>
+													</div>
 
-										    <div class="card">
-										        <div class="card-header" id="heading-2">
-										            <h2 class="card-title">
-										                <a class="collapsed checkAnchor" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
-										                    Razorpay
-										                </a>
-										            </h2>
-										        </div><!-- End .card-header -->
-										        <div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion-payment">
-										            <div class="card-body">
-														Razorpay is provides online payment solutions.										            </div><!-- End .card-body -->
-										        </div><!-- End .collapse -->
-										    </div><!-- End .card -->
+
+
+													
+												<% } %>
+											</div>
+											
+											<div class="card">
+												<div class="card-header" id="heading-2">
+													<h2 class="card-title">
+														<% if (ftotal <= 2000) { %>
+															<a id="Razorpay" class="collapsed checkAnchor" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
+																Razorpay
+															</a>
+														<% } else if(ftotal>2000) { %>
+															<a id='Razorpay' class="checkAnchor" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="true" aria-controls="collapse-2">
+																Razorpay
+															</a>
+														<% } %>
+													</h2>
+												</div>
+												<div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion-payment">
+													<div class="card-body">
+														Razorpay provides online payment solutions.
+													</div>
+												</div>
+											</div>
+											
+											<div class="card">
+												<div class="card-header" id="heading-3">
+													<h2 class="card-title">
+														<% if (ftotal) { %>
+															<a id="Wallet"  onclick="tickcheck(this)" class="collapsed checkAnchor" role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
+																Wallet
+															</a>
+														<% }%>
+														
+													</h2>
+												</div>
+												<div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-payment">
+													<div class="card-body">
+														You can make payments using your wallet amount.
+													</div>
+												</div>
+											</div>
+											
+
+
+											<!-- wallet payment -->
 
 										    
 										            
@@ -298,6 +351,28 @@
 
 		
         <script>
+			function tickcheck(tag) {
+    let rop = document.getElementById('Razorpay');
+    let wallet = document.getElementById('Wallet');
+    if (tag.id === wallet.id) {
+        console.log("entering rop");
+        rop.setAttribute('aria-expanded', 'false');
+        rop.classList.add('checkAnchor', 'collapsed');
+        rop.classList.remove('expanded'); 
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 			document.getElementById('couponInput').addEventListener('click', () => {
 
 				$('#exampleModalCenter').modal('show');
@@ -445,7 +520,10 @@ if('<%=Cmsg%>'){
 					
 					
 					checkAnchor.forEach((element) => {
+						
 						if (element.ariaExpanded === "true") {
+
+						
 							if(element.innerHTML.trim()=="Cash on delivery"){
 								if(couponId==undefined && discount==undefined){
 									
@@ -552,6 +630,7 @@ if('<%=Cmsg%>'){
 												};
 												var razorpayObject = new Razorpay(options);
 												razorpayObject.on('payment.failed', function (response){
+													fetch('/Order?id='+id+'&total='+'<%=total%>'+'&payment='+"razorpay&paymentStatus=failed",{method:'post'})
 												
 													razorpayObject.close();
 													window.location.href = '/razorpayError?status=faile';
@@ -626,7 +705,55 @@ if('<%=Cmsg%>'){
 									console.error('Error:', error);
 								});
 								}
+								// wallet payment starts here ....................................
+							}else if(element.innerHTML.trim()=="Wallet"){
+								if(couponId==undefined && discount==undefined){
+
+								fetch('/Order?id='+id+'&total='+'<%=total%>'+'&Wallet='+"wallet",{method:'post'})
+									.then(response=>response.json())
+									.then(data=>{
+										if(data.icon==='success'){
+
+											window.location.href = '/razorpayError?status=success';	
+										}else if(data.icon==='error'){
+											
+											window.location.href = '/razorpayError?status=faile';
+
+										}
+										
+										
+									})
+
+							}else{
+
+								const discoundAmd='<%=total%>'-(discount*'<%=total%>'/100)
+									fetch('/Order?id='+id+'&total='+discoundAmd+'&couponId='+couponId+'&couponpercentage='+discount,{method:'post'})
+									.then(response=>response.json())
+									.then(data=>{
+										if(data.icon==='success'){
+
+											window.location.href = '/razorpayError?status=success';	
+											}else if(data.icon==='error'){
+										
+											window.location.href = '/razorpayError?status=faile';
+
+											}
+									})
+
 							}
+						}else{
+							Swal.fire({
+							title: 'Payment Method',
+							icon:'error',
+							text:'Select any payment method',
+							timer: 3000
+							
+						});
+						return
+
+						}
+						       // wallet payment starts here ....................................
+
 						}
 					})
 							

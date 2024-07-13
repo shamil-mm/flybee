@@ -75,6 +75,32 @@
         .wallet-container button:hover {
             background-color: #c69c61;
         }
+		
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 15rem;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color:#c69c61;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #c69c61;
+        }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -118,9 +144,7 @@
 								        <a class="nav-link" id="tab-wallet-link" data-toggle="tab" href="#tab-wallet" role="tab" aria-controls="tab-wallet" aria-selected="false">Wallet</a>
 								    </li>
 								   
-								    <li class="nav-item">
-								        <a class="nav-link" href="#">Sign Out</a>
-								    </li>
+								   
 								</ul>
 	                		</aside><!-- End .col-lg-3 -->
 							
@@ -130,8 +154,8 @@
 									
 										<span>NAME :<%=data.User_name%>  </span><br>
                                       <span>EMAIL :<%=data.User_email%>  </span> <br>
-                                      <span>PHONE :<%=data.User_number%>  </span> <br><br>
-									 
+                                      <span>PHONE :<%=data.User_number%>  </span> <br>
+									 <span>refferal code :<%=data.referalCode%></span><br>
 									 Edit your <a href="#tab-account" class="tab-trigger-link" data-toggle="modal" data-target="#One">password</a> and account <a href="#tab-account" class="tab-trigger-link" data-toggle="modal" data-target="#exampleModal">details</a>
 								    </div><!-- .End .tab-pane -->
 									<!-- Button trigger modal -->
@@ -241,25 +265,47 @@
             <tbody>
 				
 				<%order.reverse().forEach((valueOne)=>{%>
-		
-					<%if(valueOne.OrderedProducts.length>1){%>
-
-						
-						<%valueOne.OrderedProducts.forEach((value)=>{%>
 					
-							<tr  style="text-align: center; background-color: rgb(250, 250, 250); ">
+
+
+					
+					<%if(valueOne.OrderedProducts.length>1){%>
+					
+							
+						<%valueOne.OrderedProducts.forEach((value)=>{%>
+
+							<tr  style="text-align: center; background-color: rgb(244, 242, 242);">
 					   
 					   <td><img src="/proimgs/<%=value.productId.image[2]%>" alt="User Image"></td>
 					   <td><%= value.productId.product_name %></td>
 					   <%if(value.orderStatus=='Canceled'){%>
 						   <td>00.0</td>
 						   <%}else{%>
-							<%if(valueOne.couponPercentage){%>
-								<td>Offer Price <br> <%= value.productId.price-value.productId.price*(valueOne.couponPercentage/100)%></td>
-								<%}else{%>
-									<td><%= valueOne.TotalAmount%></td>
-								<%}%>
-							   
+							<% 
+							let price = value.productId.price;
+							let productOffer = value.productId.offerPercentage || 0;
+							let categoryOffer = value.productId.category.offerPercentage || 0;
+							let couponOffer = valueOne.couponPercentage || 0;
+							let finalPrice = price;
+							
+						
+							if (productOffer && categoryOffer) {
+							
+								finalPrice -= finalPrice * (Math.max(productOffer, categoryOffer) / 100);
+							} else if (productOffer) {
+							
+								finalPrice -= finalPrice * (productOffer / 100);
+							} else if (categoryOffer) {
+							
+								finalPrice -= finalPrice * (categoryOffer / 100);
+							}
+							
+							
+							finalPrice -= finalPrice * (couponOffer / 100);
+							%>
+							<td><%= finalPrice %></td>
+							
+							
 						   <%}%>
 					   <%if(value.returnRequest==true && value.orderStatus!=='Return'){%>
 						   <td id="req<%=value._id%>">Requested return</td>
@@ -272,19 +318,16 @@
 					   
 					   
 					   <td class="dateData" id="<%=value._id%>" value="'<%=value.orderDate%>'"></td>
-					   <td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>')">view details</a></td>
+					   <td  id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>','<%=value.paymentStatus%>')">view details</a></td>
 					   
 				   
 						   </tr>
+						 
 						
 					   <%})%>
-					
-				
-
-
 						<%}else{%>
 							<%valueOne.OrderedProducts.forEach((value)=>{%>
-								<%console.log(valueOne.couponPercentage)%>
+								
 								<tr  style="text-align: center; background-color: rgb(250, 250, 250);">
 						   
 						   <td><img src="/proimgs/<%=value.productId.image[2]%>" alt="User Image"></td>
@@ -297,10 +340,6 @@
 									<%}else{%>
 										<td id="p<%=value._id%>"><%=valueOne.TotalAmount%></td>
 									<%}%>
-
-
-
-
 								
 							   <%}%>
 						   <%if(value.returnRequest==true && value.orderStatus!=='Return'){%>
@@ -314,7 +353,7 @@
 						   <%if(value.returnRequest==true){%>
 							<td id='button<%=value._id%>'>view details</td>
 							<%}else{%>
-								<td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>')">view details</a></td>
+								<td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>','<%=value.paymentStatus%>')">view details</a></td>
 								<%}%>
 						   
 					   
@@ -448,8 +487,33 @@
 														</ul>
 												
 												</div> 
-												<button id="addMoney">Add Money</button>
+												<button id="addMoney" data-toggle="modal" data-target=".bd-example-modal-sm">Add Money</button>
 												<!-- <button id="withdrawMoney">Withdraw Money</button> -->
+
+												<!-- modal for add money -->
+
+												<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+												  <div class="modal-dialog modal-sm">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5 class="modal-title" id="exampleModalLongTitle" >Razorpay</h5>
+															<a id="mclose" style=" margin-top: 1px;" type="button" class="close" data-dismiss="modal" aria-label="Close">
+																<span style="color: black;" aria-hidden="true">&times;</span>
+															</a>
+															
+														</div>
+														<form action="" >
+															<label id="errorpay" for="payment">Enter Amount</label><br>
+															
+															<input type="text" id="payment" name="payment">
+															<hr style="margin: 0.5rem;">
+															<input class="btn btn-outline-primary-2 btn-primary" onclick="return addmoney(payment)" type="button" value="Proceed">
+														</form>
+													
+													</div>
+												  </div>
+												</div>
+												<!-- modal for add money -->
 											</div>
 											<%}else{%>
 												<p>Wallet not found</p>
@@ -505,7 +569,7 @@
 				<span>PHONE :</span> <br>
 				<h6>Payment</h6>
 				<span > PAYMENT METHOD:</span><br>
-				<span > STATUS:</span><br><br>
+				<span> STATUS:</span><br><br>
 				<h6>Product info</h6>
 				<IMG style="width: 25vh; height: 28vh;"> </IMG><br>
 				<span ></span><br>
@@ -516,6 +580,8 @@
 				<div style="display: flex; flex-direction: row; ">
 				<a  class="btn btn-outline-primary-2" >Return</a> &nbsp;
 				<button  class="btn btn-outline-primary-2" >Cancel order</button>
+				<button class="btn btn-outline-primary-2 btn2" style="display: none;" >Pay Now</button>
+				<button class="btn btn-outline-primary-2 btn3" style="display: none;  margin-left: 1rem;" >Invoice</button>
 			</div>
 				<br>
 			</div>
@@ -572,12 +638,86 @@
 
 
 
-
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
+	function addmoney(payment){
+		if(payment.value.trim()==='' || payment.value !== 'number' && isNaN(payment.value)) {
+			document.getElementById('errorpay').innerHTML='Type Correct Amount'
+			document.getElementById('errorpay').style.color='red'
+			return 
+		}else{
+			let pay=Number(payment.value)
+		
+			fetch('/razorpay?total='+pay,{method:"post", headers: {'Content-Type': 'application/json'}})
+					.then(response => response.json())
+					.then(res => {
+
+						
+					if (res.success) {
+						
+					var options = {
+						"key": res.key_id,
+						"amount": res.amount,
+
+						"currency": "INR",
+						"name": res.product_name,
+						"description": res.description,
+						"image": "https://dummyimage.com/600x400/000/fff",
+						"order_id": res.order_id,
+						"handler": function (response){
+										document.getElementById('mclose').click()
+									    fetch('/addMoneyToWallet?payment='+pay,{method:'post'})
+										.then((response=>response.json()))
+										.then((msg)=>{
+											
+											if(msg==='success'){
+												console.log("success")
+												window.location.reload()
+											}
+										})
+									},
+									"prefill": {
+										"contact": res.contact,
+										"name": res.name,
+										"email": res.email
+									},
+									"notes" : {
+										"description": res.description
+									},
+									"theme": {
+										"color": "#2300a3"
+									}
+								};
+								var razorpayObject = new Razorpay(options);
+								razorpayObject.on('payment.failed', function (response){
+									razorpayObject.close();
+									
+									
+
+								});
+								razorpayObject.open();
+							}
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+
+		}
+		
+
+	}
+
+
+
+
+
+
+
+
 		window.onload=function(){
 		const dateTags=document.getElementsByClassName('dateData')
-		console.log(dateTags.value)
+		
 		for(i=0;i<dateTags.length;i++){
 			const date=new Date(dateTags[i].getAttribute('value'))
 			const id=dateTags[i].getAttribute('id')
@@ -590,6 +730,9 @@
 		if(window.location.hash=='#tab-wallet'){
 			document.getElementById('tab-wallet-link').click()
 		}
+		else if(window.location.hash=='#tab-orders'){
+			document.getElementById('tab-orders-link').click()
+		}
 		
 		
 
@@ -603,16 +746,17 @@
 
 
 
-		function openDetailsModal(rowid,status) {
-			
-    $('#exampleModalCenter000').modal('show');
-	fetch('/productDetailsInOrder?id='+rowid,{method:"post"})
-	.then(res =>res.json())
-	.then(res=>{
+		function openDetailsModal(rowid,status,paymentStatus) {
+			$('#exampleModalCenter000').modal('show');
 		
-		const userInfo = res.result[0];
-		
-		document.querySelector('.pl-5 span:nth-of-type(1)').textContent = `NAME : ${userInfo.shippingAddress.name}`;
+fetch('/productDetailsInOrder?id=' + rowid, { method: "post" })
+    .then(res => res.json())
+    .then(res => {
+
+        const userInfo = res.result[0];
+
+        // Update shipping address information
+        document.querySelector('.pl-5 span:nth-of-type(1)').textContent = `NAME : ${userInfo.shippingAddress.name}`;
         document.querySelector('.pl-5 span:nth-of-type(2)').textContent = `EMAIL : ${userInfo.shippingAddress.email}`;
         document.querySelector('.pl-5 span:nth-of-type(3)').textContent = `ADDRESS : ${userInfo.shippingAddress.address}`;
         document.querySelector('.pl-5 span:nth-of-type(4)').textContent = `CITY : ${userInfo.shippingAddress.city}`;
@@ -622,61 +766,177 @@
         document.querySelector('.pl-5 span:nth-of-type(8)').textContent = `PHONE : ${userInfo.shippingAddress.phone}`;
         document.querySelector('.pl-5 span:nth-of-type(9)').textContent = `PAYMENT METHOD : ${userInfo.paymentMethod}`;
         document.querySelector('.pl-5 span:nth-of-type(10)').textContent = `STATUS : ${userInfo.paymentStatus}`;
-        document.querySelector('.pl-5 img').src=`/proimgs/${userInfo.productId.image[2]}`
+        document.querySelector('.pl-5 img').src = `/proimgs/${userInfo.productId.image[2]}`;
         document.querySelector('.pl-5 span:nth-of-type(11)').textContent = `PRODUCT NAME : ${userInfo.productId.product_name}`;
         document.querySelector('.pl-5 span:nth-of-type(12)').textContent = `PRODUCT SIZE : ${userInfo.productId.size}`;
         document.querySelector('.pl-5 span:nth-of-type(13)').textContent = `BRAND : ${userInfo.productId.brand}`;
         document.querySelector('.pl-5 span:nth-of-type(14)').textContent = `DESCRIPTION : ${userInfo.productId.Description}`;
-        document.querySelector('.pl-5 span:nth-of-type(15)').textContent = `PRODUCT PRICE : ${userInfo.productId.price}`;
-		document.querySelector('.pl-5 button').setAttribute('onclick',`cancelproduct( '${status}','${userInfo._id}')`)
-		document.querySelector('.pl-5 button').setAttribute('id',`b${rowid}`)
-		document.querySelector('.pl-5 a').setAttribute('onclick',`returnProduct( '${status}','${userInfo._id}')`)
-		document.querySelector('.pl-5 a').setAttribute('id',`rs${rowid}`)
+        document.querySelector('.pl-5 span:nth-of-type(15)').textContent = `STANDARD PRICE : ${userInfo.productId.price}`;
 
-		if(status=="Canceled"){
-		
-			document.getElementById("b"+rowid).setAttribute('disabled', 'true');
-			document.getElementById("b"+rowid).innerHTML='Canceled'	
-			document.getElementById("rs"+rowid).style.display='none'
-			}else if(status=="Placed"){
-				document.getElementById("b"+rowid).removeAttribute('disabled');
-				document.getElementById("b"+rowid).innerHTML='Cancel Order'
-				
-				document.getElementById("rs"+rowid).style.display='none'
-			}
-			else if(status=="Delivered"){
-				document.getElementById("rs"+rowid).removeAttribute('disabled');
-				document.getElementById("b"+rowid).style.display='none'
-			}
-			else if(status=="Pending"){
-				document.getElementById("rs"+rowid).style.display='none'
-				document.getElementById("b"+rowid).style.display='block'
-			}
-			else if(status=="Processing"){
-				document.getElementById("rs"+rowid).style.display='none'
-				document.getElementById("b"+rowid).style.display='block'
-			}
-			else if(status=="Return"){
-				document.getElementById("rs"+rowid).removeAttribute('disabled');
-				document.getElementById("b"+rowid).style.display='none'
-				document.getElementById("rs"+rowid).innerHTML='Returned'
-			}
-			else if(status=="Shipping"){
-				document.getElementById("rs"+rowid).style.display='none'
-				document.getElementById("b"+rowid).style.display='block'
-			}
-		// if(document.getElementById('req'+rowid).innerHTML=='Requested return'){
-		// 	document.querySelector('.pl-5 a').innerHTML='Requested return';
-		// 	document.querySelector('.pl-5 a').style.marginBottom="5vh"
-		// 	document.querySelector('.pl-5 a').classList.add('disabled');
-		// 	document.querySelector('.pl-5 button').style.display='none'
-		// }
-		
-	
-	})
+
+        const cancelButton = document.querySelectorAll('.pl-5 button')[0];
+        cancelButton.setAttribute('onclick', `cancelproduct('${status}', '${userInfo._id}')`);
+        cancelButton.setAttribute('id', `b${rowid}`);
+        cancelButton.style.display = 'block';
+        cancelButton.removeAttribute('disabled');
+        cancelButton.innerHTML = 'Cancel Order';
+
+        const returnLink = document.querySelector('.pl-5 a');
+        returnLink.setAttribute('onclick', `returnProduct('${status}', '${userInfo._id}')`);
+        returnLink.setAttribute('id', `rs${rowid}`);
+        returnLink.style.display = 'block';
+        returnLink.removeAttribute('disabled');
+        returnLink.innerHTML = 'Return Product';
+
+        const payNowButton = document.querySelectorAll('.pl-5 button')[1];
+        payNowButton.setAttribute('onclick', `failedPayNow('${status}', '${userInfo._id}')`);
+        payNowButton.setAttribute('id', `pn${rowid}`);
+        payNowButton.style.display = 'none';
+
+
+        const Invoice = document.querySelectorAll('.pl-5 button')[2];
+        Invoice.setAttribute('onclick', `Invoice('${userInfo._id}')`);
+        Invoice.setAttribute('id', `Invoice${rowid}`);
+        Invoice.style.display = 'none';
+
+        if (status == "Canceled") {
+            cancelButton.setAttribute('disabled', 'true');
+            cancelButton.innerHTML = 'Canceled';
+            returnLink.style.display = 'none';
+        } else if (status == "Placed") {
+			
+            cancelButton.removeAttribute('disabled');
+            cancelButton.innerHTML = 'Cancel Order';
+            returnLink.style.display = 'none';
+			if (paymentStatus === "Paid") {
+                    Invoice.style.display = 'block';
+					
+                }
+        } else if (status == "Delivered") {
+                returnLink.removeAttribute('disabled');
+                cancelButton.style.display = 'none';
+				if (paymentStatus === "Paid") {
+                    Invoice.style.display = 'block';
+					
+                }
+        } else if (status == "Pending") {
+            returnLink.style.display = 'none';
+            cancelButton.style.display = 'none';
+            payNowButton.style.display = 'block';
+        } else if (status == "Processing") {
+            returnLink.style.display = 'none';
+            cancelButton.style.display = 'block';
+        } else if (status == "Return") {
+            returnLink.removeAttribute('disabled');
+            cancelButton.style.display = 'none';
+            returnLink.innerHTML = 'Returned';
+        } else if (status == "Shipping") {
+            returnLink.style.display = 'none';
+            cancelButton.style.display = 'block';
+        }
+    });
+
 
 	
 }
+function Invoice(id){
+	// fetch('/invoice?id='+id,{method:'get'})
+	
+	window.location.href = '/invoiceRender?id=' + id;
+}
+
+
+
+
+
+
+function failedPayNow(status,rowid){
+	$('#exampleModalCenter000').modal('hide');
+
+	Swal.fire({
+        title: "Payment",
+        text: "Pay for every products in this order?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, pay now!",
+        cancelButtonText: "Cancel"
+    }).then((result) => {
+        if (result.isConfirmed) {
+			
+	
+	fetch('/failedPayNow?id='+rowid,{method:'post'})
+	.then(res=>res.json())
+	.then((data)=>{
+	
+					fetch('/razorpay?total='+data.data.TotalAmount,{method:"post", headers: {'Content-Type': 'application/json'}})
+					.then(response => response.json())
+					.then(res => {
+
+						
+					if (res.success) {
+						
+					var options = {
+						"key": res.key_id,
+						"amount": res.amount,
+
+						"currency": "INR",
+						"name": res.product_name,
+						"description": res.description,
+						"image": "https://dummyimage.com/600x400/000/fff",
+						"order_id": res.order_id,
+						"handler": function (response){
+							fetch('/failedPaymentRetry?id='+rowid,{method:'post'})
+							.then(response=>response.json())
+							.then((data)=>{
+								
+								if(data.status=="Payment Success"){
+									window.location.href = '/razorpayError?status=success';
+
+								}
+							})
+									},
+									"prefill": {
+										"contact": res.contact,
+										"name": res.name,
+										"email": res.email
+									},
+									"notes" : {
+										"description": res.description
+									},
+									"theme": {
+										"color": "#2300a3"
+									}
+								};
+								var razorpayObject = new Razorpay(options);
+								razorpayObject.on('payment.failed', function (response){
+									razorpayObject.close();
+									window.location.href = '/razorpayError?status=faile';
+									
+
+								});
+								razorpayObject.open();
+							}
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+	})
+   
+           
+        }
+    });
+
+
+
+
+}
+
+
+
+
+
+
+
 function returnProduct(status,rowid){
 			
 		// document.getElementById('subButton').setAttribute('data-dismiss','modal')
@@ -694,7 +954,7 @@ function returnProduct(status,rowid){
     .then((result) => {
     if (result.value) {
 	
-		console.log("showing modal")
+	
 		document.getElementById('reason').setAttribute('action','/reasonSubmit?orderId='+rowid)
 		var reasonmodal=document.getElementById('exampleModal111')
 		var modal = new bootstrap.Modal(reasonmodal)
@@ -719,7 +979,7 @@ function returnProduct(status,rowid){
 
 }
 function reasonSub(rowid){
-	console.log("reason sub")
+	
 	
 		fetch('/returnProduct?id='+rowid,{method:'post'}) 
 		if(document.getElementById('req'+rowid)){
@@ -747,17 +1007,11 @@ function reasonSub(rowid){
     })
     .then((result) => {
     if (result.value) {
-
-	
         fetch('/removeproductorder?id='+rowid,{method:'post'})
 		document.getElementById("b"+rowid).innerHTML='Canceled'	
 		document.getElementById("b"+rowid).setAttribute('disabled', 'true');
 		document.getElementById("p"+rowid).innerHTML='00.0'	
-		document.getElementById("rs"+rowid).style.display='none'
-		
-				
-				
-				
+		document.getElementById("rs"+rowid).style.display='none'			
     } else{
 		swal.fire({
     title: "Cancelled",
@@ -871,16 +1125,14 @@ function deletefn(id){
 		document.getElementById('passwordError').textContent = '';
 		document.getElementById('repasswordError').textContent = '';
 		document.getElementById('repas').textContent = '';
-		console.log(password)
-		console.log(rePassword)
-
+		
 	
         if (!password) {
             document.getElementById('passwordError').textContent = 'Enter password.';
             return false;
         }
         if (!rePassword) {
-			console.log("re")
+		
             document.getElementById('repasswordError').textContent = 're-enter password.';
             return false;
         }

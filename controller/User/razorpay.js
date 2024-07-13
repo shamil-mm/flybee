@@ -1,6 +1,6 @@
 const Razorpay=require('razorpay')
 const {RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY}=process.env
-const razorpay=async(req,res)=>{
+const razorpay=async(req,res,next)=>{
     try {
     
 
@@ -24,11 +24,11 @@ const razorpay=async(req,res)=>{
                        order_id:order.id,
                        amount:totalAmount,
                        key_id:RAZORPAY_ID_KEY,
-                       product_name:"hello",
+                       product_name:"FLYBEE",
                        description:"hai",
-                       contact:"1234567890",
-                       name:"vaseem",
-                       email:'vasi@gmail.com'
+                       contact:"9865208451",
+                       name:"shamil",
+                       email:'shamil@gmail.com'
            
                    }
                    res.json(resposeObj)
@@ -41,16 +41,16 @@ const razorpay=async(req,res)=>{
             }
            
     catch (error) {
-      console.log(error)  
+      next(error)  
     }
 }
 
-const razorpayErrorPage=async(req,res)=>{
+const razorpayErrorPage=async(req,res,next)=>{
   try {
       const status=req.query.status
       res.render('razorpayError',{status})
   } catch (error) {
-      console.log(error)
+      next(error)
   }
 }
 

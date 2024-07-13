@@ -64,6 +64,9 @@ const offerLoad=async(req,res)=>{
                     expiryDate:expireDate
                 })
                 await offer.save();
+                categoryFound.offerPercentage=amount
+                await categoryFound.save()
+
                 res.redirect('/admin/offers');
 
             }else{

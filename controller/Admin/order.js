@@ -7,84 +7,81 @@ const paginate=require('../../functions/pagination')
 const orderRenderPage=async(req,res)=>{
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit =10 ;
+        const limit = 10;
         const startIndex = (page - 1) * limit;
-
-
-let totalDocuments = 0;
-const orders = await Order.find({})
-orders.forEach(order => {
-    totalDocuments += order.OrderedProducts.length;
-});
-
-
-
-
-const totalPages = Math.ceil(totalDocuments / limit);
-
-
-let cumulativeProducts = 0;
-let startOrderIndex = 0;
-for (let i = 0; i < orders.length; i++) {
-    cumulativeProducts += orders[i].OrderedProducts.length;
-    if (cumulativeProducts > startIndex) {
-        startOrderIndex = i;
-        break;
+    
+        let totalDocuments = 0;
+        const orders = await Order.find({});
+        
+        if (orders.length === 0) {
+            // Handle the scenario where there are no orders
+            const FullData = { results: [], totalPages: 0, currentPage: page };
+            return res.render('adminOrders', { all: FullData, view: req.flash("view") });
+        }
+    
+        orders.forEach(order => {
+            totalDocuments += order.OrderedProducts.length;
+        });
+    
+        const totalPages = Math.ceil(totalDocuments / limit);
+    
+        let cumulativeProducts = 0;
+        let startOrderIndex = 0;
+        for (let i = 0; i < orders.length; i++) {
+            cumulativeProducts += orders[i].OrderedProducts.length;
+            if (cumulativeProducts > startIndex) {
+                startOrderIndex = i;
+                break;
+            }
+        }
+    
+        let ordersToFetch = [];
+        let fetchedProductsCount = 0;
+    
+        for (let i = startOrderIndex; i < orders.length; i++) {
+            ordersToFetch.push(orders[i]);
+            fetchedProductsCount += orders[i].OrderedProducts.length;
+            if (fetchedProductsCount >= limit + (cumulativeProducts - orders[i].OrderedProducts.length - startIndex)) {
+                break;
+            }
+        }
+    
+        const orderIds = ordersToFetch.map(order => order._id);
+    
+        let paginatedOrders = await Order.find({ _id: { $in: orderIds } }).populate('OrderedProducts.productId');
+    
+        let productCount = cumulativeProducts - orders[startOrderIndex].OrderedProducts.length;
+        const finalOrders = [];
+        let remainingLimit = limit;
+    
+        for (let order of paginatedOrders) {
+            const products = order.OrderedProducts;
+            
+            let start = 0;
+            if (productCount < startIndex) {
+                start = startIndex - productCount;
+            }
+    
+            const end = Math.min(start + remainingLimit, products.length);
+    
+            order.OrderedProducts = products.slice(start, end).reverse();
+            finalOrders.push(order);
+            remainingLimit -= (end - start);
+    
+            if (remainingLimit <= 0) {
+                break;
+            }
+    
+            productCount += products.length;
+        }
+    
+        const FullData = { results: finalOrders, totalPages, currentPage: page };
+        res.render('adminOrders', { all: FullData, view: req.flash("view") });
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).send("Server Error");
     }
-}
-
-
-let ordersToFetch = [];
-let fetchedProductsCount = 0;
-
-for (let i = startOrderIndex; i < orders.length; i++) {
-    ordersToFetch.push(orders[i]);
-    fetchedProductsCount += orders[i].OrderedProducts.length;
-    if (fetchedProductsCount >= limit + (cumulativeProducts - orders[i].OrderedProducts.length - startIndex)) {
-        break;
-    }
-}
-
-
-const orderIds = ordersToFetch.map(order => order._id);
-
-let paginatedOrders = await Order.find({ _id: { $in: orderIds } }).populate('OrderedProducts.productId');
-
-
-let productCount = cumulativeProducts - orders[startOrderIndex].OrderedProducts.length;
-const finalOrders = [];
-let remainingLimit = limit;
-
-for (let order of paginatedOrders) {
-    const products = order.OrderedProducts;
-  
-    let start = 0;
-
-    if (productCount < startIndex) {
-        start = startIndex - productCount;
-    }
-
-    const end = Math.min(start + remainingLimit, products.length);
-
-    // Reverse the order of products within the array
-    order.OrderedProducts = products.slice(start, end).reverse()
-    finalOrders.push(order);
-    remainingLimit -= (end - start);
-
-    if (remainingLimit <= 0) {
-        break;
-    }
-
-    productCount += products.length;
-}
-
-
-
-
-const FullData = { results: finalOrders, totalPages, currentPage: page };
-
-res.render('adminOrders', { all: FullData, view: req.flash("view") });
-
+    
 
 
         // const page = parseInt(req.query.page) || 1;
@@ -106,9 +103,7 @@ res.render('adminOrders', { all: FullData, view: req.flash("view") });
 
         // res.render('adminOrders',{all:FullData,view:req.flash("view")})
         
-    } catch (error) {
-        console.log(error)
-    }
+   
 }
 const viewOrderDetailsRender=async(req,res)=>{
    try {
@@ -124,7 +119,7 @@ const orderProductModalView=async(req,res)=>{
        const special_id = req.query.id;
        const orderWithProduct = await Order.find({'OrderedProducts._id':special_id}).populate('OrderedProducts.productId')
        orderWithProduct.forEach((value)=>{
-        const orderedProduct= value.OrderedProducts.find(product => product._id.equals(special_id));
+        const orderedProduct= value.OrderedProducts.find(product => product._id.equals(special_id))
              res.send(orderedProduct);
        })
 
@@ -148,6 +143,11 @@ const changeOrderStatus=async(req,res)=>{
         
             
         orderedProduct.orderStatus=currentSelection;
+        if(currentSelection==='Delivered'){
+            orderedProduct.paymentStatus='Paid'; 
+        }
+       
+        
         await order.save();
             if(currentSelection==='Canceled'){
                 
@@ -192,28 +192,31 @@ const orderReturnApprove=async(req,res)=>{
 
                 if (!productOfferApplied && !categoryOfferApplied) {
                     productPrice = prochange.price * foundProduct.quantity;
-                    order.TotalAmount -= productPrice;
+                   
                 } else if (productOfferApplied && categoryOfferApplied) {
                     if (productOfferApplied.offerPrecentage > categoryOfferApplied.offerPrecentage) {
                         productPrice = productOfferApplied.productId.price - (productOfferApplied.productId.price * productOfferApplied.offerPrecentage / 100);
                     } else {
                         productPrice = prochange.price - (prochange.price * categoryOfferApplied.offerPrecentage / 100);
                     }
+                    productPrice *= foundProduct.quantity;
                 } else if (productOfferApplied) {
+                  
                     productPrice = productOfferApplied.productId.price - (productOfferApplied.productId.price * productOfferApplied.offerPrecentage / 100);
+                    productPrice *= foundProduct.quantity;
                 } else if (categoryOfferApplied) {
                     productPrice = prochange.price - (prochange.price * categoryOfferApplied.offerPrecentage / 100);
+                    productPrice *= foundProduct.quantity;
                 }
                 let lastPrice=0
                 if(couponPercentage>0){
                     lastPrice= productPrice-productPrice*(couponPercentage/100)
                     
-                 if (productPrice !== undefined) {
-                     order.TotalAmount = lastPrice;
-                 }
-                    
                  }else{
-                    order.TotalAmount = productPrice;
+                    lastPrice = productPrice;
+                }
+                if (productPrice !== undefined) {
+                    order.TotalAmount -= lastPrice;
                 }
 
                 await prochange.save();
@@ -245,7 +248,7 @@ const orderReturnApprove=async(req,res)=>{
                     }
                 await userWalletfount.save()
                 }
-                console.log('everythiing okkey')
+                // console.log('everythiing okkey')
             }
         }
         res.json('Return')

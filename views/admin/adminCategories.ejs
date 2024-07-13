@@ -9,10 +9,13 @@
             <input type="text" placeholder="Search Categories" class="form-control bg-white" />
         </div>
     </div>
+
+                          
    
     <div class="card">
         
         <div class="card-body">
+            
             <div class="row">
                 <div class="col-md-3">
                     
@@ -27,18 +30,21 @@
                             <textarea placeholder="Type here" class="form-control" name="category_description" id="category_description"></textarea>
                         </div>
                        
-                        <div class="d-grid">
-                            <button class="btn btn-primary" type="submit" >Create category</button>
+                        <div class="mb-4" style="text-align: center;">
+                            <button class="btn btn-primary" type="submit" >Create category</button> 
+                           
+                            
                         </div>
+                       
                     </form>
                 </div>
                 <br>
                 <div class="col-md-9">
                     <div class="table-responsive">
-                        <br>
-                        <h3> List of categories</h3>
-                       <a href="/admin/delete/page"> <button class="btn btn-primary float-end">Deleted categories</button></a>
-                       
+                   
+                      
+                      
+                        <a  href="/admin/delete/page"> <button type="button" class="btn btn-primary" style="margin-bottom: 0.5rem; float: right;">Deleted categories</button></a>
                         <table class="table table-hover">
                            
                             <thead>
@@ -65,9 +71,9 @@
                                     <td><%=category.description%></td>
                                    
                                     <%if(category.is_list==false){%>
-                                        <td id=list_id>List</td>
+                                        <td id='list_id<%=category._id%>'>List</td>
                                         <%}else if(category.is_list==true){%>
-                                            <td id=list_id>Unlist</td>
+                                            <td id='list_id<%=category._id%>'>Unlist</td>
                                             <%}%>
                                     
                                         
@@ -127,9 +133,11 @@
 </div>
 
 <script>
-    let list=document.getElementById("list_id")
+    
     
     function listChange(Atag,id){
+        let list=document.getElementById("list_id"+id)
+        // console.log(Atag)
         // console.log(Atag.innerText)
         if(Atag.innerText=="List"){
             Atag.innerText="Unlist"  

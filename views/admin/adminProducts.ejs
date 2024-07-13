@@ -73,10 +73,10 @@
                                 
                                 <a  href="/admin/Edit_product/?id=<%=product._id%>" class="btn btn-sm font-sm rounded btn-brand" onclick="editData('<%=product._id%>')" > <i class="material-icons md-edit"> </i> Edit </a>
                                 <%if(product.is_list==false){%>
-                                    <a  class="btn btn-sm font-sm btn-light rounded" onclick="listData('<%=product._id%>','<%=product.is_list%>')" id="list">List</a>
+                                    <a  class="btn btn-sm font-sm btn-light rounded" onclick="listData('<%=product._id%>','<%=product.is_list%>')" id="list<%=product._id%>">List</a>
                                     <%}%>
                                 <%if(product.is_list==true){%>
-                                    <a  class="btn btn-sm font-sm btn-light rounded" onclick="listData('<%=product._id%>','<%=product._is_list%>')" id="list">Unlist</a>
+                                    <a  class="btn btn-sm font-sm btn-light rounded" onclick="listData('<%=product._id%>','<%=product._is_list%>')" id="list<%=product._id%>">Unlist</a>
                                     <%}%>
                                 <a class="btn btn-sm font-sm btn-light rounded" onclick="deletefn('<%=product._id%>')" > <i class="material-icons md-delete_forever" ></i>Delete</a>
                             </div>
@@ -111,7 +111,7 @@
             <script>
                function listData(id){
                 fetch('/admin/List_product/?id='+id,{method:'post'})
-               const list= document.getElementById('list')
+               const list= document.getElementById('list'+id)
               
                if(list.innerText=="List"){   
                 list.innerText='Unlist'
@@ -176,15 +176,15 @@ Swal.fire({
 
             }
             if('<%-msg1%>'){
-                window.onload = function() {
-    // Use SweetAlert to show an alert
-    Swal.fire({
-        
-          text: '<%-msg1%>',
-          icon: 'success',
-          confirmButtonText: 'OK'
-    });
-  };
+                  window.onload = function() {
+                        // Use SweetAlert to show an alert
+                        Swal.fire({
+                            
+                            text: '<%-msg1%>',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                                });
+                    };
 
 
 

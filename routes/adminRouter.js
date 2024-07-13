@@ -16,6 +16,7 @@ const order=require('../controller/Admin/order')
 const Coupons=require('../controller/Admin/Coupons')
 const offer=require('../controller/Admin/offer')
 const salesReport=require('../controller/Admin/salesReport')
+const chart=require('../controller/Admin/chartData')
 
 
 // landing signin and register process
@@ -94,6 +95,10 @@ adminRouter.post('/offerDelete',offer.offerDelete)
 // salesreports process
 adminRouter.get('/salesReporst',salesReport.salesReporst)
 adminRouter.post('/sortListOfOrder',salesReport.sortListOfOrder)
+
+// chart
+adminRouter.post('/salesData',chart.chartData)
+adminRouter.post('/bestSellingProducts',chart.chartDataTwo)
 
 
 

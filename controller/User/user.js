@@ -4,23 +4,17 @@ const bcrypt=require('bcrypt')
 const otp_email_generator=require('../../functions/otp_email_generator')
 const otps=require('../../models/otpSchema')
 const wallet=require('../../models/walletSchema')
+const order=require('../../models/orderSchema')
 
-
-
-
-
-const homePageRender=async(req,res)=>{
+const homePageRender=async(req,res,next)=>{
     try {
-        const first_8_product=await productSchema.add_pro_model.find({}).limit(8)
+        const first_8_product=await productSchema.add_pro_model.find({}).sort({updatedAt:1}).limit(8)
         res.render('homePage',{newpro:first_8_product,msg:req.flash('msg'),login:req.flash('login'),user:req.session.user_id,rg:req.flash('rg'),alreadyexist:req.flash('alreadyexist')})
-  
     } catch (error) {
-        console.log(error);
+        next(error);
     }
 }
-
-
-const loadSignin=async(req,res)=>{
+const loadSignin=async(req,res,next)=>{
     try {
         const{user_email,user_password}=req.body
             const checkEmail=await userSchema.userRegister.findOne({User_email:user_email})
@@ -48,39 +42,45 @@ const loadSignin=async(req,res)=>{
             }
          }
     catch(error){
-        console.log(error)
+         next(error)
     }
 }
 
 
-const loadRegister=async(req,res)=>{
+const loadRegister=async(req,res,next)=>{
     try { 
-        let name=req.body.register_username;
-        let email=req.body.register_email;
-        let password=req.body.register_password;
-        let number=req.body.register_number;
-        let confirmpassword=req.body.confirm_Password;
-        let alreadyexist=await userSchema.userRegister.findOne({User_email:email})
+        const {register_username,register_email,register_password,register_number,Refferal}=req.body
+        if(Refferal){
+
+            const checkRefferalCode = await userSchema.userRegister.findOne({referalCode:Refferal})
+            if(!checkRefferalCode){
+                req.flash('alreadyexist','the refferal code is failled')
+                res.redirect('/homePage')
+                return
+            }
+        }
+        let alreadyexist=await userSchema.userRegister.findOne({User_email:register_email})
         
          if(alreadyexist){
-                        // console.log("already user existed")
+                       
                         req.flash('alreadyexist','User already existed... Try again')
                         res.redirect('/homePage')
                         return
                         
                     }else{
-                    let hash_password = await bcrypt.hash(password,10)
+                    let hash_password = await bcrypt.hash(register_password,10)
                     let userData={
-                        User_name:name,
-                        User_email:email,
-                        User_number:number,
-                        User_password:hash_password
+                        User_name:register_username,
+                        User_email:register_email,
+                        User_number:register_number,
+                        User_password:hash_password,
+                        Refferal
                       }
                       req.session.theUser=userData;
                       if( req.session.theUser){
-                     let otp =  otp_email_generator(email)
+                     let otp =  otp_email_generator(register_email)
                     console.log(otp);
-                     const newOTP=new otps({email,otp})
+                     const newOTP=new otps({email:register_email,otp})
                   const OTP=  await newOTP.save();
                   req.flash('otp',OTP)
                 
@@ -92,39 +92,48 @@ const loadRegister=async(req,res)=>{
      } 
     }
      catch (error) {
-        console.log(error)
+         next(error)
     }
 }
-const otpPageRender=async(req,res)=>{
+const otpPageRender=async(req,res,next)=>{
     try {
+        
         res.render('userOtp',{otp:req.flash('otp'),otpstatus:req.flash('otpstatus')})
     } catch (error){
-        console.log(error)
+         next(error)
     }
 }
 
 
 
 
-const loadOTP=async(req,res)=>{
+const loadOTP=async(req,res,next)=>{
     try {
         const a={input1,input2,input3,input4}=req.body
         let inputOTP=Object.values(a).join('')
         if(req.session.theUser){
         const otp=await otps.findOne({email:req.session.theUser.User_email}) 
        if(otp){
+        
         if(otp.otp == inputOTP){
+          
+            const{Refferal}=req.session.theUser
+           
+            if(Refferal){
+                const refferalUser = await userSchema.userRegister.findOne({referalCode:Refferal})
+                await wallet.findOneAndUpdate({userId:refferalUser._id},{$inc:{userBalance:100},$push:{transferHistory:{type:'CREDIT',amount:100,description:"the refffered offer"}}},{new:true})
+            }
             req.flash('rg','registration successfull.       Now you can LogIn')
-            //  console.log(req.session.theUser)
+          
+            const{User_email}=req.session.theUser
+            req.session.theUser.referalCode=User_email+inputOTP
             const data=new userSchema.userRegister(req.session.theUser)
             data.save()
             const UserWallet=new wallet({
                 userId:data._id
             })
            await UserWallet.save()
-
-            
-            res.redirect('/homePage')
+           res.redirect('/homePage')
             
         }else{
             req.flash('otpstatus','Incorrect OTP')
@@ -133,86 +142,102 @@ const loadOTP=async(req,res)=>{
                 else{
                     req.flash('otpstatus','click resend OTP')
                 }}else{
-                    res.redirect('/homePage')
+                    
+                    const otp=await otps.findOne({email:req.session.forgotpasswordEmail}) 
+                    if(otp.otp == inputOTP){
+                        res.redirect('/homePage#setforgotpassword-modal')
+                    }else{
+                        req.flash('otpstatus','Incorrect OTP')
+                        res.redirect('/otp');
+                      
+                    }
+   
                 }
     } catch (error) {
-        console.log(error)
+         next(error)
     }
 }
 
 
 
-const loadResentOtp=async(req,res)=>{
+const loadResentOtp=async(req,res,next)=>{
     try {
-      await otps.deleteMany({email:req.session.theUser.User_email})
+   
         if( req.session.theUser){
             let otp =  otp_email_generator(req.session.theUser.User_email)
             console.log("resent otp :"+otp)
+            await otps.deleteMany({email:req.session.theUser.User_email})
             const newOTP=new otps({email:req.session.theUser.User_email,otp})
          const OTP=  await newOTP.save();
          req.flash('otp',OTP)
            res.redirect('/otp') 
              } 
-              else{
-               res.redirect('/homePage')
+            else{
+                let otp =  otp_email_generator(req.session.forgotpasswordEmail)
+                console.log("forgot password resent otp :"+otp)
+                await otps.deleteMany({email:req.session.forgotpasswordEmail})
+            const newOTP=new otps({email:req.session.forgotpasswordEmail,otp})
+         const OTP=  await newOTP.save();
+         req.flash('otp',OTP)
+         res.redirect('/otp')
            } 
         
     } catch (error) {
-        console.log(error)
+         next(error)
     }
 }
 
 
-   const resetPassword=async(req,res)=>{
+   const resetPassword=async(req,res,next)=>{
     try {
-        const repas_email=req.body.resetpassword_email
-        let check= await userSchema.userRegister.findOne({User_email:repas_email})
-        if(check){
-        otp_email_generator((otp_data)=>{
-            otp_data.save()
-        },repas_email)  
-        res.render('userOtp',{re:"repassword"})
+        const {forgotpasswordEmail}=req.body
+        let check= await userSchema.userRegister.findOne({User_email:forgotpasswordEmail})
+        if(check){ 
+        let otp =  otp_email_generator(forgotpasswordEmail)
+        console.log("forgot password otp :"+otp)
+       
+        await otps.deleteMany({email:check.User_email})      
+        const newOTP=new otps({email:check.User_email,otp})
+        const OTP=  await newOTP.save();
+        req.session.forgotpasswordEmail=check.User_email
+        req.flash('otp',OTP)
+          res.redirect('/otp')
         }else{
-            res.redirect('/user')
+            res.redirect('/homePage#signin-modal')
         }
     } catch (error) {
-       console.log(error) 
-    }
-}
-
-const loadOtpRepassword=async(req,res)=>{
-    try {
-        const a={input1,input2,input3,input4}=req.body
-        let inputOTP=Object.values(a).join('')
-        const checkOTP=await userSchema.OTP.findOne({User_otp:inputOTP})
-        if(checkOTP){
-            res.render('changepass')
-        }else{
-            console.log("invalid otp")
-        }
-        
-    } catch (error) {
-   
+        next(error) 
     }
 }
 
 
-const loadRepassword=async(req,res)=>{
+
+
+const loadRepassword=async(req,res,next)=>{
     try {
-    const {f_password,s_password,f_email} =req.body
+    const {f_password,s_password} =req.body
     if(f_password==s_password){
-        await userSchema.userRegister.updateOne({User_email:f_email},{$set:{User_password:await bcrypt.hash(f_password,10)}})
-    res.redirect('/user')
+        await userSchema.userRegister.updateOne({User_email:req.session.forgotpasswordEmail},{$set:{User_password:await bcrypt.hash(f_password,10)}})
+        req.flash('login',"Password reseted")
+        res.redirect('/homePage')
     }else{
-        res.render('/user')
+        res.render('/homePage')
     }    
     } catch (error) {
-        console.log(error)
+         next(error)
+    }
+}
+const error=async(req,res,next)=>{
+    try {
+        res.render('error')
+        
+    } catch (error) {
+         next(error)
     }
 }
 
 
 
 
-module.exports={homePageRender,loadSignin,loadRegister,otpPageRender,loadOTP,loadResentOtp,resetPassword,loadOtpRepassword,loadRepassword}
+module.exports={homePageRender,loadSignin,loadRegister,otpPageRender,loadOTP,loadResentOtp,resetPassword,loadRepassword,error}
 

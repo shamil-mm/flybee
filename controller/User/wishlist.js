@@ -1,5 +1,5 @@
 const Wishlist=require('../../models/wishlistSchema')
-const wishlistRender=async(req,res)=>{
+const wishlistRender=async(req,res,next)=>{
     try {
         if(req.session.user_id){
         const wishlistData=await Wishlist.findOne({userId: req.session.user_id}).populate('wishlist.items')
@@ -12,13 +12,13 @@ const wishlistRender=async(req,res)=>{
         
         
         }else{
-            res.redirect('/homePage')
+            res.redirect('/homePage#signin-modal')
         }
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
-const addWishlist=async(req,res)=>{
+const addWishlist=async(req,res,next)=>{
     try {
         if(req.session.user_id){
         const productId=req.query.id
@@ -40,24 +40,21 @@ const addWishlist=async(req,res)=>{
     
         
         await userWishlist.save();
-      res.redirect('/wishlist')
+        res.redirect('/wishlist')
         }else{
             res.redirect('/homePage')
         }  
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 
-const removeWishList=async(req,res)=>{
+const removeWishList=async(req,res,next)=>{
     try {
        const wishlistId= req.query.id
-       await Wishlist.updateOne({ userId: req.session.user_id},{ $pull:{ wishlist:{_id:wishlistId }} })
-       
-        
-        
+       await Wishlist.updateOne({ userId: req.session.user_id},{ $pull:{ wishlist:{_id:wishlistId }} })   
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 module.exports={wishlistRender,addWishlist,removeWishList}

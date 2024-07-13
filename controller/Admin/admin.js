@@ -1,11 +1,13 @@
 const otps=require('../../models/otpSchema')
 const userSchema=require('../../models/userSchema')
 const otp_email_generator=require('../../functions/otp_email_generator')
+const Order=require('../../models/orderSchema')
 const bcrypt=require('bcrypt')
+const productSchema=require('../../models/productSchema')
 
 const LoginPage=async(req,res)=>{
     try {
-        res.render('adminLogin',{msg:req.flash('msg')})
+        res.render('adminLogin',{msg:req.flash('rg')})
     } catch (error) {
         console.log(error)
     }
@@ -27,7 +29,8 @@ const loadLoginForm=async(req,res)=>{
         if(checkPassword){
              if(checkEmail.Is_block==false && checkEmail.is_admin==true){
                 req.session.admin_id=checkEmail._id
-                console.log(req.session.admin_id)
+                // console.log(req.session.admin_id)
+                req.flash('rg',"Login Successfully")
                 res.redirect('/admin/home')
             }else{
                 req.flash('msg',"user is blocked")
@@ -65,6 +68,7 @@ const loadRegisterForm=async(req,res)=>{
             is_admin:true
           }
         req.session.theuser=userData
+       
         if(req.session.theuser){
             let otp=otp_email_generator(useremail)
             console.log(otp);
@@ -82,10 +86,112 @@ const loadRegisterForm=async(req,res)=>{
 
 const homePage=async(req,res)=>{
     try {
-        res.render('index',{rg:req.flash('rg')})
+        const topCategories = await Order.aggregate([
+            {
+                $match: {
+                    'OrderedProducts.orderStatus': "Delivered"
+                }
+            },
+            {
+                $unwind: '$OrderedProducts'
+            },
+            {
+                $group: {
+                    _id: '$OrderedProducts.productId',
+                    totalOrdered: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products',  
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            {
+                $unwind: '$productDetails'
+            },
+            {
+                $lookup: {
+                    from: 'cate_schemas',  
+                    localField: 'productDetails.category',
+                    foreignField: '_id',
+                    as: 'categoryDetails'
+                }
+            },
+            {
+                $unwind: '$categoryDetails'
+            },
+            {
+                $group: {
+                    _id: '$categoryDetails._id',
+                    name: { $first: '$categoryDetails.name' },
+                    description: { $first: '$categoryDetails.description' },
+                    totalOrdered: { $sum: '$totalOrdered' }
+                }
+            },
+            {
+                $sort: { totalOrdered: -1 }
+            },
+            {
+                $limit: 5 
+            },
+            {
+                $project: {
+                    _id: 0,
+                    name: 1,
+                    description: 1,
+                    totalOrdered: 1
+                }
+            }
+        ]);
+        
+
+        const result = await Order.aggregate([
+            {
+              $match: {
+                'OrderedProducts.orderStatus': "Delivered",
+                'OrderedProducts.paymentStatus': "Paid"
+              }
+            },
+            {
+              $group: {
+                _id: null,
+                totalRevenue: { $sum: "$TotalAmount" }
+              }
+            }
+          ]);
+          const orderCount = await Order.aggregate([
+            {
+              $match: {
+                'OrderedProducts.orderStatus': "Delivered",
+                'OrderedProducts.paymentStatus': "Paid"
+              }
+            },
+            {
+              $count: "totalCount"
+            }
+          ]);
+
+          const countoftotalproduct=await productSchema.add_pro_model.find({is_list:false,is_delete:false}).countDocuments()    
+          
+   
+          const totalRevenue=result[0].totalRevenue
+        
+          const totalorderCount= orderCount[0].totalCount
+        
+       
+        
+        res.render('index', {
+            rg: req.flash('rg'),categoryDetails:topCategories,totalRevenue,totalorderCount,countoftotalproduct
+        });
+    
     } catch (error) {
-        console.log(error)
+        console.log("Error fetching data:", error);
     }
+    
+    
 }
 const otpPageRender=async(req,res)=>{
     try {
@@ -96,26 +202,36 @@ const otpPageRender=async(req,res)=>{
 }
 
 const loadOTP=async(req,res)=>{
+    
     try {
         const a={input1,input2,input3,input4}=req.body
         let inputOTP=Object.values(a).join('')
+                    
+        
         if(req.session.theuser){
         const otp=await otps.findOne({email:req.session.theuser.User_email}) 
        if(otp){
         if(otp.otp == inputOTP){
-            req.flash('rg',`registration successfull`)
-            const data=new userSchema.userRegister(req.session.theUser)
+
+            
+            const data=new userSchema.userRegister(req.session.theuser)
             await data.save()
+           
             console.log('data saved');
-            res.redirect('/admin/home')
+            req.flash('rg',`registration successfull`)
+            res.redirect('/admin/')
             
         }else{
             req.flash('otpstatus','Incorrect OTP')
             res.redirect('/admin/otp');
-                }}
-                else{
+                }
+            }else{
+
                     req.flash('otpstatus','click resend OTP')
-                }}else{
+                }
+            
+            }else{
+                 
                     res.redirect('/admin/register')
                 }
     } catch (error) {

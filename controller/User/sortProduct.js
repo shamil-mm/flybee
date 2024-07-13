@@ -1,5 +1,6 @@
+
 const helpfunctions=require('../../functions/helpFunctions')
-const sortProduct=async(req,res)=>{
+const sortProduct=async(req,res,next)=>{
     try {
         
        const sort=req.query.sort
@@ -8,7 +9,7 @@ const sortProduct=async(req,res)=>{
         req.session.save()
 
     } catch (error) {
-        console.log(error)
+        next(error)
     }
 }
 module.exports=sortProduct

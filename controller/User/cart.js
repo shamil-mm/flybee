@@ -2,7 +2,7 @@ const productSchema=require('../../models/productSchema')
 const Cart=require('../../models/cartSchema')
 
 
-const addToCart=async(req,res)=>{
+const addToCart=async(req,res,next)=>{
        
     try {
         const userId=req.session.user_id
@@ -14,8 +14,7 @@ const addToCart=async(req,res)=>{
         if(!cart){
             cart=new Cart({userId:userId,
                 items:{ productId:product._id,
-                        quantity:1,
-                        
+                        quantity:1,      
                }
             })
             await cart.save()  
@@ -32,37 +31,29 @@ const addToCart=async(req,res)=>{
                 cart.save()
                 req.flash('cart','product saved in cart')
                 res.redirect('/cart')
-            }
-          
+            } 
         }
     }else{
         req.flash('msg','product out of stock')
-        res.redirect('/product')
-        
+        res.redirect('/product')  
     }
         }
     else{
         res.redirect('/homePage')
     }
     } catch (error) {
-        console.log(error)
+       next(error)
     }
 }
-
-
-
-const cartRender=async(req,res)=>{
+const cartRender=async(req,res,next)=>{
     try {
         
         if(req.session.user_id){
-
             const data=await Cart.findOne({userId:req.session.user_id}).populate('items.productId')
-            
             if(data&&data.items!==null){
                 const filteredItems=data.items.filter((value)=>value.productId.stock>0)
                 data.items=filteredItems
                 await data.save()
-               
                 res.render('cart',{data:filteredItems,productsFound:true,cart:req.flash('cart')}) 
             }else{
                
@@ -71,33 +62,30 @@ const cartRender=async(req,res)=>{
             }   
     }
     else{
-        res.redirect('/homePage')
+        res.redirect('/homePage#signin-modal')
        
     }
     } catch (error) {
-        console.log(error)
+       next(error)
     }
 }
 
 
-const cartQuantityDynamic=async(req,res)=>{
+const cartQuantityDynamic=async(req,res,next)=>{
     try {
 
         if(req.session.user_id){
             const productId=req.query.id
             const quantity=req.query.value
-
-            
-
-        const data=await Cart.findOne({userId:req.session.user_id})
-      const isMatch=  data.items.find((value)=>{
+            const data=await Cart.findOne({userId:req.session.user_id})
+            const isMatch=  data.items.find((value)=>{
             return value.productId.equals(productId)
-        })
+            })
        const checkQuantity= await productSchema.add_pro_model.findOne({_id:isMatch.productId})
         if(checkQuantity.stock<quantity){
             res.json({msg:'only'+(quantity-1)+' stocks availiable',stock:checkQuantity.stock})
             return
-        }
+            }
         
         isMatch.quantity=quantity
         data.save()
@@ -106,17 +94,17 @@ const cartQuantityDynamic=async(req,res)=>{
         }
         
     } catch (error) {
-        console.log(error)
+       next(error)
     }
 }
 
-const removeCartProduct=async(req,res)=>{
+const removeCartProduct=async(req,res,next)=>{
     try {
         
        if(req.session.user_id) {
         const removeData=await Cart.findOne({userId:req.session.user_id})
-       const findData= removeData.items.find((value)=>{
-            return value.productId.equals(req.query.id)
+        const findData= removeData.items.find((value)=>{
+        return value.productId.equals(req.query.id)
         })
         removeData.items=removeData.items.filter(items=>!items.productId.equals(findData.productId))
         removeData.save()
@@ -124,7 +112,7 @@ const removeCartProduct=async(req,res)=>{
         res.redirect('/homePage')
     }
     } catch (error) {
-        console.log(error)
+       next(error)
     }
 }
 
