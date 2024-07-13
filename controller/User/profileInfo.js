@@ -44,7 +44,7 @@ const personalInfo=async(req,res,next)=>{
             res.render('userinfo', { data: data, datas: datas, addressFound:false,orderfound:false, message: text, edit: req.flash('edit'),form:req.flash('form'),pass:req.flash('pass'),coupon:couponfount,Wallet,fullData});
            }
         }else{
-            res.redirect('/homePage#signin-modal')
+            res.redirect('/#signin-modal')
         }
     } catch (error) {
         next(error);
@@ -68,7 +68,7 @@ const editUserPresonalInfo=async(req,res,next)=>{
             res.redirect('/personalInfo')
            } 
         }else{
-            res.redirect('/homePage')
+            res.redirect('/')
         }
         
     } catch (error) {
@@ -90,7 +90,7 @@ const changeUserPassword=async(req,res,next)=>{
         }
 
         }else{
-            res.redirect('/homePage')
+            res.redirect('/')
         }
       
     } catch (error) {
@@ -166,7 +166,7 @@ const AddorUpdateAddress=async(req,res,next)=>{
    res.redirect('/personalInfo')
 }else{
 
-res.redirect('/homePage')
+res.redirect('/')
 }
 
     } catch (error) {

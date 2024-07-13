@@ -12,7 +12,7 @@ const wishlistRender=async(req,res,next)=>{
         
         
         }else{
-            res.redirect('/homePage#signin-modal')
+            res.redirect('/#signin-modal')
         }
     } catch (error) {
         next(error)
@@ -42,7 +42,7 @@ const addWishlist=async(req,res,next)=>{
         await userWishlist.save();
         res.redirect('/wishlist')
         }else{
-            res.redirect('/homePage')
+            res.redirect('/')
         }  
     } catch (error) {
         next(error)

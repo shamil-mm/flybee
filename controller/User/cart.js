@@ -39,7 +39,7 @@ const addToCart=async(req,res,next)=>{
     }
         }
     else{
-        res.redirect('/homePage')
+        res.redirect('/')
     }
     } catch (error) {
        next(error)
@@ -62,7 +62,7 @@ const cartRender=async(req,res,next)=>{
             }   
     }
     else{
-        res.redirect('/homePage#signin-modal')
+        res.redirect('/#signin-modal')
        
     }
     } catch (error) {
@@ -90,7 +90,7 @@ const cartQuantityDynamic=async(req,res,next)=>{
         isMatch.quantity=quantity
         data.save()
         }else{
-            res.redirect('/homePage')
+            res.redirect('/')
         }
         
     } catch (error) {
@@ -109,7 +109,7 @@ const removeCartProduct=async(req,res,next)=>{
         removeData.items=removeData.items.filter(items=>!items.productId.equals(findData.productId))
         removeData.save()
     }else{
-        res.redirect('/homePage')
+        res.redirect('/')
     }
     } catch (error) {
        next(error)

@@ -41,7 +41,7 @@ const checkoutRender=async(req,res,next)=>{
             }
          }else{
            
-             res.redirect('/homePage')
+             res.redirect('/')
          }
        
     } catch (error) {

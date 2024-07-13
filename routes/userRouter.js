@@ -32,7 +32,7 @@ const about=require('../controller/User/about')
 
 
 // homePage,login and register process
-userRouter.get('/homePage',user.homePageRender) 
+userRouter.get('/',user.homePageRender) 
 userRouter.post('/loadEP',user.loadSignin)
 userRouter.post('/loadRG',user.loadRegister)
 userRouter.post('/loadOTP',user.loadOTP)

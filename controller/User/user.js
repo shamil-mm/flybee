@@ -24,21 +24,21 @@ const loadSignin=async(req,res,next)=>{
                          if(checkEmail.Is_block==false){
                             req.session.user_id=checkEmail._id
                             req.flash('login',"login succesful")
-                            res.redirect('/homePage')
+                            res.redirect('/')
                         }else{
-                            res.redirect('/homePage')
+                            res.redirect('/')
                             req.flash('msg',"user is blocked")
                         }
                     }else{
                         
                         req.flash('msg',"wrong password")
-                        res.redirect('/homePage')
+                        res.redirect('/')
 
                     }
             }
             else{
                 req.flash('msg',"user not fount")
-                res.redirect('/homePage')
+                res.redirect('/')
             }
          }
     catch(error){
@@ -55,7 +55,7 @@ const loadRegister=async(req,res,next)=>{
             const checkRefferalCode = await userSchema.userRegister.findOne({referalCode:Refferal})
             if(!checkRefferalCode){
                 req.flash('alreadyexist','the refferal code is failled')
-                res.redirect('/homePage')
+                res.redirect('/')
                 return
             }
         }
@@ -64,7 +64,7 @@ const loadRegister=async(req,res,next)=>{
          if(alreadyexist){
                        
                         req.flash('alreadyexist','User already existed... Try again')
-                        res.redirect('/homePage')
+                        res.redirect('/')
                         return
                         
                     }else{
@@ -133,7 +133,7 @@ const loadOTP=async(req,res,next)=>{
                 userId:data._id
             })
            await UserWallet.save()
-           res.redirect('/homePage')
+           res.redirect('/')
             
         }else{
             req.flash('otpstatus','Incorrect OTP')
@@ -145,7 +145,7 @@ const loadOTP=async(req,res,next)=>{
                     
                     const otp=await otps.findOne({email:req.session.forgotpasswordEmail}) 
                     if(otp.otp == inputOTP){
-                        res.redirect('/homePage#setforgotpassword-modal')
+                        res.redirect('/#setforgotpassword-modal')
                     }else{
                         req.flash('otpstatus','Incorrect OTP')
                         res.redirect('/otp');
@@ -203,7 +203,7 @@ const loadResentOtp=async(req,res,next)=>{
         req.flash('otp',OTP)
           res.redirect('/otp')
         }else{
-            res.redirect('/homePage#signin-modal')
+            res.redirect('/#signin-modal')
         }
     } catch (error) {
         next(error) 
@@ -219,9 +219,9 @@ const loadRepassword=async(req,res,next)=>{
     if(f_password==s_password){
         await userSchema.userRegister.updateOne({User_email:req.session.forgotpasswordEmail},{$set:{User_password:await bcrypt.hash(f_password,10)}})
         req.flash('login',"Password reseted")
-        res.redirect('/homePage')
+        res.redirect('/')
     }else{
-        res.render('/homePage')
+        res.render('/')
     }    
     } catch (error) {
          next(error)

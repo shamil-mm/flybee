@@ -9,7 +9,7 @@ const invoiceRender=async(req,res,next)=>{
             res.render('invoice',{order:orderList,address:orderList.OrderedProducts[0].shippingAddress})
 
         }else{
-            res.redirect('/homePage')
+            res.redirect('/')
         }
         
     } catch (error) {
