@@ -177,14 +177,14 @@ const homePage=async(req,res)=>{
           const countoftotalproduct=await productSchema.add_pro_model.find({is_list:false,is_delete:false}).countDocuments()    
           
    
-          const totalRevenue=result[0].totalRevenue
+          const totalrevenue=result[0].totalRevenue
         
           const totalorderCount= orderCount[0].totalCount
         
        
         
         res.render('index', {
-            rg: req.flash('rg'),categoryDetails:topCategories,totalRevenue,totalorderCount,countoftotalproduct
+            rg: req.flash('rg'),categoryDetails:topCategories,totalrevenue,totalorderCount,countoftotalproduct
         });
     
     } catch (error) {
