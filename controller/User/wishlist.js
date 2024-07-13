@@ -10,8 +10,8 @@ const wishlistRender=async(req,res,next)=>{
             res.render('wishlist',{wishlist:false})
         }
         
-        
-        }else{
+         
+        }else{    
             res.redirect('/#signin-modal')
         }
     } catch (error) {
