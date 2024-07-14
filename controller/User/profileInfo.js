@@ -47,6 +47,7 @@ const personalInfo=async(req,res,next)=>{
             res.redirect('/#signin-modal')
         }
     } catch (error) {
+        console.log(error);
         next(error);
     }
 }
