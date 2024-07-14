@@ -3,6 +3,11 @@ const googleStrategy=require('passport-google-oauth2')
 const userSchema=require('./models/userSchema')
 const wallet=require('./models/walletSchema')
 require('dotenv').config();
+console.log('Loading passport:', passport);
+console.log('Loading googleStrategy:', googleStrategy);
+console.log('Loading userSchema:', userSchema);
+console.log('Loading wallet:', wallet);
+
 
 passport.use(new googleStrategy({
 
