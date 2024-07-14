@@ -1,11 +1,12 @@
 const passport=require('passport')
 const googleStrategy=require('passport-google-oauth2')
 const userSchema=require('./models/userSchema')
+const wallet=require('./models/walletSchema')
 require('dotenv').config();
 
 passport.use(new googleStrategy({
 
-    
+
     clientID:process.env.CLIENT_ID,
     clientSecret:process.env.CLIENT_SECRET,
     callbackURL:"https://flybee.store/auth/google/callback"
@@ -24,6 +25,10 @@ passport.use(new googleStrategy({
                     User_name,
                     password:googleId
                 })
+                const UserWallet=new wallet({
+                    userId:user._id
+                })
+                await UserWallet.save()
             }
             return done(null,user)
         } catch (error) {
