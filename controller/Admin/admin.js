@@ -25,7 +25,8 @@ const loadLoginForm=async(req,res)=>{
    
     const checkEmail=await userSchema.userRegister.findOne({User_email:email12})
     if(checkEmail){
-        const checkPassword=await bcrypt.compare(password12,checkEmail.User_password)
+        console.log(req.body);
+        const checkPassword= await bcrypt.compare(password12,checkEmail.User_password)
         if(checkPassword){
              if(checkEmail.Is_block==false && checkEmail.is_admin==true){
                 req.session.admin_id=checkEmail._id

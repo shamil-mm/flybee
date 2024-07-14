@@ -1,9 +1,10 @@
 const Razorpay=require('razorpay')
+require('dotenv').config()
 const {RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY}=process.env
 const razorpay=async(req,res,next)=>{
     try {
     
-
+console.log('raaaaa',process.env);
             const totalAmount =req.query.total
            
               const razorpayInstance = new Razorpay({
