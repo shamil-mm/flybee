@@ -4,7 +4,7 @@ const {RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY}=process.env
 const razorpay=async(req,res,next)=>{
     try {
     
-
+        console.log(RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY);
             const totalAmount =req.query.total
               const razorpayInstance = new Razorpay({
                key_id:RAZORPAY_ID_KEY,
