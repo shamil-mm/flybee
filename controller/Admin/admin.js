@@ -177,14 +177,11 @@ const homePage=async(req,res)=>{
           const countoftotalproduct=await productSchema.add_pro_model.find({is_list:false,is_delete:false}).countDocuments()    
           
    
-          const totalrevenue=result[0].totalRevenue
-        
-          const totalorderCount= orderCount[0].totalCount
-        
-       
-        
+  
+          const totalRevenue = (result[0] && result[0].totalRevenue) || 0;
+          const totalorderCount = (orderCount[0] && orderCount[0].totalCount) || 0;
         res.render('index', {
-            rg: req.flash('rg'),categoryDetails:topCategories,totalrevenue,totalorderCount,countoftotalproduct
+            rg: req.flash('rg'),categoryDetails:topCategories,totalRevenue,totalorderCount,countoftotalproduct
         });
     
     } catch (error) {
