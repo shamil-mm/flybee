@@ -4,9 +4,8 @@ const {RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY}=process.env
 const razorpay=async(req,res,next)=>{
     try {
     
-console.log('raaaaa',process.env);
+
             const totalAmount =req.query.total
-           
               const razorpayInstance = new Razorpay({
                key_id:RAZORPAY_ID_KEY,
                key_secret:RAZORPAY_SECRET_KEY
@@ -34,6 +33,7 @@ console.log('raaaaa',process.env);
                    }
                    res.json(resposeObj)
                }else{
+                console.log(err);
                    res.status(400).send({success:false,msg:'Something went wrong!'});
            
                }
@@ -42,6 +42,7 @@ console.log('raaaaa',process.env);
             }
            
     catch (error) {
+      console.log(error);
       next(error)  
     }
 }

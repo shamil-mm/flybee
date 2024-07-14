@@ -582,7 +582,7 @@ if('<%=Cmsg%>'){
 								
 								if(couponId==undefined && discount==undefined){
 									// console.log("enter undefinder")
-								
+							
 									fetch('/razorpay?total=<%=total%>',{method:"post", headers: {'Content-Type': 'application/json'}})
 									.then(response => response.json())
 									.then(res => {
