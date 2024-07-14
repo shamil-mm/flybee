@@ -2,6 +2,7 @@ const passport=require('passport')
 const googleStrategy=require('passport-google-oauth2')
 const userSchema=require('./models/userSchema')
 require('dotenv').config();
+
 passport.use(new googleStrategy({
     clientID:process.env.CLIENT_ID,
     clientSecret:process.env.CLIENT_SECRET,
@@ -26,8 +27,6 @@ passport.use(new googleStrategy({
         } catch (error) {
             console.error("Error during Google authentication:", error);
             return done(error, null);
-
-
         }
      }
      
@@ -53,9 +52,9 @@ passport.use(new googleStrategy({
             if (req.isAuthenticated()) {
          
                 req.session.user_id = req.user._id;
-                // console.log(req.session.user_id);
+               
             } 
-            // console.log(req.session.user_id);
+           
             res.redirect('/');
             
         }
