@@ -32,7 +32,7 @@ passport.use(new googleStrategy({
             }
             return done(null,user)
         } catch (error) {
-            console.error("Error during Google authentication:", error);
+           
             return done(error, null);
         }
      }
