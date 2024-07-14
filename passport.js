@@ -5,10 +5,10 @@ require('dotenv').config();
 passport.use(new googleStrategy({
     clientID:process.env.CLIENT_ID,
     clientSecret:process.env.CLIENT_SECRET,
-    callbackURL:"http://localhost:3000/auth/google/callback"
+    callbackURL:"http://flybee.store/auth/google/callback"
      },
      async(accessToken,refreshToken,profile,done)=>{
-        // console.log(profile)
+     
         try {
             const{id:googleId,email:User_email,displayName:User_name}=profile
             
@@ -56,7 +56,7 @@ passport.use(new googleStrategy({
                 // console.log(req.session.user_id);
             } 
             // console.log(req.session.user_id);
-            res.redirect('/homePage');
+            res.redirect('/');
             
         }
      }
