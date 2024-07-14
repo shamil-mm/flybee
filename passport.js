@@ -1,5 +1,5 @@
 const passport=require('passport')
-const googleStrategy=require('passport-google-oauth2')
+const googleStrategy=require('passport-google-oauth20')
 const userSchema=require('./models/userSchema')
 const wallet=require('./models/walletSchema')
 require('dotenv').config();
