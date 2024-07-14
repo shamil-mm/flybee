@@ -6,7 +6,7 @@ require('dotenv').config()
 const nocache=require('nocache')
 app.use(nocache())
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: 'mysecretkey',
     resave: false,
     saveUninitialized:true
 }))
