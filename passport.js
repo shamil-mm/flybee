@@ -7,8 +7,8 @@ require('dotenv').config();
 passport.use(new googleStrategy({
 
 
-    clientID:"10530821826-60qc5po7qtedru2143ucei8di5q8gtqa.apps.googleusercontent.com",
-    clientSecret:"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",
+    clientID:process.env.CLIENT_ID,
+    clientSecret:process.env.CLIENT_SECRET,
     callbackURL:"https://flybee.store/auth/google/callback"
      },
      async(accessToken,refreshToken,profile,done)=>{
