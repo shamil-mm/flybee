@@ -25,12 +25,11 @@ const loadLoginForm=async(req,res)=>{
    
     const checkEmail=await userSchema.userRegister.findOne({User_email:email12})
     if(checkEmail){
-        console.log(req.body);
         const checkPassword= await bcrypt.compare(password12,checkEmail.User_password)
         if(checkPassword){
              if(checkEmail.Is_block==false && checkEmail.is_admin==true){
                 req.session.admin_id=checkEmail._id
-                // console.log(req.session.admin_id)
+               
                 req.flash('rg',"Login Successfully")
                 res.redirect('/admin/home')
             }else{
@@ -57,7 +56,6 @@ const loadRegisterForm=async(req,res)=>{
       const{username,useremail,userpassword}=req.body
       let alreadyexist=await userSchema.userRegister.findOne({User_email:useremail})
       if(alreadyexist){
-        console.log("already existed");
         res.redirect('/admin/register')
         return
       }else{
@@ -214,8 +212,6 @@ const loadOTP=async(req,res)=>{
             
             const data=new userSchema.userRegister(req.session.theuser)
             await data.save()
-           
-            console.log('data saved');
             req.flash('rg',`registration successfull`)
             res.redirect('/admin/')
             
