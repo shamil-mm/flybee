@@ -1,11 +1,11 @@
 require('dotenv').config();
-const passport=require('passport')
+const passports=require('passport')
 const googleStrategy=require('passport-google-oauth2')
 const userSchema=require('./models/userSchema')
 const wallet=require('./models/walletSchema')
 
 
-passport.use(new googleStrategy({
+passports.use(new googleStrategy({
 
 
     clientID:process.env.CLIENT_ID,
@@ -40,10 +40,10 @@ passport.use(new googleStrategy({
      
      )
      );
-     passport.serializeUser((user,done)=>{
+     passports.serializeUser((user,done)=>{
         done(null,user.id)
      })
-     passport.deserializeUser(async(id,done)=>{
+     passports.deserializeUser(async(id,done)=>{
         try {
             const user=await userSchema.userRegister.findById(id)
             done(null,user);
@@ -54,8 +54,8 @@ passport.use(new googleStrategy({
         }
      })
      module.exports={
-        googleAuth:passport.authenticate('google',{scope:['profile','email']}),
-        googleCallback:passport.authenticate('google',{failureRedirect:'/user'}),
+        googleAuth:passports.authenticate('google',{scope:['profile','email']}),
+        googleCallback:passports.authenticate('google',{failureRedirect:'/user'}),
         setupSession:(req,res,next)=>{
             if (req.isAuthenticated()) {
          
