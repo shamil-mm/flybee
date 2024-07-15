@@ -1,3 +1,4 @@
+const mongoose=require('mongoose')
 const passport=require('passport')
 const googleStrategy=require('passport-google-oauth2')
 const userSchema=require('./models/userSchema')
