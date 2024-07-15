@@ -8,13 +8,11 @@ const salesReporst=async(req,res)=>{
     const deliveredOrders = orders.filter(order => 
         order.OrderedProducts.every(product => product.orderStatus === 'Delivered')
     );
-     if(deliveredOrders.length==0){
-            console.log("order have't")
-        }else{
+   
            
            res.render('salesReport',{deliveredOrders})
            
-        }   
+         
     } catch (error) {
         console.log(error)
     }
