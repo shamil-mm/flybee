@@ -1,4 +1,4 @@
-const google_pass=require('../passport')
+const google_pass=require('../passports')
 const express=require('express')
 const userRouter=express();
 userRouter.set('view engine','ejs')
