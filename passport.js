@@ -1,11 +1,13 @@
+
+
+import { use, serializeUser, deserializeUser, authenticate } from 'passport';
+import googleStrategy from 'passport-google-oauth2';
+import { userRegister } from './models/userSchema';
+import wallet from './models/walletSchema';
 require('dotenv').config();
-const passports=require('passport')
-const googleStrategy=require('passport-google-oauth2')
-const userSchema=require('./models/userSchema')
-const wallet=require('./models/walletSchema')
 
 
-passports.use(new googleStrategy({
+use(new googleStrategy({
 
 
     clientID:process.env.CLIENT_ID,
@@ -18,9 +20,9 @@ passports.use(new googleStrategy({
             const{id:googleId,email:User_email,displayName:User_name}=profile
             
             
-            let user = await userSchema.userRegister.findOne({User_email:User_email});
+            let user = await userRegister.findOne({User_email:User_email});
             if(!user){
-                user=await userSchema.userRegister.create({
+                user=await userRegister.create({
                     googleId,
                     User_email:User_email,
                     User_name,
@@ -40,12 +42,12 @@ passports.use(new googleStrategy({
      
      )
      );
-     passports.serializeUser((user,done)=>{
+     serializeUser((user,done)=>{
         done(null,user.id)
      })
-     passports.deserializeUser(async(id,done)=>{
+     deserializeUser(async(id,done)=>{
         try {
-            const user=await userSchema.userRegister.findById(id)
+            const user=await userRegister.findById(id)
             done(null,user);
             
         } catch (error) {
@@ -53,17 +55,15 @@ passports.use(new googleStrategy({
 
         }
      })
-     module.exports={
-        googleAuth:passports.authenticate('google',{scope:['profile','email']}),
-        googleCallback:passports.authenticate('google',{failureRedirect:'/user'}),
-        setupSession:(req,res,next)=>{
-            if (req.isAuthenticated()) {
-         
-                req.session.user_id = req.user._id;
-               
-            } 
-           
-            res.redirect('/');
-            
-        }
-     }
+     export const googleAuth = authenticate('google', { scope: ['profile', 'email'] });
+export const googleCallback = authenticate('google', { failureRedirect: '/user' });
+export function setupSession(req, res, next) {
+    if (req.isAuthenticated()) {
+
+        req.session.user_id = req.user._id;
+
+    }
+
+    res.redirect('/');
+
+}
