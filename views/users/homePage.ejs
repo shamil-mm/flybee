@@ -229,18 +229,18 @@
                             <div class="product product-7 text-center">
                                 <figure class="product-media">
                                     <span class="product-label label-sale">Sale</span>
-                                    <a href="/products" style="height: 26rem;">
+                                    <a href="/product" style="height: 26rem;">
                                         <img src="/proimgs/<%=value.image[2]%>"  alt="Product image" class="product-image">
                                         <img src="/proimgs/<%=value.image[1]%>" alt="Product image" class="product-image-hover">
                                     </a>
                                     
 
                                     <div class="product-action-vertical">
-                                        <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                        <a href="/addWishlist?id=<%=value._id%>" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
                                     </div><!-- End .product-action-vertical -->
 
                                     <div class="product-action">
-                                        <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                                        <a href="/cart/add?id=<%=value._id%>" class="btn-product btn-cart"><span>add to cart</span></a>
                                     </div><!-- End .product-action -->
                                 </figure><!-- End .product-media -->
 
