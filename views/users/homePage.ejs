@@ -253,13 +253,13 @@
                                        
 
                                         <%if(value.finalPercentage && value.price*(value.finalPercentage/100) !== value.price){%>
-                                            <p> offer applied</p>
+                                           
                                             
-                                            <span class="new-price">PRICE : <del>₹ <%=value.price%></del> <br><span style="color: #c69c61;">OFFER(<%=value.finalPercentage%>%) <br>New Offer Price :<%=value.price-value.price*value.finalPercentage/100%></span>
+                                            <span style="color: #f38d7b;">PRICE : <del>₹ <%=value.price%></del> <br><span style="color:#f38d7b">OFFER(<%=value.finalPercentage%>%) <br>New Offer Price :<%=value.price-value.price*value.finalPercentage/100%></span>
 
                                                 <%}else{%>
-                                                    <p>no offer</p>
-                                                    <span class="new-price">PRICE : <%=value.price %></span>
+                                                  
+                                                    <span style="color: #f38d7b;">PRICE : <%=value.price %></span>
                                                     <%}%>
                                     </div>
                                    
