@@ -5,6 +5,7 @@ const otp_email_generator=require('../../functions/otp_email_generator')
 const otps=require('../../models/otpSchema')
 const wallet=require('../../models/walletSchema')
 const order=require('../../models/orderSchema')
+const offerHelper=require('../../functions/offerCalculations')
 
 const homePageRender=async(req,res,next)=>{
     try {
