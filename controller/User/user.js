@@ -8,7 +8,38 @@ const order=require('../../models/orderSchema')
 
 const homePageRender=async(req,res,next)=>{
     try {
-        const first_8_product=await productSchema.add_pro_model.find({}).sort({updatedAt:1}).limit(8)
+        const product=await productSchema.add_pro_model.find({is_delete:false,is_list:false}).populate('category').sort({updatedAt:1}).limit(8)
+        
+        const first_8_product= await Promise.all(product.map(async(product)=>{
+            let finalPercentage=0
+            let productOffer = 0;
+            let categoryOffer = 0;
+  
+            const activeProductOffers = await offerHelper.getActiveProductOffers(product._id)
+            const activeCategoryOffers = await offerHelper.getActiveCategoryOffers(product.category._id)
+  
+              if(activeProductOffers.length>0){
+  
+                activeProductOffers.forEach((offer)=>{
+                  const offerAmount =offer.offerPrecentage;
+                  productOffer = Math.max(productOffer, offerAmount);
+                })
+              }
+  
+  
+              if(activeCategoryOffers.length>0){
+                activeCategoryOffers.forEach((offer)=>{
+                const offerAmount = offer.offerPrecentage;
+                categoryOffer = Math.max(categoryOffer, offerAmount);
+             
+                })
+              }
+              finalPercentage=productOffer>categoryOffer?productOffer:categoryOffer
+              const updated_data=await productSchema.add_pro_model.findByIdAndUpdate(product._id, {offerPercentage:finalPercentage}, {new: true});
+              return {...product.toObject(),finalPercentage}
+  
+          }))
+
         res.render('homePage',{newpro:first_8_product,msg:req.flash('msg'),login:req.flash('login'),user:req.session.user_id,rg:req.flash('rg'),alreadyexist:req.flash('alreadyexist')})
     } catch (error) {
         next(error);
