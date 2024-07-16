@@ -250,13 +250,14 @@
                                         <h5><%=value.product_name %></h5>
                                         <p><%=value.Description %></p>
                                         <h6 style="padding-top: 2px;">BRAND : <%=value.brand %></h6>
+                                        <%console.log(value)%>
 
                                         <%if(value.finalPercentage && value.finalPercentage!==value.price){%>
                                             
                                             <span class="new-price">PRICE123 : <del>₹ <%=value.price%></del> <br><span style="color: #c69c61;">OFFER(<%=value.finalPercentage%>%) <br>New Offer Price :<%=value.price-value.price*value.finalPercentage/100%></span>
 
                                                 <%}else{%>
-                                                    <span class="new-price">PRICE : <%=value.price %></span>
+                                                    <span class="new-price">PRICE12345 : <%=value.price %></span>
                                                     <%}%>
                                     </div>
                                    
