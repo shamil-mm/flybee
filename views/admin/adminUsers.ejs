@@ -104,7 +104,16 @@
    function block_user(buttontag,id){
     
    
-    if(buttontag.innerText=='UnBlock'){
+   
+    Swal.fire({
+    text: `Do you want to ${buttontag.innerText}?`,
+    icon: 'info',
+    showCancelButton: true,
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No'
+}).then((result) => {
+    if (result.isConfirmed) {
+        if(buttontag.innerText=='UnBlock'){
         buttontag.innerText="Block";
        buttontag.style.background='#d43737';
        buttontag.style.color='white'
@@ -115,8 +124,9 @@
        buttontag.style.background='#3BB77E';
        buttontag.style.color='white'
     }
-    
-    fetch(`/admin/block/?userid=${id}`,{method:'POST'})
+        console.log('User confirmed');
+
+        fetch(`/admin/block/?userid=${id}`,{method:'POST'})
     .then(response=>{
         if(!response){
             throw new Error('net work issue')
@@ -125,6 +135,10 @@
     .catch(error=>{
         console.log('Error',error)
     })
+    }
+});
+    
+    
    }
  
     

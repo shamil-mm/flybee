@@ -1,11 +1,20 @@
+const user=require('../models/userSchema')
 
 const is_login=async(req,res,next)=>{
     try {
-        if(!req.session.user_id){
-            // console.log(req.session.user_id+"hai")
-            res.redirect('/user')
+        if(!req.session.user_id){ 
+            res.redirect('/')
         }else{
-            next()
+            const userOkay = await user.userRegister.findOne({_id:req.session.user_id,Is_block:true});
+            if(userOkay){
+                req.session.user_id=null
+                res.redirect('/')
+
+            }else{
+                next()
+            }
+
+           
         }
         
     } catch (error) {
@@ -14,7 +23,7 @@ const is_login=async(req,res,next)=>{
 }
 const is_logout=async(req,res,next)=>{
     try {
-        // console.log(req.session.user_id+"hello")
+        
         if(req.session.user_id){
             res.redirect('/homePage')
         }else{
