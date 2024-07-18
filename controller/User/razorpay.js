@@ -3,8 +3,6 @@ require('dotenv').config()
 const {RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY}=process.env
 const razorpay=async(req,res,next)=>{
     try {
-    
-        console.log(RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY);
             const totalAmount =req.query.total
               const razorpayInstance = new Razorpay({
                key_id:RAZORPAY_ID_KEY,
@@ -25,7 +23,7 @@ const razorpay=async(req,res,next)=>{
                        amount:totalAmount,
                        key_id:RAZORPAY_ID_KEY,
                        product_name:"FLYBEE",
-                       description:"hai",
+                       description:"flybee ecommerce web",
                        contact:"9865208451",
                        name:"shamil",
                        email:'shamil@gmail.com'

@@ -261,13 +261,14 @@
 												
 												
 										<%if(couponStatus){%>
-
+											<%console.log('placeorder coupon') %>
 											<button onclick="return Place_Order('<%=couponStatus._id%>','<%=couponStatus.discountAmount%>')" class="btn btn-outline-primary-2 btn-order btn-block">
 												<span class="btn-text">Place Order</span>
 												<span class="btn-hover-text">Proceed to Checkout</span>
 											</button>
 											
 											<%}else{%>
+												<%console.log('placeorder no coupon') %>
 		                				<button onclick="return Place_Order()" class="btn btn-outline-primary-2 btn-order btn-block">
 		                					<span class="btn-text">Place Order</span>
 		                					<span class="btn-hover-text">Proceed to Checkout</span>
@@ -309,16 +310,6 @@
 							</div><!-- End .page-content -->
 						</main><!-- End .main -->
 
-
-
-
-
-						<!-- Button trigger modal -->
-<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-	Launch demo modal
-  </button> -->
-  
-  <!-- Modal -->
   <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" style="padding: 1rem; width: 40rem;">
@@ -512,14 +503,9 @@ if('<%=Cmsg%>'){
 		
 
 		 function Place_Order(couponId,discount){
-
-		
-					
 			        const id=document.getElementById('inputBox').value
 					const checkAnchor=document.querySelectorAll('.checkAnchor')
-					
-					
-					checkAnchor.forEach((element) => {
+                    checkAnchor.forEach((element) => {
 						
 						if (element.ariaExpanded === "true") {
 
@@ -600,20 +586,7 @@ if('<%=Cmsg%>'){
 											fetch('/Order?id='+id+'&total='+'<%=total%>'+'&payment='+"razorpay",{method:'post'})
 											
 											window.location.href = '/razorpayError?status=success';		
-														// 		Swal.fire({
-														// 				icon: 'success',
-														// 				title: 'Order Saved!',
-														// 				text: 'Your order has been successfully saved.',
-														// 				showCancelButton: true,  
-														// 				confirmButtonText: 'Purchase More Products',
-														// }).then((result) => {
 														
-														// if (result.isConfirmed) {
-														// 	window.location.href = '/product';  
-														// } else {
-														// 	window.location.href = '/personalInfo'
-														// }
-														// 		});
                            
 													},
 													"prefill": {

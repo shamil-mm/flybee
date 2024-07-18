@@ -38,14 +38,14 @@ const orderCreation=async(req,res,next)=>{
                     return value._id.equals(product.productId._id)
                 })
                
-                
-                
-                if(data.stock!==0 && data.stock>product.quantity){
+                if(data.stock!==0 && data.stock>=product.quantity){
                   data.stock = data.stock - product.quantity
+                
                 }else{  
                     stockOut=true     
                 }
-
+                
+                
                 const cate= await Category.category_schema_model.findOne({_id:data.category})
                 const copyProduct={ 
                   _id:data._id,
@@ -67,13 +67,16 @@ const orderCreation=async(req,res,next)=>{
                 }else{
                     orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result,paymentMethod:"Rasorpay",paymentStatus:'Failed',orderStatus:'Pending'})
                 }
-            }  
+                
+            } 
+         
            }else if(req.query.Wallet){
+            
             for (const product of products) {
                 const data =   productdata.find((value)=>{
                 return value._id.equals(product.productId._id)
                 })
-                  if(data.stock!==0 && data.stock>product.quantity){
+                  if(data.stock!==0 && data.stock>=product.quantity){
                     data.stock = data.stock - product.quantity
                   }else{  
                       stockOut=true                      
@@ -103,12 +106,13 @@ const orderCreation=async(req,res,next)=>{
 
 
            }else{
+            
            
             for (const product of products) {
               const data =   productdata.find((value)=>{
                     return value._id.equals(product.productId._id)
                 })
-                if(data.stock!==0 && data.stock>product.quantity){
+                if(data.stock!==0 && data.stock>=product.quantity){
                  
                 data.stock = data.stock - product.quantity
               }else{
@@ -133,7 +137,8 @@ const orderCreation=async(req,res,next)=>{
                orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result})
             }
            }
-
+          
+           
            if(stockOut==false){
             const order=new Order({
                 userId:req.session.user_id,
@@ -141,6 +146,7 @@ const orderCreation=async(req,res,next)=>{
                 TotalAmount:amountTotal,
                 couponPercentage:couponpercentage
             })
+            
             order.save()
            await Cart.findOneAndDelete({ userId: req.session.user_id })
            await coupon.updateOne(
