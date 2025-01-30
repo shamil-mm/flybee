@@ -18,6 +18,9 @@ const adminRouter=require('./routes/adminRouter')
 const userRouter=require('./routes/userRouter')
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
+app.set('view engine','ejs')
+app.set('views','views/users')
+app.use(express.static('public/users'))
 
 
 app.use(flash())
@@ -27,6 +30,9 @@ app.use(flash())
 app.use(express.static('public'))
 app.use('/admin',adminRouter.adminRouter)
 app.use('/',userRouter.userRouter)
+app.use('*',(req,res)=>{
+    res.render('error')
+})
 
 
 

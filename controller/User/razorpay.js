@@ -1,11 +1,9 @@
 const Razorpay=require('razorpay')
+require('dotenv').config()
 const {RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY}=process.env
 const razorpay=async(req,res,next)=>{
     try {
-    
-
             const totalAmount =req.query.total
-           
               const razorpayInstance = new Razorpay({
                key_id:RAZORPAY_ID_KEY,
                key_secret:RAZORPAY_SECRET_KEY
@@ -25,7 +23,7 @@ const razorpay=async(req,res,next)=>{
                        amount:totalAmount,
                        key_id:RAZORPAY_ID_KEY,
                        product_name:"FLYBEE",
-                       description:"hai",
+                       description:"flybee ecommerce web",
                        contact:"9865208451",
                        name:"shamil",
                        email:'shamil@gmail.com'
@@ -33,6 +31,7 @@ const razorpay=async(req,res,next)=>{
                    }
                    res.json(resposeObj)
                }else{
+                console.log(err);
                    res.status(400).send({success:false,msg:'Something went wrong!'});
            
                }
@@ -41,6 +40,7 @@ const razorpay=async(req,res,next)=>{
             }
            
     catch (error) {
+      console.log(error);
       next(error)  
     }
 }

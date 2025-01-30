@@ -4,7 +4,7 @@ const categorySchema=require('../../models/categorySchema')
 const categoryRenderPage=async(req,res)=>{
     try {
         const all_category=await categorySchema.category_schema_model.find({is_delete:false})
-        res.render('admincategories',{categories:all_category})
+        res.render('adminCategories',{categories:all_category})
     } catch (error) {
         console.log( error)
     }

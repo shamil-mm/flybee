@@ -32,12 +32,19 @@
                                             <input class="form-select" type="text" id="datePicker" placeholder="Select date range" style="display: none;">
                                         </select>
                                                                             </div>
+                                <%if(deliveredOrders.length>0){%>                                       
                                     <div class="col-lg-2 col-md-3 ">
                                         <button id="pdfButton" class="btn" style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-pdf"></i>PDF</button>
-                                        <button id="excelButton"class="btn " style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-excel"></i>EXCEL</button>
-
-                                      
+                                        <button id="excelButton"class="btn " style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-excel"></i>EXCEL</button> 
                                     </div>
+                                    <%}else{%>
+                                        <div class="col-lg-2 col-md-3 " style="display: none;">
+                                            <button  id="pdfButton" class="btn" style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-pdf"></i>PDF</button>
+                                            <button id="excelButton"class="btn " style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-excel"></i>EXCEL</button> 
+                                        </div>
+                                        
+                                        
+                                        <%}%>
 
                                     
                                 </div>
@@ -45,6 +52,9 @@
                             <!-- card-header end// -->
                             <div class="card-body">
                                 <div class="table-responsive">
+                                    <%if(deliveredOrders.length>0){%>
+                                        
+                                       
                                     <table class="table table-hover" id="table">
                                         <thead>
                                             <tr>
@@ -131,6 +141,9 @@
                                             </tr>
                                         </tbody>
                                     </table>
+                                    <%}else{%>
+                                        <p>No orders fount</p>
+                                        <%}%>
                                 </div>
                                 <!-- table-responsive //end -->
                             </div>
@@ -144,10 +157,7 @@
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-start">
                             <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                            <li class="page-item"><a class="page-link" href="#">02</a></li>
-                            <li class="page-item"><a class="page-link" href="#">03</a></li>
-                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                            <li class="page-item"><a class="page-link" href="#">16</a></li>
+                               
                             <li class="page-item">
                                 <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
                             </li>

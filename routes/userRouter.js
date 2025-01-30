@@ -1,4 +1,4 @@
-const google_pass=require('../passport')
+const google_pass=require('../passports')
 const express=require('express')
 const userRouter=express();
 userRouter.set('view engine','ejs')
@@ -42,38 +42,38 @@ userRouter.post('/reset_password',user.resetPassword)
 userRouter.post('/loadrepassword',user.loadRepassword)
 userRouter.get('/auth/google',google_pass.googleAuth);
 userRouter.get("/auth/google/callback",google_pass.googleCallback,google_pass.setupSession)
-userRouter.get('/error',user.error) 
+userRouter.get('/error',userAuth.is_login,user.error) 
 
 
 // logout
-userRouter.get("/logout",logOut)
+userRouter.get("/logout",userAuth.is_login,logOut)
 
 
 // product
-userRouter.get('/product',product.productPageRender)
-userRouter.get('/men',product.mensPageRender)
-userRouter.get('/women',product.womensPageRender)
-userRouter.get('/productView',product.productViewPage)
+userRouter.get('/product',userAuth.is_login,product.productPageRender)
+userRouter.get('/men',userAuth.is_login,product.mensPageRender)
+userRouter.get('/women',userAuth.is_login,product.womensPageRender)
+userRouter.get('/productView',userAuth.is_login,product.productViewPage)
 
 
 // profileInfo
-userRouter.get('/personalInfo',profileInfo.personalInfo)
+userRouter.get('/personalInfo',userAuth.is_login,profileInfo.personalInfo)
 userRouter.post('/edituser',profileInfo.editUserPresonalInfo)
 userRouter.post('/userPassword',profileInfo.changeUserPassword)
-userRouter.get('/EditAddress',profileInfo.AddnewAddressRender)
+userRouter.get('/EditAddress',userAuth.is_login,profileInfo.AddnewAddressRender)
 userRouter.post('/addorupdateaddress',profileInfo.AddorUpdateAddress)
-userRouter.get('/editAddressrender',profileInfo.EditAddressPageRender)
+userRouter.get('/editAddressrender',userAuth.is_login,profileInfo.EditAddressPageRender)
 
 
 // cart
-userRouter.get('/cart/add',cart.addToCart)
-userRouter.get('/cart',cart.cartRender)
+userRouter.get('/cart/add',userAuth.is_login,cart.addToCart)
+userRouter.get('/cart',userAuth.is_login,cart.cartRender)
 userRouter.post('/cartdynamic',cart.cartQuantityDynamic)
 userRouter.post('/removeCartProduct',cart.removeCartProduct)
 
 
 // checkout
-userRouter.get('/checkout',checkoutRender)
+userRouter.get('/checkout',userAuth.is_login,checkoutRender)
 
 
 // order
@@ -82,15 +82,15 @@ userRouter.post('/removeproductorder',removeproductorder.removeproductorder)
 userRouter.post('/returnProduct',removeproductorder.returnProduct)
 userRouter.post('/productDetailsInOrder',order.productDetailsInOrder)
 userRouter.post('/updateaddress',order.orderTimeUpdateAddress)
-userRouter.delete('/deleteAddress',order.orderTimeDeleteAddress)
+userRouter.delete('/deleteAddress',userAuth.is_login,order.orderTimeDeleteAddress)
 userRouter.post('/reasonSubmit',order.reasonSubmit)
 userRouter.post('/failedPayNow',order.failedPayNow)
 userRouter.post('/failedPaymentRetry',order.failedPaymentRetry)
 
 // invoice
 
-userRouter.get('/invoiceRender',invoice.invoiceRender)
-userRouter.get('/downloadInvoice',invoice.downloadInvoice)
+userRouter.get('/invoiceRender',userAuth.is_login,invoice.invoiceRender)
+userRouter.get('/downloadInvoice',userAuth.is_login,invoice.downloadInvoice)
 
 
 
@@ -107,23 +107,24 @@ userRouter.post('/fetchAvaliableCoupon',couponController.fetchAvaliableCoupon)
  
 
 // wishlist
-userRouter.get('/wishlist',wishlist.wishlistRender)
-userRouter.get('/addWishlist',wishlist.addWishlist)
+userRouter.get('/wishlist',userAuth.is_login,wishlist.wishlistRender)
+userRouter.get('/addWishlist',userAuth.is_login,wishlist.addWishlist)
 userRouter.delete('/removeWishList',wishlist.removeWishList)
 
 
 // razorpay
 userRouter.post('/razorpay',razorpay.razorpay)
-userRouter.get('/razorpayError',razorpay.razorpayErrorPage)
+userRouter.get('/razorpayError',userAuth.is_login,razorpay.razorpayErrorPage)
 
 //wallet
 userRouter.post('/addMoneyToWallet',wallet.addMoneyToWallet)
 
 // about 
-userRouter.get('/about',about)
+userRouter.get('/about',userAuth.is_login,about)
 
 userRouter.use((err, req, res, next) => {
-    res.status(500).render('error', { error: err.message }); // Render the error page with the error message
+    console.log(err)
+    res.status(500).render('error', { error: err.message });
 });
 
 

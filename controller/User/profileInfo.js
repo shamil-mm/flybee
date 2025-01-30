@@ -26,8 +26,8 @@ const personalInfo=async(req,res,next)=>{
              const skip = (page - 1) * limit;
 
              const Wallet = await wallet.findOne({ userId: req.session.user_id }).populate('userId');
-
-           const totalPages = Math.ceil(Wallet.transferHistory.length/limit)
+             const transferHistoryLength = Wallet.transferHistory?.length || 0;
+              const totalPages = Math.ceil(transferHistoryLength / limit) || 0;
            const transactions =Wallet.transferHistory.reverse().slice(skip, skip + limit);
           const fullData={transactions,totalPages,page,totalAmount:Wallet.userBalance}
           
