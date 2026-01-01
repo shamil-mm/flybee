@@ -34,24 +34,6 @@ app.use('*',(req,res)=>{
     res.render('error')
 })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.listen(process.env.PORT,()=>{
     console.log('server running on port 3000')
 })
