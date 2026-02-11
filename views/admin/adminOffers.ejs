@@ -67,7 +67,7 @@
                 <div class="content-header">
                     <div>
                         <h2 class="content-title card-title">Offer List</h2>
-                        <p>Lorem ipsum dolor sit amet.</p>
+                     
 
                     </div>
                     <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
@@ -80,28 +80,26 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card mb-4">
-                            <header class="card-header">
-                                <div class="row gx-3">
-                                    <div class="col-lg-4 col-md-6 me-auto">
-                                        <input type="text" placeholder="Search..." class="form-control" />
+                              <header class="card ">
+                                    <div class="row gx-1 align-items-center">
+                                        <div class="col-lg-4 col-md-6 col-lg-12">
+                                        <form method="get" action="/admin/offers">
+                                        <div class="input-group input-group-sm">
+                                        <input
+                                            type="text"
+                                            name="search"
+                                            class="form-control"
+                                            placeholder="Search products..."
+                                           
+                                        />
+                                        <button class="btn btn-primary" type="submit">
+                                            Search
+                                        </button>
+                                        </div>
+                                    </form>
+                                        </div>
                                     </div>
-                                    <div class="col-lg-2 col-md-3 col-6">
-                                        <select class="form-select">
-                                            <option>Status</option>
-                                            <option>Active</option>
-                                            <option>Disabled</option>
-                                            <option>Show all</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-2 col-md-3 col-6">
-                                        <select class="form-select">
-                                            <option>Show 20</option>
-                                            <option>Show 30</option>
-                                            <option>Show 40</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </header>
+                                </header>
                             <!-- card-header end// -->
 
                             <div class="card-body">
@@ -200,7 +198,7 @@
             </div>
             
             <div class="form-group">
-                <label for="name">Product Name:</label>
+                <label for="name" id="nameLabel">Product Name:</label>
                 <label id="nameError" class="ErroR"></label>
                 <input type="text"  name="name" id="productName"> 
                 <div id="autocompleteBox" class="autocomplete-items"></div>
@@ -270,16 +268,6 @@
             }else{
                 document.getElementById('expireDateError').textContent = '';
             }
-           
-    
-        const namePattern = /^[a-zA-Z0-9\s']+$/;
-        if (!namePattern.test(name)) {
-         
-            document.getElementById('nameError').textContent = 'Name should only contain alphanumeric characters and spaces';
-            return false;
-        }else{
-            document.getElementById('nameError').textContent = ''; 
-        }
         if (amount < 1 || amount > 100) {
             document.getElementById('amountError').textContent = 'Discount percentage must be between 1 and 100';
            
@@ -298,7 +286,7 @@
     }
 </script>
  <script>
-//   when the page is load this will work
+
     function settingValues(){
       
        const selectedOfferType= document.getElementById('OfferType').value
@@ -311,8 +299,6 @@
         })
     }
     }
-
-    // when user change the type of offer 
 
     function TypeSelection(tag){
         if(tag.value=='Product'){
@@ -429,6 +415,18 @@ function selectOne(element) {
 
     
   </script>
+
+  <script>
+    function TypeSelection(select) {
+        const nameLabel = document.getElementById('nameLabel');
+
+        if (select.value === 'Product') {
+            nameLabel.innerText = 'Product Name:';
+        } else if (select.value === 'Category') {
+            nameLabel.innerText = 'Category Name:';
+        }
+    }
+</script>
 
           
    

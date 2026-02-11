@@ -1,5 +1,5 @@
 const mongoose=require('mongoose')
-const category_schema=new mongoose.Schema({
+const categorySchema=new mongoose.Schema({
     name:{type:String},
     description:{type:String},
     is_list:{type:Boolean,default:false},
@@ -9,5 +9,5 @@ const category_schema=new mongoose.Schema({
     offerPercentage:{type:Number,default:0}
 })
 
-const category_schema_model=mongoose.model("cate_schema",category_schema)
-module.exports={category_schema_model}
+const Category=mongoose.model("category",categorySchema)
+module.exports={Category}

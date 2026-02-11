@@ -1,192 +1,215 @@
-
+const mongoose = require("mongoose");
 const Cart=require('../../models/cartSchema')
-const productSchema=require('../../models/productSchema')
+const {Product}=require('../../models/productSchema')
 const Address=require('../../models/addressSchema')
 const Order=require('../../models/orderSchema')
 const coupon=require('../../models/couponSchema')
-const Category=require('../../models/categorySchema')
+const {Category}=require('../../models/categorySchema')
 
 
-const orderCreation=async(req,res,next)=>{
-    try {
-       
-       
-       const amountTotal=req.query.total
-       const userId=req.session.user_id
-       const couponId=req.query.couponId
-       const couponpercentage=req.query.couponpercentage
-       const userfind=await Cart.findOne({userId:userId}).populate('userId').populate("items.productId")
-       if(!userfind.items){
-            res.status(400).json({ title: "info",text:"product not found" ,icon:'error'});
-        }
-        const products=userfind.items
-        const orderproducts=[]
-        const addressId=req.query.id
-        const productdata = await productSchema.add_pro_model.find({})
-        const find_user=await Address.findOne({userId:userId})
+const orderCreation = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    console.log('order creation is working ')
+    const userId = req.session.user_id;
+    const {
+      total,
+      couponId,
+      couponpercentage,
+      id: addressId,
+      payment,
+      Wallet,
+      paymentStatus
+    } = req.query;
 
 
-        const find_result=find_user.addresses.find((value)=>{
-            return value._id.equals(addressId)
-          })
-        let stockOut=false
-           
+    const cart = await Cart.findOne({ userId }).populate("items.productId") .session(session)
 
-        if(req.query.payment){
-            for (const product of products) {
-                    const data =   productdata.find((value)=>{
-                    return value._id.equals(product.productId._id)
-                })
-               
-                if(data.stock!==0 && data.stock>=product.quantity){
-                  data.stock = data.stock - product.quantity
-                
-                }else{  
-                    stockOut=true     
-                }
-                
-                
-                const cate= await Category.category_schema_model.findOne({_id:data.category})
-                const copyProduct={ 
-                  _id:data._id,
-                  product_name:data.product_name,
-                  size:data.size,
-                  brand:data.brand,
-                  Description:data.Description,
-                  image:data.image,
-                  price:data.price,
-                  stock:data.stock,
-                  category:cate,
-                  offerPercentage:data.offerPercentage
-               
-               }
-
-                data.save();
-                if(!req.query.paymentStatus){
-                    orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result,paymentMethod:"Rasorpay",paymentStatus:'Paid'})
-                }else{
-                    orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result,paymentMethod:"Rasorpay",paymentStatus:'Failed',orderStatus:'Pending'})
-                }
-                
-            } 
-         
-           }else if(req.query.Wallet){
-            
-            for (const product of products) {
-                const data =   productdata.find((value)=>{
-                return value._id.equals(product.productId._id)
-                })
-                  if(data.stock!==0 && data.stock>=product.quantity){
-                    data.stock = data.stock - product.quantity
-                  }else{  
-                      stockOut=true                      
-                  }
-  
-                  const cate= await Category.category_schema_model.findOne({_id:data.category})
-                  const copyProduct={ 
-                    _id:data._id,
-                    product_name:data.product_name,
-                    size:data.size,
-                    brand:data.brand,
-                    Description:data.Description,
-                    image:data.image,
-                    price:data.price,
-                    stock:data.stock,
-                    category:cate,
-                    offerPercentage:data.offerPercentage
-                 
-                 }
-  
-                  data.save();
-                   orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result,paymentMethod:"Wallet",paymentStatus:'Paid'})
-                 
-              }
-              
-             
-
-
-           }else{
-            
-           
-            for (const product of products) {
-              const data =   productdata.find((value)=>{
-                    return value._id.equals(product.productId._id)
-                })
-                if(data.stock!==0 && data.stock>=product.quantity){
-                 
-                data.stock = data.stock - product.quantity
-              }else{
-                stockOut=true 
-                
-              }
-              const cate= await Category.category_schema_model.findOne({_id:data.category})
-              const copyProduct={ 
-                _id:data._id,
-                product_name:data.product_name,
-                size:data.size,
-                brand:data.brand,
-                Description:data.Description,
-                image:data.image,
-                price:data.price,
-                stock:data.stock,
-                category:cate,
-                offerPercentage:data.offerPercentage
-             
-             }
-              data.save();
-               orderproducts.push({productId:copyProduct,quantity:product.quantity,shippingAddress:find_result})
-            }
-           }
-          
-           
-           if(stockOut==false){
-            const order=new Order({
-                userId:req.session.user_id,
-                OrderedProducts:orderproducts,
-                TotalAmount:amountTotal,
-                couponPercentage:couponpercentage
-            })
-            
-            order.save()
-           await Cart.findOneAndDelete({ userId: req.session.user_id })
-           await coupon.updateOne(
-            { _id: couponId, 'usageCount.userId': req.session.user_id },
-            { $set: { 'usageCount.$.used': true } }
-          )
-          res.status(200).json({ title: "Order success",text:"Product ordered successfully",icon:'success'});
-
-           }else{
-            res.status(400).json({ title: "Order canceled",text:"Product out of stock" ,icon:'error'});
-           }
-
-    
-    
-} catch (error) {
-        next(error)
+    if (!cart || cart.items.length === 0) {
+     throw new Error("CART_EMPTY");
     }
-}
+
+    let removed = false;
+    cart.items = cart.items.filter(item => {
+        const product = item.productId;
+        if (!product) {
+          removed = true;
+          return false;
+        }
+
+        const variant = product.variants.id(item.variantId);
+        if (!variant) {
+          removed = true;
+          return false;
+        }
+
+        return true;
+      });
+
+      if (removed) {
+        await cart.save();
+        throw new Error("INVALID_CART_ITEMS");
+      }
+
+    const addressDoc = await Address.findOne({ userId }).session(session)
+    const shippingAddress = addressDoc.addresses.find(addr =>
+      addr._id.equals(addressId)
+    );
+
+    if (!shippingAddress) {
+      throw new Error("ADDRESS_NOT_FOUND");
+    }
+
+    let paymentMethod = "cash on delivery";
+    let finalPaymentStatus = "Not paid";
+
+    if (payment) {
+      paymentMethod = "Rasorpay";
+      finalPaymentStatus = paymentStatus ? "Failed" : "Paid";
+    } else if (Wallet) {
+      paymentMethod = "Wallet";
+      finalPaymentStatus = "Paid";
+    }
+
+    const orderedProducts = [];
+
+
+    for (const item of cart.items) {
+
+      const stockResult = await Product.updateOne(
+        {
+          _id: item.productId._id,
+          "variants._id": item.variantId,
+          "variants.stock": { $gte: item.quantity }
+        },
+        {
+          $inc: { "variants.$.stock": -item.quantity }
+        },
+        { session }
+      ); 
+
+      if (stockResult.modifiedCount === 0) {
+        throw new Error("OUT_OF_STOCK");
+      }
+
+      const product = await Product.findById(item.productId._id).session(session);
+
+      const variant = product.variants.id(item.variantId);
+
+      orderedProducts.push({
+        productId: product._id,
+        variantId: variant._id,
+        productName: product.product_name,
+        brand: product.brand,
+        size: variant.size,
+        color: variant.color,
+        price: variant.price,
+        image: variant.images?.[0],
+        quantity: item.quantity,
+        offerPercentage: product.offerPercentage || 0,
+        category:product.category
+      });
+    }
+    
+
+    
+    const order = new Order({
+      userId,
+      OrderedProducts: orderedProducts,
+      shippingAddress,
+      paymentMethod,
+      paymentStatus: finalPaymentStatus,
+      TotalAmount: total,
+      couponPercentage: couponpercentage || 0
+    });
+
+    await order.save();
+
+    await Cart.findOneAndDelete({ userId }).session(session);
+    
+
+    if (couponId) {
+      await coupon.updateOne(
+        { _id: couponId, "usageCount.userId": userId },
+        { $set: { "usageCount.$.used": true } }
+      );
+    }
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      title: "Order Success",
+      text: "Product ordered successfully",
+      icon: "success"
+    });
+
+  } catch (error) {
+    console.log("catch block is working")
+    await session.abortTransaction();
+    session.endSession();
+    console.error(error.message);
+
+    if (error.message === "OUT_OF_STOCK") {
+      return res.status(400).json({
+        title: "Order Failed",
+        text: "One or more products are out of stock",
+        icon: "error"
+      });
+    }
+
+    if (error.message === "CART_EMPTY") {
+      return res.status(400).json({
+        title: "Error",
+        text: "Your cart is empty",
+        icon: "error"
+      });
+    }
+
+    if (error.message === "INVALID_CART_ITEMS") {
+      req.flash(
+        "error",
+        "Some items were removed because they are no longer available"
+      );
+      return res.redirect("/cart");
+    }
+
+    if (error.message === "ADDRESS_NOT_FOUND") {
+      return res.status(400).json({
+        title: "Error",
+        text: "Shipping address not found",
+        icon: "error"
+      });
+    }
+
+
+
+    next(error);
+  }
+};
+
 
 const productDetailsInOrder=async(req,res,next)=>{
     try { 
-     const objId=req.query.id
-     const data= await Order.find({userId:req.session.user_id}).populate('OrderedProducts.productId')
-   
-   
-    if(data){
-        let result
-        data.forEach((value)=>{
-           result=value.OrderedProducts.filter((value)=>{
-            return value._id==objId
-        })
-       
-        if(result.length==1){
-            res.send({result}) 
-        }
-        })
         
+     const productOrderId =req.query.id
+      const userId = req.session.user_id;
+     const order = await Order.findOne({userId,"OrderedProducts._id": productOrderId}).populate('OrderedProducts.productId');
+     if (!order) {
+      return res.status(404).json({ message: "Order not found" });
     }
-       
-      
+     const orderedProduct = order.OrderedProducts.id(productOrderId);  
+      res.json({
+      result: [
+        {
+          ...orderedProduct.toObject(),
+          shippingAddress: order.shippingAddress,
+          paymentMethod: order.paymentMethod,
+          paymentStatus: order.paymentStatus,
+          orderStatus: order.orderStatus
+        }
+      ]
+    });
       
     } catch (error) {
         next(error)

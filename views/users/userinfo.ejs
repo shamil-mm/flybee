@@ -5,15 +5,6 @@
     transition: none !important;
 }
 
-	/* .modal-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 20px;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-} */
 
 .container {
     padding-left: 20px;
@@ -266,25 +257,28 @@
 				
 				<%order.reverse().forEach((valueOne)=>{%>
 					
-
+					
+	
 
 					
 					<%if(valueOne.OrderedProducts.length>1){%>
 					
 							
 						<%valueOne.OrderedProducts.forEach((value)=>{%>
+							
 
 							<tr  style="text-align: center; background-color: rgb(244, 242, 242);">
 					   
-					   <td><img src="/proimgs/<%=value.productId.image[2]%>" alt="User Image"></td>
+					   <td><img src="<%=value.image%>" alt="User Image"></td>
 					   <td><%= value.productId.product_name %></td>
 					   <%if(value.orderStatus=='Canceled'){%>
 						   <td>00.0</td>
-						   <%}else{%>
+						<%}else{%>
 							<% 
-							let price = value.productId.price;
+							let price = value.productId.variants.id(value.variantId).price;
 							let productOffer = value.productId.offerPercentage || 0;
-							let categoryOffer = value.productId.category.offerPercentage || 0;
+							let categoryOffer = value.category.offerPercentage || 0;
+							
 							let couponOffer = valueOne.couponPercentage || 0;
 							let finalPrice = price;
 							
@@ -299,10 +293,9 @@
 							
 								finalPrice -= finalPrice * (categoryOffer / 100);
 							}
-							
-							
 							finalPrice -= finalPrice * (couponOffer / 100);
 							%>
+							
 							<td><%= finalPrice %></td>
 							
 							
@@ -317,8 +310,8 @@
 							   
 					   
 					   
-					   <td class="dateData" id="<%=value._id%>" value="'<%=value.orderDate%>'"></td>
-					   <td  id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>','<%=value.paymentStatus%>')">view details</a></td>
+					   <td class="dateData" id="<%=value._id%>" value="'<%=valueOne.createdAt%>'"></td>
+					   <td  id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>','<%=valueOne.paymentStatus%>')">view details</a></td>
 					   
 				   
 						   </tr>
@@ -328,32 +321,40 @@
 						<%}else{%>
 							<%valueOne.OrderedProducts.forEach((value)=>{%>
 								
-								<tr  style="text-align: center; background-color: rgb(250, 250, 250);">
+							<tr  style="text-align: center; background-color: rgb(250, 250, 250);">
 						   
-						   <td><img src="/proimgs/<%=value.productId.image[2]%>" alt="User Image"></td>
-						   <td><%= value.productId.product_name %></td>
+						   <td><img src="<%=value.image%>" alt="User Image"></td>
+						   <td><%= value.productName %></td>
+								
+							 	
 						   <%if(value.orderStatus=='Canceled'){%>
 							   <td>00.0</td>
-							   <%}else{%>
-								<%if(valueOne.couponPercentage){%>
-									<td>Offer Price <br><%= value.productId.price-value.productId.price*(valueOne.couponPercentage/100)%></td>
-									<%}else{%>
-										<td id="p<%=value._id%>"><%=valueOne.TotalAmount%></td>
-									<%}%>
+							  
+							<%}else{%>
 								
-							   <%}%>
-						   <%if(value.returnRequest==true && value.orderStatus!=='Return'){%>
+							    <%if(valueOne.couponPercentage>0){%>
+							         <td>Offer Price <br><%= value.price-value.price*(valueOne.couponPercentage/100)%></td>
+								<%}else{%>
+									
+									<td id="p<%=value._id%>"><%=valueOne.TotalAmount%></td>
+								<%}%>
+							<%}%>
+
+						   
+							<%if(value.returnRequest==true && value.orderStatus!=='Return'){%>
 							   <td id="req<%=value._id%>">Requested return</td>
 							   <%}else{%>
 								   <td id="ROW<%=value._id%>"><%=value.orderStatus%></td>
 							   <%}%>
 							   
 				
-						   <td class="dateData" id="<%=value._id%>" value="'<%=value.orderDate%>'"></td>
+						   <td class="dateData" id="<%=value._id%>" value="'<%=valueOne.createdAt%>'"></td>
+						  
 						   <%if(value.returnRequest==true){%>
 							<td id='button<%=value._id%>'>view details</td>
 							<%}else{%>
-								<td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>','<%=value.paymentStatus%>')">view details</a></td>
+								<%console.log(value.paymentStatus)%>
+								<td id='button<%=value._id%>'> <a href="" data-toggle="modal" data-target="#exampleModalCenter000" onclick="openDetailsModal('<%=value._id%>','<%=value.orderStatus%>','<%=valueOne.paymentStatus%>')">view details</a></td>
 								<%}%>
 						   
 					   
@@ -672,7 +673,7 @@
 										.then((msg)=>{
 											
 											if(msg==='success'){
-												console.log("success")
+												
 												window.location.reload()
 											}
 										})
@@ -747,13 +748,15 @@
 
 
 		function openDetailsModal(rowid,status,paymentStatus) {
+			console.log('paymentstatus is here',paymentStatus)
 			$('#exampleModalCenter000').modal('show');
 		
 fetch('/productDetailsInOrder?id=' + rowid, { method: "post" })
     .then(res => res.json())
     .then(res => {
-
-        const userInfo = res.result[0];
+		
+		const userInfo = res.result[0];
+		
 
         // Update shipping address information
         document.querySelector('.pl-5 span:nth-of-type(1)').textContent = `NAME : ${userInfo.shippingAddress.name}`;
@@ -766,12 +769,11 @@ fetch('/productDetailsInOrder?id=' + rowid, { method: "post" })
         document.querySelector('.pl-5 span:nth-of-type(8)').textContent = `PHONE : ${userInfo.shippingAddress.phone}`;
         document.querySelector('.pl-5 span:nth-of-type(9)').textContent = `PAYMENT METHOD : ${userInfo.paymentMethod}`;
         document.querySelector('.pl-5 span:nth-of-type(10)').textContent = `STATUS : ${userInfo.paymentStatus}`;
-        document.querySelector('.pl-5 img').src = `/proimgs/${userInfo.productId.image[2]}`;
+        document.querySelector('.pl-5 img').src = `${userInfo.image}`;
         document.querySelector('.pl-5 span:nth-of-type(11)').textContent = `PRODUCT NAME : ${userInfo.productId.product_name}`;
-        document.querySelector('.pl-5 span:nth-of-type(12)').textContent = `PRODUCT SIZE : ${userInfo.productId.size}`;
-        document.querySelector('.pl-5 span:nth-of-type(13)').textContent = `BRAND : ${userInfo.productId.brand}`;
-        document.querySelector('.pl-5 span:nth-of-type(14)').textContent = `DESCRIPTION : ${userInfo.productId.Description}`;
-        document.querySelector('.pl-5 span:nth-of-type(15)').textContent = `STANDARD PRICE : ${userInfo.productId.price}`;
+        document.querySelector('.pl-5 span:nth-of-type(13)').textContent = `BRAND : ${userInfo.brand}`;
+        document.querySelector('.pl-5 span:nth-of-type(14)').textContent = `DESCRIPTION : ${userInfo.productId.description}`;
+        document.querySelector('.pl-5 span:nth-of-type(15)').textContent = `STANDARD PRICE : ${userInfo.price}`;
 
 
         const cancelButton = document.querySelectorAll('.pl-5 button')[0];
@@ -804,13 +806,12 @@ fetch('/productDetailsInOrder?id=' + rowid, { method: "post" })
             cancelButton.innerHTML = 'Canceled';
             returnLink.style.display = 'none';
         } else if (status == "Placed") {
-			
+			console.log("its comming inside the placed",paymentStatus)
             cancelButton.removeAttribute('disabled');
             cancelButton.innerHTML = 'Cancel Order';
             returnLink.style.display = 'none';
 			if (paymentStatus === "Paid") {
-                    Invoice.style.display = 'block';
-					
+                    Invoice.style.display = 'block';	
                 }
         } else if (status == "Delivered") {
                 returnLink.removeAttribute('disabled');

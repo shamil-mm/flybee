@@ -1,76 +1,62 @@
 const Order = require('../../models/orderSchema');
-const productSchema = require('../../models/productSchema');
+const {Product} = require('../../models/productSchema');
 const Offer = require('../../models/offerSchema');
 const wallet = require('../../models/walletSchema');
 
 const removeproductorder = async (req,res,next) => {
     try {
-        const productId = req.query.id;
-        const userOrders = await Order.find({ userId: req.session.user_id }).populate('OrderedProducts.productId');
+        const { id: orderedProductId } = req.query;
+        const userId = req.session.user_id;
 
-        for (const order of userOrders) {
-            let couponPercentage = order.couponPercentage;
-            const product = order.OrderedProducts.find(product => product._id.toString() === productId);
-
-            if (product) {
-                const prochange = await productSchema.add_pro_model.findOne({ _id: product.productId._id });
-                prochange.stock += product.quantity;
-
-                const productOfferApplied = await Offer.findOne({ productId: prochange._id }).populate('productId');
-                const categoryOfferApplied = await Offer.findOne({ categoryId: prochange.category }).populate('categoryId');
-
-                let productPrice;
-
-               
-                if (!productOfferApplied && !categoryOfferApplied){
-                    productPrice = prochange.price * product.quantity;
-                } else if (productOfferApplied && categoryOfferApplied) {
-                    if (productOfferApplied.offerPrecentage > categoryOfferApplied.offerPrecentage) {
-                        productPrice = productOfferApplied.productId.price - (productOfferApplied.productId.price * productOfferApplied.offerPrecentage / 100);
-                    } else {
-                        productPrice = prochange.price - (prochange.price * categoryOfferApplied.offerPrecentage / 100);
-                    }
-                    productPrice *= product.quantity;
-                } else if (productOfferApplied) {
-                    
-                    productPrice = productOfferApplied.productId.price - (productOfferApplied.productId.price * productOfferApplied.offerPrecentage / 100);
-                    productPrice *= product.quantity;
-                  
-                } else if (categoryOfferApplied) {
-                    productPrice = prochange.price - (prochange.price * categoryOfferApplied.offerPrecentage / 100);
-                    productPrice *= product.quantity;
-                  
-                }
-
-              
-                let lastPrice = 0;
-                if (couponPercentage > 0) {
-                    lastPrice = productPrice - productPrice * (couponPercentage / 100);
-                } else {
-                    lastPrice = productPrice;
-                }
-
-                if (productPrice !== undefined) {
-                    order.TotalAmount -= lastPrice;
-                }
-                await prochange.save();
-                product.orderStatus = 'Canceled';
-                await order.save();
-
-                const Fproduct = order.OrderedProducts.find(product => product._id.toString() === productId);
-
-                if (Fproduct.paymentMethod === 'Rasorpay') {
-                    const userWalletfount = await wallet.findOne({ userId: req.session.user_id });
-                    userWalletfount.userBalance += lastPrice;
-                    userWalletfount.transferHistory.push({
-                        type: 'CREDIT',
-                        amount: lastPrice,
-                        description: "Order Cancel"
-                    });
-                    await userWalletfount.save();
-                }
-            }
+        const order  = await Order.findOne({ userId ,"OrderedProducts._id": orderedProductId});
+         if (!order) {
+        return res.redirect('/orders');
         }
+        const orderedProduct = order.OrderedProducts.id(orderedProductId);
+
+        if (!orderedProduct || orderedProduct.orderStatus === 'Canceled') {
+        return res.redirect('/orders');
+        }
+        const product = await Product.findById(orderedProduct.productId);
+        if (!product) throw new Error('Product not found');
+
+        const variant = product.variants.id(orderedProduct.variantId);
+        if (!variant) throw new Error('Variant not found');
+        variant.stock += orderedProduct.quantity;
+        const basePrice = orderedProduct.price; // already stored
+        const offerPercentage = orderedProduct.offerPercentage || 0;
+        let discountedPrice = basePrice - (basePrice * offerPercentage) / 100;
+        let productTotal = discountedPrice * orderedProduct.quantity
+
+        let refundAmount = productTotal;
+
+        if (order.couponPercentage && order.couponPercentage > 0) {refundAmount -= (productTotal * order.couponPercentage) / 100;}
+
+        order.TotalAmount -= refundAmount;
+        if (order.TotalAmount < 0) order.TotalAmount = 0;
+        orderedProduct.orderStatus = 'Canceled';
+
+        if (
+        order.paymentMethod !== 'cash on delivery' &&
+        order.paymentStatus === 'Paid'
+        ) {
+        const userWallet = await wallet.findOne({ userId });
+
+        if (userWallet) {
+            userWallet.userBalance += refundAmount;
+            userWallet.transferHistory.push({
+            type: 'CREDIT',
+            amount: refundAmount,
+            description: 'Order item cancelled refund'
+            });
+            await userWallet.save();
+        }
+        }
+
+        await product.save();
+        await order.save();
+
+        res.redirect('/orders');
     } catch (error) {
         next(error);
     }

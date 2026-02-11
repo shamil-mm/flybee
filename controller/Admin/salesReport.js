@@ -8,17 +8,14 @@ const salesReporst=async(req,res)=>{
     const deliveredOrders = orders.filter(order => 
         order.OrderedProducts.every(product => product.orderStatus === 'Delivered')
     );
-   
-           
-           res.render('salesReport',{deliveredOrders})
-           
-         
+    res.render('salesReport',{deliveredOrders})
     } catch (error) {
         console.log(error)
     }
 }
 const sortListOfOrder=async(req,res)=>{
     try {
+        console.log('sort list of order is working')
         const type=req.query.value
       
 
@@ -41,15 +38,23 @@ const sortListOfOrder=async(req,res)=>{
         }else{
             startDate = new Date(0);    
         }
-         const orders = await Order.find({'OrderedProducts.orderDate': { $gte: startDate, $lte: endDate }
-        }).populate('OrderedProducts.productId');
+
+
+         const orders = await Order.find({createdAt:{ $gte: startDate, $lte: endDate }
+        })
+         .populate('OrderedProducts.productId')
+         .populate('OrderedProducts.category')
+         .lean();
        
         
         const deliveredOrders = orders.filter(order =>
             order.OrderedProducts.every(product => product.orderStatus === 'Delivered')
         );
+        
+
         if(req.query.downloadPDF){
-            console.log('pdf download')
+
+            
             const pdfBuffer = await pdfGenerate(deliveredOrders);
             const filePath = 'sales_report.pdf';
             fs.writeFileSync(filePath, pdfBuffer);
@@ -62,8 +67,7 @@ const sortListOfOrder=async(req,res)=>{
             });
 
         }else{
-
-            res.json({ deliveredOrders });
+            return res.json({ deliveredOrders });
         }
       
 

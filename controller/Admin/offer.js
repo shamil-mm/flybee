@@ -1,5 +1,5 @@
-const product=require('../../models/productSchema')
-const category=require('../../models/categorySchema')
+const {Product}=require('../../models/productSchema')
+const {Category}=require('../../models/categorySchema')
 const Offer=require('../../models/offerSchema')
 const offerRender=async(req,res)=>{
     try {
@@ -12,11 +12,11 @@ const offerRender=async(req,res)=>{
 const showProductlist=async(req,res)=>{
     try {
         if(req.query.offerType!==undefined&&req.query.offerType=='Product'){
-       const productList=await product.add_pro_model.find({is_list:false,is_delete:false})
+       const productList=await Product.find({is_list:false,is_delete:false})
        const productNames=productList.map((value)=>(value.product_name))
         res.json(productNames)
         }else if(req.query.offerType!==undefined&&req.query.offerType=='Category'){
-            const categoryList=await category.category_schema_model.find({is_list:false,is_delete:false})
+            const categoryList=await Category.find({is_list:false,is_delete:false})
             const categoryNames=categoryList.map((value)=>(value.name))
         res.json(categoryNames)
         
@@ -30,7 +30,7 @@ const offerLoad=async(req,res)=>{
     try {
        const { OfferType,OfferName,name,amount,startDate,expireDate}=req.body
       if(OfferType=='Product'){
-            const productFound=await product.add_pro_model.findOne({product_name:name})
+            const productFound=await Product.findOne({product_name:name})
             const offerExists = await Offer.findOne({ name: OfferName });
                 if (offerExists) {
                     req.flash('msg', 'An offer with this name already exists for the specified product');
@@ -54,7 +54,7 @@ const offerLoad=async(req,res)=>{
 
             }
          }else if(OfferType=='Category'){
-            const categoryFound=await category.category_schema_model.findOne({name})
+            const categoryFound=await Category.findOne({name})
             if(categoryFound){
                 const offer=new Offer({
                     name:OfferName,
@@ -94,7 +94,7 @@ const loadEditOffer=async(req,res)=>{
             return res.redirect('/admin/offers');
         }
         if (OfferType === 'Product') {
-            const producFound=await product.add_pro_model.findOne({product_name:name})
+            const producFound=await Product.findOne({product_name:name})
             const updatedData = await Offer.findOneAndUpdate(
                 {_id:req.query.id},
                 {
@@ -115,7 +115,7 @@ const loadEditOffer=async(req,res)=>{
             }
            
         } else if (OfferType === 'Category') {
-            const categoryFound=await category.category_schema_model.findOne({name})
+            const categoryFound=await Category.findOne({name})
             const updatedData = await Offer.findOneAndUpdate(
                 {_id:req.query.id},
                 {

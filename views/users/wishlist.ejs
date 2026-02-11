@@ -36,12 +36,20 @@
                                         </tr>
                                         
                                         <%wishListData.forEach((value)=>{%>
+
+                                        <%
+                                        const prices = value.items.variants.map(v => Number(v.price));
+                                        const lowestPrice = Math.min(...prices);
+                                        const stocks = value.items.variants.map(v => Number(v.stock));
+                                        const totalStock = stocks.reduce((sum, s) => sum + s, 0);
+                                        const inStock = totalStock > 0;
+                                        %>
                                         <tr id="row<%=value._id%>">
                                             <td class="product-col">
                                                 <div class="product">
                                                     <figure class="product-media">
                                                         <a href="#">
-                                                            <img src="/proimgs/<%=value.items.image[2]%>" alt="Product image">
+                                                            <img src="<%=value.items.variants[0].images[2]%>" alt="Product image">
                                                         </a>
                                                     </figure>
             
@@ -50,38 +58,37 @@
                                                     </h3><!-- End .product-title -->
                                                 </div><!-- End .product -->
                                             </td>
-                                            <td class="price-col">₹ <%=value.items.price%></td>
-                                            <%if(value.items.stock>0){%>
-                                                <td class="stock-col"><span class="in-stock">In stock</span></td>
-                                                <td class="action-col">
-                                                    <a href="/cart/add?id=<%=value.items._id%>" class="btn btn-block btn-outline-primary-2" onclick="removeWishList('<%=value._id%>')"><span><i class="icon-cart-plus"></i>add to cart</span></a>
-                                                    
-                                                </td>
-                                               
-                                                <%}else{%>
-                                                    <td class="stock-col"><span class="out-of-stock">Out of stock</span></td>
-                                            <td class="action-col">
-                                                <button class="btn btn-block btn-outline-primary-2 disabled">Out of Stock</button>
-                                            </td>
-                                            
-            
-                                                    <%}%>
+                                            <td class="price-col">₹ <%=lowestPrice%></td>
+                                          <% if (inStock) { %>
+                <td class="stock-col">
+                  <span class="in-stock">In stock</span>
+                </td>
+
+                <td class="action-col">
+                  <a 
+                    href="/cart/add?id=<%= value.items._id %>" 
+                    class="btn btn-block btn-outline-primary-2"
+                    onclick="removeWishList('<%= value._id %>')">
+                    <span>
+                      <i class="icon-cart-plus"></i> add to cart
+                    </span>
+                  </a>
+                </td>
+              <% } else { %>
+                <td class="stock-col">
+                  <span class="out-of-stock">Out of stock</span>
+                </td>
+
+                <td class="action-col">
+                  <button class="btn btn-block btn-outline-primary-2 disabled">
+                    Out of Stock
+                  </button>
+                </td>
+              <% } %>
                                             <td class="remove-col"><button class="btn-remove" onclick="removeWishList('<%=value._id%>')"><i class="icon-close"></i></button></td>
                                             
                                             
                                         </tr>
-
-
-
-
-
-                                       
-
-
-
-
-
-
 
                                         <%})%>
                                        

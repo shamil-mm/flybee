@@ -34,9 +34,6 @@
             				<div class="cart-discount">
                                 <form action="/couponVerifiction"  method="post" id="couponVerifiction">
                                     <div class="input-group">
-										
-										
-										
                                         
                                         <%if(!couponStatus){%>
 											<input type="text" id="couponInput" class="form-control" required placeholder="coupon code" name="coupon_code">	
@@ -117,19 +114,21 @@
 		                					<tbody>
 												
 										
-										<% let ftotal=0%>
+										<% let ftotal=0 %>
+										
 												<%product.forEach((value)=>{%>
+									
 											
 		                						<tr>
-		                							<td><a href="#"></a><%=value.productId.product_name%></td>
+		                							<td><a href="#"></a><%=value.productName%></td>
 		                							<td class="quantity" style="text-align: center;"><%=value.quantity%></td>
-													<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
-														<td class="price"><%=value.productId.price-value.productId.price*value.productId.offerPercentage/100%></td>
-														<%ftotal+=value.productId.price-value.productId.price*value.productId.offerPercentage/100%>
-														<%}else{%>
-															<td class="price"><%=value.productId.price%></td>
-															<%ftotal+=value.productId.price%>
-															<%}%>
+													<%if((value.price-value.price*value.offerPercentage/100)!==0){%>
+														<td class="price"><%=value.price%></td>
+														<%ftotal+=value.price-value.price*value.offerPercentage/100%>
+													<%}else{%>
+														<td class="price"><%=value.price%></td>
+														<%ftotal+=value.price%>
+													<%}%>
 		                							
 		                						</tr>
 												
@@ -261,14 +260,13 @@
 												
 												
 										<%if(couponStatus){%>
-											<%console.log('placeorder coupon') %>
+											
 											<button onclick="return Place_Order('<%=couponStatus._id%>','<%=couponStatus.discountAmount%>')" class="btn btn-outline-primary-2 btn-order btn-block">
 												<span class="btn-text">Place Order</span>
 												<span class="btn-hover-text">Proceed to Checkout</span>
 											</button>
 											
 											<%}else{%>
-												<%console.log('placeorder no coupon') %>
 		                				<button onclick="return Place_Order()" class="btn btn-outline-primary-2 btn-order btn-block">
 		                					<span class="btn-text">Place Order</span>
 		                					<span class="btn-hover-text">Proceed to Checkout</span>
@@ -503,13 +501,30 @@ if('<%=Cmsg%>'){
 		
 
 		 function Place_Order(couponId,discount){
+					const checkboxes=document.getElementsByClassName('Allcheckbox')
+					let isChecked = false;
+					if(checkboxes.length>1){
+						for (let checkbox of checkboxes) {
+							if (checkbox.checked) {
+							isChecked = true;
+							break;
+							}
+						}
+					}
+					if (!isChecked) {
+						Swal.fire({
+						icon: 'warning',
+						title: 'Address Required',
+						text: 'Please select at least one delivery address to continue.',
+						confirmButtonText: 'OK'
+						});
+						return false;
+					}
+
 			        const id=document.getElementById('inputBox').value
 					const checkAnchor=document.querySelectorAll('.checkAnchor')
                     checkAnchor.forEach((element) => {
-						
 						if (element.ariaExpanded === "true") {
-
-						
 							if(element.innerHTML.trim()=="Cash on delivery"){
 								if(couponId==undefined && discount==undefined){
 									
@@ -567,7 +582,7 @@ if('<%=Cmsg%>'){
 							else if(element.innerHTML.trim()=="Razorpay"){
 								
 								if(couponId==undefined && discount==undefined){
-									// console.log("enter undefinder")
+									
 							
 									fetch('/razorpay?total=<%=total%>',{method:"post", headers: {'Content-Type': 'application/json'}})
 									.then(response => response.json())
@@ -620,7 +635,7 @@ if('<%=Cmsg%>'){
 								else{
 									
 									
-									const discoundAmd='<%=total%>'-(discount*'<%=total%>'/100)
+								const discoundAmd='<%=total%>'-(discount*'<%=total%>'/100)
 									
 
 								fetch('/razorpay?total='+discoundAmd,{method:"post", headers: {'Content-Type': 'application/json'}})
@@ -715,6 +730,7 @@ if('<%=Cmsg%>'){
 
 							}
 						}else{
+							console.log("its comming here else")
 							Swal.fire({
 							title: 'Payment Method',
 							icon:'error',

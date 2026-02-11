@@ -1,61 +1,14 @@
 
-const productSchema=require('../../models/productSchema')
-const category=require('../../models/categorySchema')
+const {Product}=require('../../models/productSchema')
+const {Category}=require('../../models/categorySchema')
 const Offer=require('../../models/offerSchema')
 const offerHelper=require('../../functions/offerCalculations')
 
 
 const productPageRender=async(req,res,next)=>{
     try {
-        const limit=8;
-        const page=Number(req.query.page)||1
-        const skip=(page-1)*limit
-        const count= await productSchema.add_pro_model.find({is_delete:false,is_list:false}).populate('category').countDocuments()
-        const pages=Math.ceil(count/limit)
-
-
-      const product= await productSchema.add_pro_model.find({is_delete:false,is_list:false}).populate('category').limit(limit*1).skip((page-1)*limit)
-     
-      if(req.session.sort !== undefined ){
-        res.render('product',{product:req.session.sort,msg:req.flash('msg'),pages,currentPage:page,cate_list:[]})
-      }else{
-       const cate_list=await category.category_schema_model.find({is_delete:false,is_list:false})
-
-
-        
-        const productWithOffer= await Promise.all(product.map(async(product)=>{
-          let finalPercentage=0
-          let productOffer = 0;
-          let categoryOffer = 0;
-
-          const activeProductOffers = await offerHelper.getActiveProductOffers(product._id)
-          const activeCategoryOffers = await offerHelper.getActiveCategoryOffers(product.category._id)
-
-            if(activeProductOffers.length>0){
-
-              activeProductOffers.forEach((offer)=>{
-                const offerAmount =offer.offerPrecentage;
-                productOffer = Math.max(productOffer, offerAmount);
-              })
-            }
-
-
-            if(activeCategoryOffers.length>0){
-              activeCategoryOffers.forEach((offer)=>{
-              const offerAmount = offer.offerPrecentage;
-              categoryOffer = Math.max(categoryOffer, offerAmount);
-           
-              })
-            }
-            finalPercentage=productOffer>categoryOffer?productOffer:categoryOffer
-            const updated_data=await productSchema.add_pro_model.findByIdAndUpdate(product._id, {offerPercentage:finalPercentage}, {new: true});
-            return {...product.toObject(),finalPercentage}
-
-        }))
-      
-        res.render('product',{product:productWithOffer,msg:req.flash('msg'),pages,currentPage:page,cate_list})
-      }
-      
+      const cate_list=await Category.find({is_delete:false,is_list:false})
+      res.render('product',{msg:req.flash('msg'),cate_list})
     } catch (error) {
         next(error)
     }
@@ -65,7 +18,7 @@ const productPageRender=async(req,res,next)=>{
 
 const mensPageRender=async(req,res,next)=>{
     try {
-      const data= await productSchema.add_pro_model.find({}).populate("category")
+      const data= await Product.find({}).populate("category")
       const menProducts=data.filter((product)=>{
         return product.category.name=="Men's"
     })
@@ -77,7 +30,7 @@ const mensPageRender=async(req,res,next)=>{
 }
 const womensPageRender=async(req,res,next)=>{
   try {
-      const data=await productSchema.add_pro_model.find({}).populate('category')
+      const data=await Product.find({}).populate('category')
       const womensproduct=data.filter((product)=>{
           return product.category.name=="Women's"
       })
@@ -92,11 +45,126 @@ const womensPageRender=async(req,res,next)=>{
 const productViewPage=async(req,res,next)=>{
     try {
         const id =req.query.id
-        const singleData= await productSchema.add_pro_model.findOne({_id:id}).populate('category')
-     res.render('productView',{singleData})
+        const singleData= await Product.findOne({_id:id}).populate('category')
+       res.render('productView',{singleData})
     } catch (error) {
         next(error);
     }
 }
 
-module.exports={productPageRender,mensPageRender,womensPageRender,productViewPage}
+const fetchProducts = async (req, res, next) => {
+  try {
+    
+
+    let {
+      search = "",
+      category = [],
+      size = [],
+      minPrice,
+      maxPrice,
+      sort = "newArrival",
+      page = 1,
+    } = req.query;
+
+    category = category ? Array.isArray(category) ? category : [category] : [];
+    size = size ? Array.isArray(size) ? size : [size] : [];
+    page = Number(page);
+    
+
+    const limit = 8;
+    const skip = (page - 1) * limit;
+
+    const query = {
+      is_delete: false,
+      is_list: false,
+    };
+
+    if (search.trim()) {
+      query.$or = [
+        { product_name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } },
+      ];
+    }
+
+
+    if (category.length > 0) {
+      query.category = { $in: category };
+    }
+
+
+    if (size.length || minPrice || maxPrice) {
+      query.variants = {
+        $elemMatch: {
+          is_active: true,
+          ...(size.length && { size: { $in: size } }),
+          ...((minPrice || maxPrice) && {
+            price: {
+              ...(minPrice && { $gte: Number(minPrice) }),
+              ...(maxPrice && { $lte: Number(maxPrice) }),
+            },
+          }),
+        },
+      };
+    }
+
+    let sortQuery = {};
+    switch (sort) {
+      case "priceHighToLow":
+        sortQuery["variants.price"] = -1;
+        break;
+      case "priceLowToHigh":
+        sortQuery["variants.price"] = 1;
+        break;
+      case "aToZ":
+        sortQuery.product_name = 1;
+        break;
+      case "zToA":
+        sortQuery.product_name = -1;
+        break;
+      default:
+        sortQuery.createdAt = -1;
+    }
+
+    const total = await Product.countDocuments(query);
+
+    const products = await Product.find(query)
+      .populate("category")
+      .sort(sortQuery)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    const productsWithOffer = await Promise.all(
+      products.map(async (product) => {
+        let productOffer = 0;
+        let categoryOffer = 0;
+
+        const productOffers = await offerHelper.getActiveProductOffers(product._id);
+        const categoryOffers = await offerHelper.getActiveCategoryOffers(product.category._id);
+
+        productOffers.forEach(o => productOffer = Math.max(productOffer, o.offerPrecentage));
+        categoryOffers.forEach(o => categoryOffer = Math.max(categoryOffer, o.offerPrecentage));
+
+        return {
+          ...product,
+          finalPercentage: Math.max(productOffer, categoryOffer),
+        };
+      })
+    );
+
+
+
+    res.json({
+      products:productsWithOffer,
+      totalPages: Math.ceil(total / limit),
+      currentPage: Number(page),
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+module.exports={productPageRender,mensPageRender,womensPageRender,productViewPage,fetchProducts }

@@ -1,6 +1,6 @@
 const Order = require('../../models/orderSchema');
 const user=require('../../models/userSchema')
-const product=require('../../models/productSchema')
+const {Product}=require('../../models/productSchema')
 const {endOfYear,subYears,startOfYear,endOfMonth,startOfMonth,subMonths, startOfWeek, subDays, endOfDay, subWeeks, endOfWeek, format, startOfDay, isWithinInterval } = require('date-fns');
 
 const chartData = async (req, res) => {
@@ -37,9 +37,6 @@ async function getWeeklyData() {
     const startDate = startOfWeek(subDays(today, 7)); 
     const endDate = endOfDay(today); 
 
-    // console.log(`Start Date: ${startDate}`);
-    // console.log(`End Date: ${endDate}`);
-
     const orderlist = await Order.find({
         'OrderedProducts.orderDate': {
             $gte: startDate,
@@ -52,7 +49,7 @@ async function getWeeklyData() {
             $lte: endDate
         }
     })
-    const productlist = await product.add_pro_model.find({
+    const productlist = await Product.find({
         updatedAt: {
             $gte: startDate,
             $lte: endDate
@@ -358,7 +355,7 @@ const chartDataTwo = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: 'products',  // Replace with your actual product collection name
+                    from: 'products',
                     localField: '_id',
                     foreignField: '_id',
                     as: 'productDetails'
@@ -373,14 +370,9 @@ const chartDataTwo = async (req, res) => {
                 }
             }
         ])
-        // Prepare data for Chart.js
-        const labels = topProducts.map(product => product.productId.product_name.split(' ')[0]);
-        const data = topProducts.map(product => product.totalOrdered);
-
-        // Return or use this data in your Chart.js rendering function
        
-
-        // Example response for API
+        const labels = topProducts.map(product => product.productDetails.product_name);
+        const data = topProducts.map(product => product.totalOrdered);
         res.json({ labels, data });
     } catch (error) {
         console.log(error);

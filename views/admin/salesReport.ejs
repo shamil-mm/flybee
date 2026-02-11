@@ -9,7 +9,7 @@
                 <div class="content-header">
                     <div>
                         <h2 class="content-title card-title">Sales Report</h2>
-                        <p>Lorem ipsum dolor sit amet.</p>
+                       
                     </div>
                     
                 </div>
@@ -19,32 +19,31 @@
                             <header class="card-header">
                                 <div class="row gx-3">
                                     <div class="col-lg-4 col-md-6 me-auto">
-                                        <input type="text" placeholder="Search..." class="form-control" />
+                                        
                                     </div>
                                     <div class="col-lg-2 col-md-3 col-6">
-                                       
-                                        <select class="form-select" onchange="sortList(this)">
-                                            <option>Full Report</option>
-                                            <option>daily</option>
-                                            <option>monthly</option>
-                                            <option>yearly</option>
-                                            <option>Custom</option>
                                             <input class="form-select" type="text" id="datePicker" placeholder="Select date range" style="display: none;">
-                                        </select>
-                                                                            </div>
-                                <%if(deliveredOrders.length>0){%>                                       
-                                    <div class="col-lg-2 col-md-3 ">
+                                    </div>
+                                    
+                                    <%if(deliveredOrders.length>0){%>                                       
+                                        <div class="col-lg-2 col-md-3 col-6">
+                                           
+                                            <select class="form-select" onchange="sortList(this)">
+                                                <option>Full Report</option>
+                                                <option>daily</option>
+                                                <option>monthly</option>
+                                                <option>yearly</option>
+                                                <option>Custom</option>
+                                            </select>
+                                            
+                                        </div>
+                                        
+                                    <div class="col-lg-3 col-md-5 col-7">
                                         <button id="pdfButton" class="btn" style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-pdf"></i>PDF</button>
                                         <button id="excelButton"class="btn " style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-excel"></i>EXCEL</button> 
                                     </div>
-                                    <%}else{%>
-                                        <div class="col-lg-2 col-md-3 " style="display: none;">
-                                            <button  id="pdfButton" class="btn" style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-pdf"></i>PDF</button>
-                                            <button id="excelButton"class="btn " style="background-color: #3BB77E; color:white"><i class="fa-solid fa-file-excel"></i>EXCEL</button> 
-                                        </div>
-                                        
-                                        
-                                        <%}%>
+                                    <%}%>
+                                      
 
                                     
                                 </div>
@@ -75,42 +74,52 @@
                                             let totalOrderAmount = 0;
                                             let totalOfferDiscount = 0;
                                             let totalCouponDiscount = 0; 
+                                            let offerPercentage=0
                                             %>
                                             
                                            
                                               <% deliveredOrders.forEach((value)=>{%>
+                                                
                                                 <%value.OrderedProducts.forEach((order)=>{%>
+                                                    
 
                                                     
                                                    <%
                                                     totalSalesCount++;
                                                     totalOrderAmount += value.TotalAmount;
-                                                    totalOfferDiscount += (order.productId.price * order.productId.offerPercentage / 100);
-                                                    totalCouponDiscount += (order.productId.price * value.couponPercentage / 100);
-        
+                                                    totalOfferDiscount += (order.price * order.productId.offerPercentage / 100);
+                                                    totalCouponDiscount += (order.price * value.couponPercentage / 100);
+                                                    if(order.offerPercentage && order.productId.offerPercentage){
+                                                        offerPercentage= order.offerPercentage < order.productId.offerPercentage ? order.productId.offerPercentage : order.offerPercentage;
+                                                    }else if(order.offerPercentage){
+                                                        offerPercentage= order.offerPercentage
+                                                    }else if(order.productId.offerPercentage){
+                                                        offerPercentage=order.productId.offerPercentage
+                                                    }
                                                     %>
                                                     
                                                
                                                  
                                                     <tr>
                                                         <td><%=order._id.toString().slice(-4)%></td>
-                                                        <td ><%=new Date(order.orderDate).toLocaleDateString('en-GB', {
+                                                        <td ><%=new Date(value.createdAt).toLocaleDateString('en-GB', {
                                                             day: '2-digit',
                                                             month: '2-digit',
                                                             year: 'numeric'
                                                         })%></td>
                                                         <td><%=order.productId.product_name%></td>
-                                                        <td ><%=order.shippingAddress.name%> <br>
-                                                            <%=order.shippingAddress.address%> 
+                                                        <td ><%=value.shippingAddress.name%> <br>
+                                                            <%=value.shippingAddress.address%> 
                                                         </td>
-                                                        <td><%=order.paymentMethod%></td>
-                                                        <%if(order.productId.offerPercentage==0){%>
-                                                            <td>No Offer Applied</td>
+
+                                                        <td><%=value.paymentMethod%></td>
+                                                        <%if(offerPercentage==0){%>
+                                                            <td>Not Applied</td>
                                                         <%}else{%>
-                                                            <td><%=order.productId.price*order.productId.offerPercentage/100%></td>
+                                                            <td><%=offerPercentage%></td>
                                                         <%}%>
                                                         <%if(value.couponPercentage==0){%>
-                                                            <td>No Coupon Applied</td>
+                                                            <td>Not Applied</td>
                                                         <%}else{%>
                                                             <td><%=order.productId.price*value.couponPercentage/100%></td>
                                                         <%}%>
@@ -221,27 +230,20 @@
                     'Content-Type': 'application/json'
                 }
             });
-
-    
             if (response.ok) {
-                // Convert the response to a Blob
                 const pdfBlob = await response.blob();
-
-                // Create a URL for the Blob
                 const url = window.URL.createObjectURL(pdfBlob);
-
-                // Create a link element and trigger a click to download the PDF
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'sales_report.pdf'; // Specify the filename for the downloaded file
+                link.download = 'sales_report.pdf';
                 document.body.appendChild(link);
                 link.click();
 
-                // Cleanup
+               
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(link);
             } else {
-                // Handle error response
+               
                 console.error('Error:', response.status, response.statusText);
             }
         } catch (error) {
@@ -268,9 +270,8 @@
        
         if(tag.value=='Custom'){
           
-            document.getElementById('datePicker').style.display='block'
-             // Initialize Flatpickr
-    const datePicker = flatpickr("#datePicker", {
+        document.getElementById('datePicker').style.display='block'
+        const datePicker = flatpickr("#datePicker", {
         dateFormat: "d-m-Y",
         maxDate: "today",
         mode: "range",
@@ -282,7 +283,8 @@
             
             fetch('/admin/sortListOfOrder?value='+tag.value+'&startDate='+startDate+'&endDate='+endDate,{method:'post'})
             .then(response=>response.json())
-      .then((data)=>{
+            .then((data)=>{
+        
         let tableBody= document.getElementById('tBody')
         tableBody.innerHTML=''
         
@@ -305,28 +307,24 @@
                         totalOrderAmount += order.TotalAmount;
                        
                         const row = document.createElement('tr');
-                        const orderDate = new Date(product.orderDate).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric'
-                    });
+                        const orderDate = new Date(data.createdAt).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'});
                         row.innerHTML = `
                             <td>${product._id}</td>
                             <td>${orderDate}</td>
                             <td>${product.productId.product_name}</td>
                             <td>
-                                ${product.shippingAddress.name} <br>
-                                ${product.shippingAddress.address}
+                                ${order.shippingAddress.name} <br>
+                                ${order.shippingAddress.address}
                             </td>
                             <td>${product.paymentMethod}</td>
-                            <td>${product.productId.offerPercentage === 0 ? 'No Offer Applied' : (product.productId.price * product.productId.offerPercentage / 100)}</td>
-                            <td>${order.couponPercentage === 0 ? 'No Coupon Applied' : (product.productId.price * order.couponPercentage / 100)}</td>
+                            <td>${product.productId.offerPercentage === 0 ? 'Not Applied' : (product.productId.price * product.productId.offerPercentage / 100)}</td>
+                            <td>${order.couponPercentage === 0 ? 'Not Applied' : (product.productId.price * order.couponPercentage / 100)}</td>
                             <td>${order.TotalAmount}</td>
                         `;
                         tableBody.appendChild(row);
                     });
                 });
-                // Append totals row
+                
 let totalsRow = document.createElement('tr');
 totalsRow.innerHTML = `
     <th colspan="5"><h6>Totals</h6></th>
@@ -349,7 +347,7 @@ tableBody.appendChild(salesCountRow);
         }]
     });
 
-    // Call open() method when Flatpickr is ready
+    
     datePicker.calendarContainer.addEventListener("ready", function() {
         datePicker.open();
     });
@@ -357,9 +355,11 @@ tableBody.appendChild(salesCountRow);
         }else{
             document.getElementById('datePicker').style.display='none'
         }
+
       fetch('/admin/sortListOfOrder?value='+tag.value,{method:'post'}) 
       .then(response=>response.json())
       .then((data)=>{
+        console.log("data is here",data)
         let tableBody= document.getElementById('tBody')
         tableBody.innerHTML=''
         
@@ -367,38 +367,48 @@ tableBody.appendChild(salesCountRow);
            
                 tableBody.innerHTML = '<tr><td colspan="8">No delivered orders found</td></tr>';
             } else {
-                let totalOfferDiscount = 0;
-                let totalCouponDiscount = 0;
+                let totalSalesCount = 0;
                 let totalOrderAmount = 0;
-                let totalSalesCount = 0
+                let totalOfferDiscount = 0;
+                let totalCouponDiscount = 0; 
+                let offerPercentage=0
 
 
-                data.deliveredOrders.forEach(order => {
+                data.deliveredOrders.forEach(value => {
                     
-                    order.OrderedProducts.forEach(product => {
-                        totalSalesCount++
-                        totalOfferDiscount += product.productId.offerPercentage === 0 ? 0 : (product.productId.price * product.productId.offerPercentage / 100);
-                        totalCouponDiscount += order.couponPercentage === 0 ? 0 : (product.productId.price * order.couponPercentage / 100);
-                        totalOrderAmount += order.TotalAmount;
+                    value.OrderedProducts.forEach(order => {
+
+                        totalSalesCount++;
+                        totalOrderAmount += value.TotalAmount;
+                        totalOfferDiscount += (order.price * order.productId.offerPercentage / 100);
+                        totalCouponDiscount += (order.price * value.couponPercentage / 100);
+
+                        if(order.offerPercentage && order.productId.offerPercentage){
+                            offerPercentage= order.offerPercentage < order.productId.offerPercentage ? order.productId.offerPercentage : order.offerPercentage;
+                        }else if(order.offerPercentage){
+                            offerPercentage= order.offerPercentage
+                        }else if(order.productId.offerPercentage){
+                            offerPercentage=order.productId.offerPercentage
+                        }
                        
                         const row = document.createElement('tr');
-                        const orderDate = new Date(product.orderDate).toLocaleDateString('en-GB', {
+                        const orderDate = new Date(value.createdAt).toLocaleDateString('en-GB', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric'
                     });
                         row.innerHTML = `
-                            <td>${product._id}</td>
+                            <td>${order._id.toString().slice(-4)}</td>
                             <td>${orderDate}</td>
-                            <td>${product.productId.product_name}</td>
+                            <td>${order.productId.product_name}</td>
                             <td>
-                                ${product.shippingAddress.name} <br>
-                                ${product.shippingAddress.address}
+                                ${value.shippingAddress.name} <br>
+                                ${value.shippingAddress.address}
                             </td>
-                            <td>${product.paymentMethod}</td>
-                            <td>${product.productId.offerPercentage === 0 ? 'No Offer Applied' : (product.productId.price * product.productId.offerPercentage / 100)}</td>
-                            <td>${order.couponPercentage === 0 ? 'No Coupon Applied' : (product.productId.price * order.couponPercentage / 100)}</td>
-                            <td>${order.TotalAmount}</td>
+                            <td>${value.paymentMethod}</td>
+                            <td>${offerPercentage === 0 ? 'Not Applied' : offerPercentage }</td>
+                            <td>${value.couponPercentage === 0 ? 'Not Applied' : (order.productId.price * value.couponPercentage / 100)}</td>
+                            <td>${value.TotalAmount}</td>
                         `;
                         tableBody.appendChild(row);
                     });

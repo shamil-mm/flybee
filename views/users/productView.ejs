@@ -1,289 +1,248 @@
-<%-include('../layouts/userheader')%>
+<%- include('../layouts/userheader') %>
 
-        <main class="main">
-            <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
-                <div class="container d-flex align-items-center">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item"><a href="/product">Products</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Product Details</li>
-                    </ol>
+<script>
+  // Make variants available in the browser JS
+  const variants = <%- JSON.stringify(singleData.variants || []) %>;
+  const productId = "<%= singleData._id %>";
+  const bestOffer = <%= Math.max(singleData.offerPercentage || 0, singleData.category?.offerPercentage || 0) %>;
+</script>
 
-                 
-                </div><!-- End .container -->
-            </nav><!-- End .breadcrumb-nav -->
+<%
+  // -------- DEFAULT VARIANT (first in-stock or fallback) --------
+  const selectedVariant =
+    singleData.variants.find(v => v.stock > 0) || singleData.variants[0];
 
-            <div class="page-content">
-                <div class="container">
-                    <div class="product-details-top mb-2">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="product-gallery">
-                                    <figure class="product-main-image">
-                                        <img style="height: 52rem; width: 45rem;" id="product-zoom" src="/proimgs/<%=singleData.image[2]%>" data-zoom-image="/proimgs/<%=singleData.image[2]%>" alt="product image" >
+  const productOffer = singleData.offerPercentage || 0;
+  const categoryOffer = singleData.category?.offerPercentage || 0;
+  const bestOffer = Math.max(productOffer, categoryOffer);
 
-                                        <a href="#" id="btn-product-gallery" class="btn-product-gallery">
-                                            <i class="icon-arrows"></i>
-                                        </a>
-                                    </figure><!-- End .product-main-image -->
+  const finalPrice =
+    selectedVariant.price - (selectedVariant.price * bestOffer / 100);
+%>
 
-                                    <div id="product-zoom-gallery" class="product-image-gallery">
-                                        <%singleData.image.forEach((value)=>{%>
-                                        <a class="product-gallery-item" href="#" data-image="/proimgs/<%=value%>" data-zoom-image="/proimgs/<%=value%>">
-                                            <img src="/proimgs/<%=value%>" alt="product side">
-                                        </a>
-                                        <%})%>
+<main class="main">
+  <div class="page-content">
+    <div class="container">
 
-                                    </div><!-- End .product-image-gallery -->
-                                </div><!-- End .product-gallery -->
-                            </div><!-- End .col-md-6 -->
-                            <br><br><br>
+      <div class="product-details-top mb-2">
+        <div class="row">
 
-                            <div class="col-md-6">
-                                <div class="product-details">
-                                    <h3><%=singleData.product_name%></h3>
+          <!-- ================= LEFT : IMAGES ================= -->
+          <div class="col-md-6">
+            <div class="product-gallery">
 
-                                   
-                                    <div class="product-price">
-                                        ₹ <%=singleData.price%>
-                                    </div>
-                                    <h4>
-                                       <%=singleData.brand%>
-                                    </h4>
+              <figure class="product-main-image">
+                <img id="productImage"
+                     style="height:52rem;width:45rem"
+                     src="<%= selectedVariant.images?.[0] || '/images/placeholder.png' %>"
+                     alt="product image">
 
-                                    <div class="product-content">
-                                        <h6><%=singleData.Description%></h6>
-                                    </div>
-                                  
+                <a href="#" class="btn-product-gallery">
+                  <i class="icon-arrows"></i>
+                </a>
+              </figure>
 
-                                   
+              <div class="product-image-gallery">
+                <% selectedVariant.images.forEach(img => { %>
+                  <a class="product-gallery-item"
+                     href="#"
+                     onclick="changeImage('<%= img %>')">
+                    <img src="<%= img %>" alt="product image">
+                  </a>
+                <% }) %>
+              </div>
 
-                                    <div class="details-filter-row details-row-size" style="padding: 0px; margin: 0px;">
-                                        <h5 style="color: rgb(180, 143, 95);" for="product-price"><span style="color: rgba(22, 22, 22, 0.779);">OFFER PRICE : </span><%=singleData.price-singleData.price*singleData.offerPercentage/100 %> ₹</h5>
-                                    </div>
-                                    <div class="details-filter-row details-row-size">
-                                        <h6 for="size">Size : <%=singleData.size%></h6>
-                                    </div><!-- End .details-filter-row -->
-                                    <div class="product-details-action">
-                                        <a href="/cart/add?id=<%=singleData._id%>" class="btn-product btn-cart"><span>add to cart</span></a> &nbsp;&nbsp;
-                                        <a href="/addWishlist?id=<%=singleData._id%>" class="btn-product btn-cart"><span>Add to Wishlist</span></a>
-                                    </div>
+            </div>
+          </div>
 
-                                    <div class="product-details-footer">
-                                        <div class="product-cat">
-                                            <span>Category:</span>
-                                            <a href="#"><%=singleData.category.name%></a>
-                                           
-                                        </div><!-- End .product-cat -->
+          <!-- ================= RIGHT : DETAILS ================= -->
+          <div class="col-md-6">
+            <div class="product-details">
 
-                                        <div class="social-icons social-icons-sm">
-                                            <span class="social-label">Share:</span>
-                                            <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-                                            <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-                                            <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-                                            <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
-                                        </div>
-                                    </div><!-- End .product-details-footer -->
-                                </div><!-- End .product-details -->
-                            </div><!-- End .col-md-6 -->
-                        </div><!-- End .row -->
-                    </div><!-- End .product-details-top -->
-                </div><!-- End .container -->
+              <h3><%= singleData.product_name %></h3>
+                 <h5>Brand: <%= singleData.brand %></h5>
+              <!-- PRICE -->
+              <div class="product-price " id="selectedVariantPrice">
+                <% if (bestOffer > 0) { %>
+                  <del>₹ <%= selectedVariant.price %></del>
+                  <span style="color:#c69c61;">
+                    ₹ <%= Math.round(finalPrice) %>
+                  </span>
+                <% } else { %>
+                    
+                    <span style="color:#c69c61;">
+                      Price: ₹<%= selectedVariant.price %>
+                    </span>
+                  
+                <% } %>
+              </div>
 
-               
+             
 
+              <div class="product-content">
+                <p><%= singleData.description %></p>
+              </div>
+
+              <!-- ================= VARIANTS ================= -->
+             <div class="row mt-4">
+        <div class="col-12">
+          <h5>Select Variant</h5>
+          <div style="display:flex;gap:15px;flex-wrap:wrap;">
+            <% singleData.variants.forEach((v, idx) => { %>
+              <div class="card variant-card"
+                   style="width:12rem; position:relative; border:1px solid #ccc; padding:0.5rem;">
                 
-            </div><!-- End .page-content -->
-        </main><!-- End .main -->
+                <!-- Checkbox top-right -->
+                <input type="checkbox"
+       class="variant-checkbox"
+       id="variantCheck<%= idx %>"
+       style="position:absolute; top:5px; right:5px;"
+       onchange="selectVariantCard('<%= idx %>')"
+       <%= v.stock === 0 ? 'disabled' : '' %>>
 
-    </div><!-- End .page-wrapper -->
-    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+                <!-- Variant Image -->
+                <img src="<%= v.images?.[0] || '/images/placeholder.png' %>"
+                     alt="variant image"
+                     style="width:100%; height:10rem; object-fit:cover;">
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+                <!-- Variant Details -->
+                <div style="padding:0.5rem;">
+                  <p>Size: <%= v.size %></p>
+                  <p>Color: <%= v.color %></p>
+                  <% const variantOffer = Math.max(singleData.offerPercentage || 0, singleData.category?.offerPercentage || 0) %>
+                  <% const finalPrice = v.price - (v.price * variantOffer / 100) %>
+                  <% if (variantOffer>0) { %>
+                    <p>Price: <del>₹<%= v.price %></del> ₹<%= Math.round(finalPrice) %></p>
+                    <p style="color:#c69c61;">Offer: <%= variantOffer %>%</p>
+                  <% } else { %>
+                    <p>Price: ₹<%= v.price %></p>
+                  <% } %>
+                  <p>Stock: <%= v.stock > 0 ? 'In Stock' : 'Out of Stock' %></p>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+              <br>
+           
+              <div class="details-filter-row">
+                <h6 id="selectedVariantStock">
+                  <%= selectedVariant.stock > 0 ? 'Stock: In Stock' : 'Stock: Out of Stock' %>
+                </h6>
+              </div>
 
-    <div class="mobile-menu-container">
-        <div class="mobile-menu-wrapper">
-            <span class="mobile-menu-close"><i class="icon-close"></i></span>
+              <div class="product-details-action disabled">
+                <a id="addToCartBtn"
+                   href="/cart/add?id=<%= singleData._id %>&variant=<%= selectedVariant._id %>"
+                   class="btn-product btn-cart">
+                  <span>Add to Cart</span>
+                </a>
 
-            <form action="#" method="get" class="mobile-search">
-                <label for="mobile-search" class="sr-only">Search</label>
-                <input type="search" class="form-control" name="mobile-search" id="mobile-search" placeholder="Search in..." required>
-                <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
-            </form>
-            
-            <nav class="mobile-nav">
-                <ul class="mobile-menu">
-                    <li class="active">
-                        <a href="index.html">Home</a>
+                &nbsp;&nbsp;
 
-                        <ul>
-                            <li><a href="index-1.html">01 - furniture store</a></li>
-                            <li><a href="index-2.html">02 - furniture store</a></li>
-                            <li><a href="index-3.html">03 - electronic store</a></li>
-                            <li><a href="index-4.html">04 - electronic store</a></li>
-                            <li><a href="index-5.html">05 - fashion store</a></li>
-                            <li><a href="index-6.html">06 - fashion store</a></li>
-                            <li><a href="index-7.html">07 - fashion store</a></li>
-                            <li><a href="index-8.html">08 - fashion store</a></li>
-                            <li><a href="index-9.html">09 - fashion store</a></li>
-                            <li><a href="index-10.html">10 - shoes store</a></li>
-                            <li><a href="index-11.html">11 - furniture simple store</a></li>
-                            <li><a href="index-12.html">12 - fashion simple store</a></li>
-                            <li><a href="index-13.html">13 - market</a></li>
-                            <li><a href="index-14.html">14 - market fullwidth</a></li>
-                            <li><a href="index-15.html">15 - lookbook 1</a></li>
-                            <li><a href="index-16.html">16 - lookbook 2</a></li>
-                            <li><a href="index-17.html">17 - fashion store</a></li>
-                            <li><a href="index-18.html">18 - fashion store (with sidebar)</a></li>
-                            <li><a href="index-19.html">19 - games store</a></li>
-                            <li><a href="index-20.html">20 - book store</a></li>
-                            <li><a href="index-21.html">21 - sport store</a></li>
-                            <li><a href="index-22.html">22 - tools store</a></li>
-                            <li><a href="index-23.html">23 - fashion left navigation store</a></li>
-                            <li><a href="index-24.html">24 - extreme sport store</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="category.html">Shop</a>
-                        <ul>
-                            <li><a href="category-list.html">Shop List</a></li>
-                            <li><a href="category-2cols.html">Shop Grid 2 Columns</a></li>
-                            <li><a href="category.html">Shop Grid 3 Columns</a></li>
-                            <li><a href="category-4cols.html">Shop Grid 4 Columns</a></li>
-                            <li><a href="category-boxed.html"><span>Shop Boxed No Sidebar<span class="tip tip-hot">Hot</span></span></a></li>
-                            <li><a href="category-fullwidth.html">Shop Fullwidth No Sidebar</a></li>
-                            <li><a href="product-category-boxed.html">Product Category Boxed</a></li>
-                            <li><a href="product-category-fullwidth.html"><span>Product Category Fullwidth<span class="tip tip-new">New</span></span></a></li>
-                            <li><a href="cart.html">Cart</a></li>
-                            <li><a href="checkout.html">Checkout</a></li>
-                            <li><a href="wishlist.html">Wishlist</a></li>
-                            <li><a href="#">Lookbook</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="product.html" class="sf-with-ul">Product</a>
-                        <ul>
-                            <li><a href="product.html">Default</a></li>
-                            <li><a href="product-centered.html">Centered</a></li>
-                            <li><a href="product-extended.html"><span>Extended Info<span class="tip tip-new">New</span></span></a></li>
-                            <li><a href="product-gallery.html">Gallery</a></li>
-                            <li><a href="product-sticky.html">Sticky Info</a></li>
-                            <li><a href="product-sidebar.html">Boxed With Sidebar</a></li>
-                            <li><a href="product-fullwidth.html">Full Width</a></li>
-                            <li><a href="product-masonry.html">Masonry Sticky Info</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#">Pages</a>
-                        <ul>
-                            <li>
-                                <a href="about.html">About</a>
+                <a href="/addWishlist?id=<%= singleData._id %>"
+                   class="btn-product btn-cart">
+                  <span>Add to Wishlist</span>
+                </a>
+              </div>
 
-                                <ul>
-                                    <li><a href="about.html">About 01</a></li>
-                                    <li><a href="about-2.html">About 02</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="contact.html">Contact</a>
+              <!-- FOOTER -->
+              <div class="product-details-footer">
+                <div class="product-cat">
+                  <span>Category:</span>
+                  <a href="#"><%= singleData.category.name %></a>
+                </div>
 
-                                <ul>
-                                    <li><a href="contact.html">Contact 01</a></li>
-                                    <li><a href="contact-2.html">Contact 02</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="login.html">Login</a></li>
-                            <li><a href="faq.html">FAQs</a></li>
-                            <li><a href="404.html">Error 404</a></li>
-                            <li><a href="coming-soon.html">Coming Soon</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="blog.html">Blog</a>
+                <div class="social-icons social-icons-sm">
+                  <span class="social-label">Share:</span>
+                  <a href="#" class="social-icon"><i class="icon-facebook-f"></i></a>
+                  <a href="#" class="social-icon"><i class="icon-twitter"></i></a>
+                  <a href="#" class="social-icon"><i class="icon-instagram"></i></a>
+                  <a href="#" class="social-icon"><i class="icon-pinterest"></i></a>
+                </div>
+              </div>
 
-                        <ul>
-                            <li><a href="blog.html">Classic</a></li>
-                            <li><a href="blog-listing.html">Listing</a></li>
-                            <li>
-                                <a href="#">Grid</a>
-                                <ul>
-                                    <li><a href="blog-grid-2cols.html">Grid 2 columns</a></li>
-                                    <li><a href="blog-grid-3cols.html">Grid 3 columns</a></li>
-                                    <li><a href="blog-grid-4cols.html">Grid 4 columns</a></li>
-                                    <li><a href="blog-grid-sidebar.html">Grid sidebar</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">Masonry</a>
-                                <ul>
-                                    <li><a href="blog-masonry-2cols.html">Masonry 2 columns</a></li>
-                                    <li><a href="blog-masonry-3cols.html">Masonry 3 columns</a></li>
-                                    <li><a href="blog-masonry-4cols.html">Masonry 4 columns</a></li>
-                                    <li><a href="blog-masonry-sidebar.html">Masonry sidebar</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">Mask</a>
-                                <ul>
-                                    <li><a href="blog-mask-grid.html">Blog mask grid</a></li>
-                                    <li><a href="blog-mask-masonry.html">Blog mask masonry</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#">Single Post</a>
-                                <ul>
-                                    <li><a href="single.html">Default with sidebar</a></li>
-                                    <li><a href="single-fullwidth.html">Fullwidth no sidebar</a></li>
-                                    <li><a href="single-fullwidth-sidebar.html">Fullwidth with sidebar</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="elements-list.html">Elements</a>
-                        <ul>
-                            <li><a href="elements-products.html">Products</a></li>
-                            <li><a href="elements-typography.html">Typography</a></li>
-                            <li><a href="elements-titles.html">Titles</a></li>
-                            <li><a href="elements-banners.html">Banners</a></li>
-                            <li><a href="elements-product-category.html">Product Category</a></li>
-                            <li><a href="elements-video-banners.html">Video Banners</a></li>
-                            <li><a href="elements-buttons.html">Buttons</a></li>
-                            <li><a href="elements-accordions.html">Accordions</a></li>
-                            <li><a href="elements-tabs.html">Tabs</a></li>
-                            <li><a href="elements-testimonials.html">Testimonials</a></li>
-                            <li><a href="elements-blog-posts.html">Blog Posts</a></li>
-                            <li><a href="elements-portfolio.html">Portfolio</a></li>
-                            <li><a href="elements-cta.html">Call to Action</a></li>
-                            <li><a href="elements-icon-boxes.html">Icon Boxes</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav><!-- End .mobile-nav -->
+            </div>
+          </div>
 
-            <div class="social-icons">
-                <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
-            </div><!-- End .social-icons -->
-        </div><!-- End .mobile-menu-wrapper -->
-    </div><!-- End .mobile-menu-container -->
+        </div>
+      </div>
 
-    <!-- Plugins JS File -->
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/jquery.hoverIntent.min.js"></script>
-    <script src="assets/js/jquery.waypoints.min.js"></script>
-    <script src="assets/js/superfish.min.js"></script>
-    <script src="assets/js/owl.carousel.min.js"></script>
-    <script src="assets/js/bootstrap-input-spinner.js"></script>
-    <script src="assets/js/jquery.elevateZoom.min.js"></script>
-    <script src="assets/js/bootstrap-input-spinner.js"></script>
-    <script src="assets/js/jquery.magnific-popup.min.js"></script>
-    <!-- Main JS File  -->
-<script src="assets/js/main.js"></script> 
+    </div>
+  </div>
+</main>
 
-</body>
+<!-- ================= CLIENT JS ================= -->
+<script>
+  document.getElementById('addToCartBtn').addEventListener('click', function (e) {
+    console.log("its working add to cart");
 
+    const isChecked = Array.from(
+        document.querySelectorAll('.variant-checkbox')
+    ).some(chk => chk.checked);
+
+    if (!isChecked) {
+        e.preventDefault();
+			Swal.fire({
+            icon: 'warning',
+            title: 'Please select a variant before adding to cart',
+            confirmButtonText: 'OK'
+        });
+				
+        return;
+    }
+});
+
+    
+
+    function selectVariantCard(idx) {
+    document.querySelectorAll('.variant-checkbox').forEach((chk, i) => {
+      if(i !== Number(idx)) chk.checked = false;
+    });
+
+    selectedVariantIndex = idx;
+    const v = variants[idx];
+    if(v.images?.length){
+      document.getElementById('productImage').src = v.images[0];
+    }
+
+    // Update price
+    const finalPrice = v.price - (v.price * bestOffer / 100);
+    document.getElementById('selectedVariantPrice').innerHTML =
+      bestOffer > 0
+        ? `Price: <del>₹${v.price}</del> ₹${Math.round(finalPrice)} (Offer: ${bestOffer}%)`
+        : `Price: ₹${v.price}`;
+
+    // Update stock
+    document.getElementById('selectedVariantStock').innerText =
+      `Stock: ${v.stock > 0 ? 'In Stock' : 'Out of Stock'}`;
+
+    // Update Add to Cart
+    const btn = document.getElementById('addToCartBtn');
+    if(v.stock > 0){
+      btn.href = `/cart/add?id=${productId}&variant=${v._id}`;
+      btn.classList.remove('disabled');
+      btn.style.pointerEvents = 'auto';
+    } else {
+      btn.classList.add('disabled');
+      btn.style.pointerEvents = 'none';
+    }
+  }
+  function changeImage(img) {
+    document.getElementById('productImage').src = img;
+  }
+
+  function selectVariant(id, price, stock, size, color, images) {
+    document.getElementById('productImage').src =
+      images[0] || '/images/placeholder.png';
+
+    document.getElementById('stockText').innerText =
+      stock > 0 ? 'In Stock' : 'Out of Stock';
+
+    document.getElementById('addToCartBtn').href =
+      `/cart/add?id=<%= singleData._id %>&variant=${id}`;
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<%- include('../layouts/userfooter') %>

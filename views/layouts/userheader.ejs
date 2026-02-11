@@ -3,6 +3,7 @@
 
 
 <!-- FlyBee/category-boxed.html  22 Nov 2019 10:03:00 GMT -->
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -30,6 +31,227 @@
     <link rel="stylesheet" href="assets/css/plugins/owl-carousel/owl.carousel.css">
     <link rel="stylesheet" href="assets/css/plugins/magnific-popup/magnific-popup.css">
     <link rel="stylesheet" href="assets/css/plugins/nouislider/nouislider.css">
+    <style>
+        @media (max-width: 991px) {
+            .header-left {
+                display: flex;
+                align-items: center;
+                /* Ensure vertical alignment */
+                justify-content: center;
+                /* Center horizontally */
+                width: 100%;
+                /* Take full width to ensure true centering if header-right is hidden or small */
+            }
+        }
+
+        @media (min-width: 992px) {
+            .main-nav {
+                margin-left: 12rem !important;
+            }
+        }
+
+        .logo-text {
+            font-size: large;
+            font-weight: 900;
+            color: black;
+        }
+
+        @media (max-width: 576px) {
+            .logo-text {
+                font-size: 1.6rem !important;
+            }
+
+            .logo img {
+                width: 80px;
+                height: auto;
+            }
+        }
+
+        /* Fix horizontal scroll */
+        .page-wrapper {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Hamburger Menu Button - Mobile Only */
+        .mobile-menu-btn {
+            display: none;
+            position: absolute;
+            top: 28px;
+            right: 20px;
+            z-index: 50;
+            background: transparent;
+            border: none;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .mobile-menu-btn i {
+            color: #333;
+            font-size: 24px;
+            transition: color 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover i {
+            color: #c96;
+        }
+
+        @media (max-width: 991px) {
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        /* Fullscreen Modal */
+        .mobile-menu-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-menu-modal.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .mobile-menu-content {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 400px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        .mobile-menu-modal.active .mobile-menu-content {
+            right: 0;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border: none;
+            color: #333;
+            font-size: 32px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .mobile-menu-close:hover {
+            transform: rotate(90deg);
+            color: #c96;
+        }
+
+        .mobile-menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .mobile-menu-list li {
+            margin: 15px 0;
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-modal.active .mobile-menu-list li {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .mobile-menu-list li:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+
+        .mobile-menu-list li:nth-child(2) {
+            transition-delay: 0.15s;
+        }
+
+        .mobile-menu-list li:nth-child(3) {
+            transition-delay: 0.2s;
+        }
+
+        .mobile-menu-list li:nth-child(4) {
+            transition-delay: 0.25s;
+        }
+
+        .mobile-menu-list li:nth-child(5) {
+            transition-delay: 0.3s;
+        }
+
+        .mobile-menu-list li:nth-child(6) {
+            transition-delay: 0.35s;
+        }
+
+        .mobile-menu-list li:nth-child(7) {
+            transition-delay: 0.4s;
+        }
+
+        .mobile-menu-list a {
+            color: #333;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 12px 20px;
+            position: relative;
+            border-radius: 8px;
+        }
+
+        .mobile-menu-list a:hover {
+            color: #fff;
+            background: #c96;
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 480px) {
+            .mobile-menu-content {
+                width: 85%;
+            }
+        }
+    </style>
     <script src="https://kit.fontawesome.com/dbad7a6aaf.js" crossorigin="anonymous"></script>
 </head>
 
@@ -39,37 +261,39 @@
             <div class="header-middle sticky-header">
                 <div class="container">
                     <div class="header-left">
-                        <button class="mobile-menu-toggler">
-                            <span class="sr-only">Toggle mobile menu</span>
-                            <i class="icon-bars"></i>
-                        </button>
-                        
-                        <span style="font-size: large; font-weight: 900; color: black;">FLY </span>
-                            <a href="/" class="logo">
-                                <img src="assets/images/logo.png" alt="FlyBee Logo" width="105" height="25">
-                                
-                            </a>
-                            <span style="font-size: large; font-weight: 900; color: black;">BEE</span> 
-                      
 
-                     
-                       
-                        <nav class="main-nav"   style="margin-left: 12rem;">
+                        <span class="logo-text">FLY </span>
+                        <a href="/" class="logo">
+                            <img src="assets/images/logo.png" alt="FlyBee Logo" width="105" height="25">
+
+                        </a>
+                        <span class="logo-text">BEE</span>
+
+
+
+
+                        <nav class="main-nav">
                             <ul class="menu sf-arrows">
                                 <li class="megamenu-container active">
-                                    <a href="/" >Home</a>   
+                                    <a href="/">Home</a>
                                 </li>
                                 <li>
-                                    <a href="/product" >Shop</a>
+                                    <a href="/product">Shop</a>
                                 </li>
                                 <li>
                                     <a href="/about">ABOUT</a>
                                 </li>
-                               
+
                                 <li>
-                                    <a href="/personalInfo" >PROFILE</a>    
+                                    <a href="/personalInfo">PROFILE</a>
                                 </li>
-                               
+                                <li class="d-lg-none">
+                                    <%if(!commonData.user){%>
+                                        <a href="#signin-modal" data-toggle="modal">LOG IN</a>
+                                        <%}else{%>
+                                            <a href="/logout">LOG OUT</a>
+                                            <%}%>
+                                </li>
                             </ul>
                         </nav>
                     </div><!-- End .header-left -->
@@ -83,27 +307,31 @@
                                 </div>
                             </form>
                         </div> -->
-                      
+
                         <a href="/wishlist" class="wishlist-link">
                             <i class="icon-heart-o"></i>
                             <%if(commonData.wishlistCount!==0){%>
-                                <span class="wishlist-count"><%=commonData.wishlistCount%></span>
+                                <span class="wishlist-count">
+                                    <%=commonData.wishlistCount%>
+                                </span>
                                 <%}%>
-                           
-                            <!-- <span class="wishlist-txt"></span> -->
+
+                                    <!-- <span class="wishlist-txt"></span> -->
                         </a>
 
                         <!-- <div class="dropdown cart-dropdown"> -->
-                            <a href="/cart" class="wishlist-link">
-                                <i class="icon-shopping-cart"></i>
-                                <%if(commonData.cartCount!==0){%>
-                                    <span class="wishlist-count"><%=commonData.cartCount%></span>
-                                    <%}%>
-                            </a>
+                        <a href="/cart" class="wishlist-link">
+                            <i class="icon-shopping-cart"></i>
+                            <%if(commonData.cartCount!==0){%>
+                                <span class="wishlist-count">
+                                    <%=commonData.cartCount%>
+                                </span>
+                                <%}%>
+                        </a>
 
-                            <!-- <div class="dropdown-menu dropdown-menu-right"> -->
-                                <!-- <div class="dropdown-cart-products"> -->
-                                    <!-- <div class="product">
+                        <!-- <div class="dropdown-menu dropdown-menu-right"> -->
+                        <!-- <div class="dropdown-cart-products"> -->
+                        <!-- <div class="product">
                                         <div class="product-cart-details">
                                             <h4 class="product-title">
                                                 <a href="product.html">Beige knitted elastic runner shoes</a>
@@ -115,7 +343,7 @@
                                             </span>
                                         </div> End .product-cart-details -->
 
-                                       <!-- <figure class="product-image-container">
+                        <!-- <figure class="product-image-container">
                                             <a href="product.html" class="product-image">
                                                 <img src="assets/images/products/cart/product-1.jpg" alt="product">
                                             </a>
@@ -123,7 +351,7 @@
                                         <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
                                     </div> -->
 
-                                    <!-- <div class="product">
+                        <!-- <div class="product">
                                         <div class="product-cart-details">
                                             <h4 class="product-title">
                                                 <a href="product.html">Blue utility pinafore denim dress</a>
@@ -142,31 +370,92 @@
                                         </figure>
                                         <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
                                     </div> -->
-                                <!-- </div> -->
+                        <!-- </div> -->
 
-                                <!-- <div class="dropdown-cart-total">
+                        <!-- <div class="dropdown-cart-total">
                                     <span>Total</span>
 
                                     <span class="cart-total-price">$160.00</span>
                                 </div> -->
 
-                                <!-- <div class="dropdown-cart-action">
+                        <!-- <div class="dropdown-cart-action">
                                     <a href="/cart" class="btn btn-primary">View Cart</a>
                                     <a href="/checkout" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
                                 </div> -->
-                            <!-- </div> -->
                         <!-- </div> -->
-                        <%if(!commonData.user){%>
-                            <a href="#signin-modal" data-toggle="modal" class="wishlist-link"  data-placement="right" title="login">
-                               <i class="fa-solid fa-right-to-bracket fa-sm"></i>
-                              </a>
-                              &nbsp;&nbsp;&nbsp;<span>LOG IN</span>
-                            <%}else{%>
-                                <a class="wishlist-link" href="/logout"  data-placement="right" title="logout">
-                                    <i class="fa-solid fa-right-from-bracket fa-sm"></i>
-                                </a>&nbsp;&nbsp; &nbsp;<span>LOG OUT</span>
-                            <%}%>
+                        <!-- </div> -->
+
+                        <div class="d-none d-lg-flex align-items-center">
+                            <%if(!commonData.user){%>
+                                <a href="#signin-modal" data-toggle="modal" class="wishlist-link" data-placement="right"
+                                    title="login">
+                                    <i class="fa-solid fa-right-to-bracket fa-sm"></i>
+                                </a>
+                                &nbsp;&nbsp;&nbsp;<span>LOG IN</span>
+                                <%}else{%>
+                                    <a class="wishlist-link" href="/logout" data-placement="right" title="logout">
+                                        <i class="fa-solid fa-right-from-bracket fa-sm"></i>
+                                    </a>&nbsp;&nbsp; &nbsp;<span>LOG OUT</span>
+                                    <%}%>
+                        </div>
                     </div><!-- End .header-right -->
                 </div><!-- End .container -->
             </div><!-- End .header-middle -->
+
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            </script>
         </header><!-- End .header -->
+
+        <!-- Mobile Menu Modal (Outside Header) -->
+        <div class="mobile-menu-modal" id="mobileMenuModal">
+            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="mobile-menu-content">
+                <ul class="mobile-menu-list">
+                    <li><a href="/">HOME</a></li>
+                    <li><a href="/product">SHOP</a></li>
+                    <li><a href="/about">ABOUT</a></li>
+                    <li><a href="/personalInfo">PROFILE</a></li>
+                    <li><a href="/wishlist">WISHLIST</a></li>
+                    <li><a href="/cart">CART</a></li>
+                    <li>
+                        <%if(!commonData.user){%>
+                            <a href="#signin-modal" data-toggle="modal" onclick="closeMobileMenu()">LOGIN</a>
+                            <%}else{%>
+                                <a href="/logout">LOGOUT</a>
+                                <%}%>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <script>
+            function closeMobileMenu() {
+                document.getElementById('mobileMenuModal').classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+
+            document.getElementById('mobileMenuBtn').addEventListener('click', function () {
+                document.getElementById('mobileMenuModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            document.getElementById('mobileMenuClose').addEventListener('click', closeMobileMenu);
+
+   
+            document.getElementById('mobileMenuModal').addEventListener('click', function (e) {
+                if (e.target === this) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Close menu when clicking any link (except login modal)
+            document.querySelectorAll('.mobile-menu-list a:not([data-toggle="modal"])').forEach(function (link) {
+                link.addEventListener('click', closeMobileMenu);
+            });
+        </script>

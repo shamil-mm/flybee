@@ -221,74 +221,72 @@
             <div class="container">
                 <h2 class="title text-center mb-4">New Arrivals</h2><!-- End .title text-center -->
 
-                <div class="products">
-                    <div class="row justify-content-center">
-                        <%newpro.forEach((value)=>{%>
-                          
-                        <div class="col-6 col-md-4 col-lg-3">
-                            <div class="product product-7 text-center">
-                                <figure class="product-media">
-                                    <span class="product-label label-sale">Sale</span>
-                                    <a href="/product" style="height: 26rem;">
-                                        <img src="/proimgs/<%=value.image[2]%>"  alt="Product image" class="product-image">
-                                        <img src="/proimgs/<%=value.image[1]%>" alt="Product image" class="product-image-hover">
-                                    </a>
-                                    
+               <div class="products">
+  <div class="row justify-content-center">
 
-                                    <div class="product-action-vertical">
-                                        <a href="/addWishlist?id=<%=value._id%>" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                                    </div><!-- End .product-action-vertical -->
+    <% newpro.forEach((value) => { 
+         const prices = value.variants.map(v => Number(v.price));
+         const price = Math.min(...prices);
+         const offer = value.finalPercentage;
+         const offerPrice = price - (price * offer / 100);
+    %>
 
-                                    <div class="product-action">
-                                        <a href="/cart/add?id=<%=value._id%>" class="btn-product btn-cart"><span>add to cart</span></a>
-                                    </div><!-- End .product-action -->
-                                </figure><!-- End .product-media -->
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="product product-7 text-center">
 
-                                <div class="product-body">
-                                    
-                                    <div class="product-cat" >
-                                        <h5><%=value.product_name %></h5>
-                                        <p><%=value.Description %></p>
-                                        <h6 style="padding-top: 2px;">BRAND : <%=value.brand %></h6>
-                                       
+        <figure class="product-media">
+          <span class="product-label label-sale">Sale</span>
 
-                                        <%if(value.finalPercentage && value.price*(value.finalPercentage/100) !== value.price){%>
-                                           
-                                            
-                                            <span style="color: #f38d7b;">PRICE : <del>₹ <%=value.price%></del> <br><span style="color:#f38d7b">OFFER(<%=value.finalPercentage%>%) <br>New Offer Price :<%=value.price-value.price*value.finalPercentage/100%></span>
+          <a href="/productView?id=<%=value._id%>" style="height: 26rem;">
+            <img src="<%= value.variants[0].images[0] %>" class="product-image">
+            <img src="<%= value.variants[0].images[1] %>" class="product-image-hover">
+          </a>
 
-                                                <%}else{%>
-                                                  
-                                                    <span style="color: #f38d7b;">PRICE : <%=value.price %></span>
-                                                    <%}%>
-                                    </div>
-                                   
-                                    
-                                </div><!-- End .product-body -->
-                            </div><!-- End .product -->
-                          
+          <div class="product-action-vertical">
+            <a href="/addWishlist?id=<%= value._id %>" 
+               class="btn-product-icon btn-wishlist btn-expandable">
+              <span>add to wishlist</span>
+            </a>
+          </div>
 
+          <div class="product-action">
+            <a href="/productView?id=<%=value._id%>" 
+               class="btn-product btn-cart">
+              <span>add to cart</span>
+            </a>
+          </div>
+        </figure>
 
-                        </div><!-- End .col-sm-6 col-md-4 col-lg-3 -->
-                        <%})%>
-                       
+        <div class="product-body">
 
-                       
+          <h5><%= value.product_name %></h5>
+          <p><%= value.description %></p>
+          <h6>BRAND : <%= value.brand %></h6>
 
-                       
+          <% if (offer > 0) { %>
+            <p style="color:#f38d7b">
+              PRICE : <del>₹ <%= price %></del><br>
+              OFFER (<%= offer %>%)<br>
+              New Price : ₹ <%= offerPrice.toFixed(0) %>
+            </p>
+          <% } else { %>
+            <p style="color:#f38d7b">
+              PRICE : ₹ <%= price %>
+            </p>
+          <% } %>
 
-                        
+        </div>
+      </div>
+    </div>
 
-                       
+    <% }) %>
 
-                        
+  </div>
+</div>
 
-                        
-                    </div><!-- End .row -->
-                </div><!-- End .products -->
 
                 
-            </div><!-- End .container -->
+            </div>
 
             <div class="pb-3">
                 <div class="container brands pt-5 pt-lg-7 ">
@@ -361,80 +359,7 @@
  
         </main><!-- End .main -->
 
-        <footer class="footer">
-            <div class="footer-middle">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="widget widget-about">
-                                <h4 class="widget-title">about FlyBee</h4><!-- End .widget-title -->
-                                <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. </p>
-
-                                <div class="social-icons">
-                                    <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-                                    <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-                                    <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-                                    <a href="#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
-                                </div><!-- End .soial-icons -->
-                            </div><!-- End .widget about-widget -->
-                        </div><!-- End .col-sm-6 col-lg-3 -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="widget">
-                                <h4 class="widget-title">Useful Links</h4><!-- End .widget-title -->
-
-                                <ul class="widget-list">
-                                    <li><a href="about.html">About FlyBee</a></li>
-                                    <li><a href="#">How to shop on FlyBee</a></li>
-                                    <li><a href="#">FAQ</a></li>
-                                    <li><a href="contact.html">Contact us</a></li>
-                                    <li><a href="login.html">Log in</a></li>
-                                </ul><!-- End .widget-list -->
-                            </div><!-- End .widget -->
-                        </div><!-- End .col-sm-6 col-lg-3 -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="widget">
-                                <h4 class="widget-title">Customer Service</h4><!-- End .widget-title -->
-
-                                <ul class="widget-list">
-                                    <li><a href="#">Payment Methods</a></li>
-                                    <li><a href="#">Money-back guarantee!</a></li>
-                                    <li><a href="#">Returns</a></li>
-                                    <li><a href="#">Shipping</a></li>
-                                    <li><a href="#">Terms and conditions</a></li>
-                                    <li><a href="#">Privacy Policy</a></li>
-                                </ul><!-- End .widget-list -->
-                            </div><!-- End .widget -->
-                        </div><!-- End .col-sm-6 col-lg-3 -->
-
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="widget">
-                                <h4 class="widget-title">My Account</h4><!-- End .widget-title -->
-
-                                <ul class="widget-list">
-                                    <li><a href="#">Sign In</a></li>
-                                    <li><a href="/cart">View Cart</a></li>
-                                    <li><a href="#">My Wishlist</a></li>
-                                    <li><a href="#">Track My Order</a></li>
-                                    <li><a href="#">Help</a></li>
-                                </ul><!-- End .widget-list -->
-                            </div><!-- End .widget -->
-                        </div><!-- End .col-sm-6 col-lg-3 -->
-                    </div><!-- End .row -->
-                </div><!-- End .container -->
-            </div><!-- End .footer-middle -->
-
-            <div class="footer-bottom">
-                <div class="container">
-                    <figure class="footer-payments">
-                        <img src="assets/images/payments.png" alt="Payment methods" width="272" height="20">
-                    </figure><!-- End .footer-payments -->
-             
-                    <p class="footer-copyright">Copyright © 2019 FlyBee Store. All Rights Reserved.</p><!-- End .footer-copyright -->
-                </div><!-- End .container -->
-            </div><!-- End .footer-bottom -->
-        </footer><!-- End .footer -->
+        <%-include('../layouts/userfooter')%>
     </div><!-- End .page-wrapper -->
     <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
 
@@ -606,7 +531,7 @@
                                 <form action="/loadEP" method="POST" id="loginForm">
                                     <div class="form-group">
                                         <label for="singin-email-2">Email address *</label>
-                                        <input type="text" class="form-control" id="singin-email-2" name="user_email" value="harshad@gmail.com">
+                                        <input type="text" class="form-control" id="singin-email-2" name="user_email" value="niyas@gmail.com" >
                                     </div><!-- End .form-group -->
 
                                     <div class="form-group">
@@ -669,7 +594,7 @@
                                         <input type="password" class="form-control" id="register-password-3" name="confirm_Password" min="6">
                                     </div><!-- End .form-group -->
                                     <div class="form-group">
-                                        <label for="Refferal">Refferal Code *</label>
+                                        <label for="Refferal">Refferal Code * (optional)</label>
                                         <input class="form-control" id="Refferal" name="Refferal">
                                     </div><!-- End .form-group -->
                                     <div class="form-footer">

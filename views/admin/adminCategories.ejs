@@ -1,14 +1,26 @@
 <%-include('../layouts/header')%> 
 <section class="content-main">
-      <div class="content-header">
-<div>
-            <h2 class="content-title card-title">Dress Categories</h2>
-           
-        </div>
-        <div>
-            <input type="text" placeholder="Search Categories" class="form-control bg-white" />
-        </div>
-    </div>
+     <div class="content-header d-flex align-items-center justify-content-between">
+  
+  <!-- Title -->
+  <h2 class="content-title card-title mb-0">
+    Dress Categories
+  </h2>
+
+  <!-- Search -->
+  <div class="d-flex align-items-center gap-2">
+    <input 
+      type="text" 
+      class="form-control form-control-sm  border border-2"
+      placeholder="Search Categories"
+      style="width: 240px;"
+    />
+    <button class="btn btn-primary btn-sm" type="button">
+      Search
+    </button>
+  </div>
+
+</div>
 
                           
    
@@ -17,7 +29,7 @@
         <div class="card-body">
             
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-3 border border-2 rounded p-4">
                     
                     <form method="post" action="/admin/add_category" onsubmit="return validationform()">
                         
@@ -40,7 +52,7 @@
                 </div>
                 <br>
                 <div class="col-md-9">
-                    <div class="table-responsive">
+                    <div >
                    
                       
                       
@@ -118,9 +130,7 @@
         <!-- card body .// -->
     </div>
     
-    <!-- card .// -->
-    <!-- Button trigger modal -->
-
+   
  
   
 
@@ -166,17 +176,23 @@
 
         if(name_input.trim()==""){
             Swal.fire({
-  text: 'Please Enter Your Category Name',
-  icon: 'info'
-}); return false
+                    text: 'Please Enter Your Category Name',
+                    icon: 'info'
+                    }); 
+            return false
         }
         if(des_input.trim()==""){
-            Swal.fire({
-  text: 'Please Enter Your Category description',
-  icon: 'info'
-}); return false
+                    Swal.fire({
+                    text: 'Please Enter Your Category description',
+                    icon: 'info'
+                    }); 
+            return false
         }
     }
+
+
+
+
     function deletedata(id) {
   Swal.fire({
     title: 'Are you sure to delete this?',
@@ -197,6 +213,25 @@
           }
     }
   });
+}
+
+window.onload=function(){
+    if('<%=query.error%>'){
+    Swal.fire({
+            icon: 'error',
+            title:'<%=query.error%>',
+            timer:3000,
+            showConfirmButton:false
+        });
+    }
+    if('<%=query.success%>'){
+        Swal.fire({
+            icon: 'success',
+            title:'<%=query.success%>',
+            timer:3000,
+            showConfirmButton:false
+        });
+    }
 }
 
     

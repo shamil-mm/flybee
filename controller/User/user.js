@@ -1,4 +1,4 @@
-const productSchema=require('../../models/productSchema')
+const {Product}=require('../../models/productSchema')
 const userSchema=require('../../models/userSchema')
 const bcrypt=require('bcrypt')
 const otp_email_generator=require('../../functions/otp_email_generator')
@@ -9,7 +9,7 @@ const offerHelper=require('../../functions/offerCalculations')
 
 const homePageRender=async(req,res,next)=>{
     try {
-        const product=await productSchema.add_pro_model.find({is_delete:false,is_list:false}).populate('category').sort({updatedAt:1}).limit(8)
+        const product=await Product.find({is_delete:false,is_list:false}).populate('category').sort({updatedAt:1}).limit(8)
         
         const first_8_product= await Promise.all(product.map(async(product)=>{
             let finalPercentage=0
@@ -36,7 +36,7 @@ const homePageRender=async(req,res,next)=>{
                 })
               }
               finalPercentage=productOffer>categoryOffer?productOffer:categoryOffer
-              const updated_data=await productSchema.add_pro_model.findByIdAndUpdate(product._id, {offerPercentage:finalPercentage}, {new: true});
+              const updated_data=await Product.findByIdAndUpdate(product._id, {offerPercentage:finalPercentage}, {new: true});
               return {...product.toObject(),finalPercentage}
   
           }))

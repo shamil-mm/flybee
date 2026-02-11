@@ -1,112 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>FLYBEE (ADMIN)</title>
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
-        <meta name="description" content="" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta property="og:title" content="" />
-        <meta property="og:type" content="" />
-        <meta property="og:url" content="" />
-        <meta property="og:image" content="" />
-        <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="/imgs/theme/logo.png" />
-        <!-- Template CSS -->
-        <link href="/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
-        <script src="https://kit.fontawesome.com/dbad7a6aaf.js" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
-      
-       
-           </head>
-    <body>
-        <div class="screen-overlay"></div>
-        <aside class="navbar-aside" id="offcanvas_aside">
-            <div class="aside-top">
-                <a   href="/admin/home" class="brand-wrap">
-                   
-                 <img style="padding-left: 3rem;" src="/imgs/theme/logo.png" class="logo" alt="FLYBEE" />
-                  
-                </a>
-                <div>
-                    <button class="btn btn-icon btn-aside-minimize"><i class="text-muted material-icons md-menu_open"></i></button>
-                </div>
+
+<head>
+    <meta charset="utf-8" />
+    <title>FLYBEE (ADMIN)</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="" />
+    <meta property="og:type" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="" />
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/imgs/theme/logo.png" />
+    <!-- Template CSS -->
+    <link href="/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    <script src="https://kit.fontawesome.com/dbad7a6aaf.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <aside class="navbar-aside" id="offcanvas_aside">
+        <div class="aside-top">
+            <a href="/admin/home" class="brand-wrap">
+
+                <img style="padding-left: 3rem;" src="/imgs/theme/logo.png" class="logo" alt="FLYBEE" />
+
+            </a>
+            <div>
+                <button class="btn btn-icon btn-aside-minimize"><i
+                        class="text-muted material-icons md-menu_open"></i></button>
             </div>
-            <nav>
-                <ul class="menu-aside">
-                    <li class="menu-item active">
-                        <a class="menu-link" href="/admin/home">
-                            <i class="icon material-icons md-home"></i>
-                            <span class="text">Dashboard</span>                                                                  
+        </div>
+        <nav>
+            <ul class="menu-aside">
+                <li class="menu-item active">
+                    <a class="menu-link" href="/admin/home">
+                        <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/users">
+                        <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Users</span>
+                    </a>
+                </li>
+                <li class="menu-item has-submenu">
+                    <a class="menu-link" href="page-products-list.html">
+                        <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                    <div class="submenu">
+
+                        <a href="/admin/products">Product List</a>
+                        <a href="/admin/categories">Categories</a>
+                        <a href="/admin/Coupons">Coupons</a>
+                    </div>
+                </li>
+
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/order">
+                        <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+
+
+
+
+
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/offers">
+                        <i class="icon material-icons md-local_offer"></i>
+                        <span class="text">Offers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link" href="/admin/salesReporst">
+                        <i class="icon material-icons md-bar_chart"></i>
+                        <span class="text">Sales Report</span>
+                    </a>
+                </li>
+
+
+
+            </ul>
+            <hr />
+
+        </nav>
+        <footer class="main-footer font-xs" style="padding: 10px 20px; text-align: center; margin-top: auto;">
+            <p class="font-sm mb-0" style="font-size: 12px; color: #adb5bd;">&copy; 2024 FlyBee Store. <br>All rights
+                reserved.</p>
+        </footer>
+    </aside>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"><i
+                        class="material-icons md-apps"></i></button>
+                <ul class="nav">
+
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i>
                         </a>
                     </li>
-                    <li class="menu-item">
-                        <a class="menu-link" href="/admin/users">
-                            <i class="icon material-icons md-shopping_cart"></i>
-                            <span class="text">Users</span>
-                        </a>
+                    <li class="nav-item">
+                        <a href="/admin/logout" class="requestfullscreen nav-link btn-icon"> <i
+                                class="fa-solid fa-right-from-bracket fa-xl"></i></a>
                     </li>
-                    <li class="menu-item has-submenu">
-                        <a class="menu-link" href="page-products-list.html">
-                            <i class="icon material-icons md-shopping_bag"></i>
-                            <span class="text">Products</span>
-                        </a>
-                        <div class="submenu">
-                          
-                            <a href="/admin/products">Product List</a>
-                            <a href="/admin/categories">Categories</a>
-                            <a href="/admin/Coupons">Coupons</a>
-                        </div>
-                    </li>
-                    
-                    <li class="menu-item">
-                        <a class="menu-link" href="/admin/order">
-                            <i class="icon material-icons md-shopping_cart"></i>
-                            <span class="text">Orders</span>
-                        </a>
-                    </li>
-           
-                 
-                   
-                   
-                    
-                    <li class="menu-item">
-                        <a class="menu-link" href="/admin/offers">
-                            <i class="icon material-icons md-local_offer"></i>
-                            <span class="text">Offers</span>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a class="menu-link" href="/admin/salesReporst">
-                            <i class="icon material-icons md-bar_chart"></i>
-                            <span class="text">Sales Report</span>
-                        </a>
-                    </li>
-                   
-                    
-                  
+                    </a>
                 </ul>
-                <hr />
-               
-            </nav>
-        </aside>
-        <main class="main-wrap">
-            <header class="main-header navbar">
-                <div class="col-search">
-                   
-                </div>
-                <div class="col-nav">
-                    <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"><i class="material-icons md-apps"></i></button>
-                    <ul class="nav">
-                        
-                        <li class="nav-item">
-                            <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/admin/logout" class="requestfullscreen nav-link btn-icon"> <i class="fa-solid fa-right-from-bracket fa-xl"></i></a>
-                        </li>
-                        </a>
-                    </ul>
-                </div>
-            </header>
+            </div>
+        </header>

@@ -1,14 +1,26 @@
 <%-include('../layouts/header')%> 
 <section class="content-main">
-      <div class="content-header">
-<div>
-            <h2 class="content-title card-title">Coupons</h2>
-           
-        </div>
-        <div>
-            <input type="text" placeholder="Search Categories" class="form-control bg-white" />
-        </div>
-    </div><!-- Button trigger modal -->
+      <div class="content-header d-flex align-items-center justify-content-between">
+  
+  <!-- Title -->
+  <h2 class="content-title card-title mb-0">
+   Coupons
+  </h2>
+
+  <!-- Search -->
+  <div class="d-flex align-items-center gap-2">
+    <input 
+      type="text" 
+      class="form-control form-control-sm  border border-2"
+      placeholder="Search Categories"
+      style="width: 240px;"
+    />
+    <button class="btn btn-primary btn-sm" type="button">
+      Search
+    </button>
+  </div>
+
+</div>
    
     
     <!-- Modal -->
@@ -260,7 +272,8 @@
         if (couponMaxAmount.value.trim() === '' || isNaN(couponMaxAmount.value) || Number(couponMaxAmount.value) < 0) {
             setInvalid(couponMaxAmount, 'Valid maximum amount is required');
         }
-        if (couponMinAmount.value.trim()>couponMaxAmount.value.trim()) {
+        if (Number(couponMinAmount.value.trim())>Number(couponMaxAmount.value.trim())) {
+            
             setInvalid(couponMinAmount, 'minimum amount is greaterthan maximum amount ');
         }
 

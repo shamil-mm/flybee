@@ -72,19 +72,31 @@ const fetchAvaliableCoupon=async(req,res,next)=>{
     try {
         const { datas } = req.body;
         const productArray=JSON.parse(datas)
-        let priceOfProduct=0
         let totalPrice=0
-        productArray.forEach(element => {
-          
-            if(element.productId.offerPercentage>0){
-                priceOfProduct=  element.productId.price-element.productId.price*(element.productId.offerPercentage/100)
-            }else{
-                priceOfProduct= element.productId.price
-            }
-            totalPrice+=priceOfProduct
+
+
+        productArray.forEach(item => {
+        const price = Number(item.price) || 0;
+        const offer = Number(item.offerPercentage) || 0;
+        const quantity = Number(item.quantity) || 1;
+
+        const finalPrice =
+            offer > 0 ? price - price * (offer / 100) : price;
+
+        totalPrice += finalPrice * quantity;
         });
-        
-        const allCoupon=await coupon.find({status:true, minAmount:{$lte:totalPrice},maxAmount:{$gte:totalPrice},expirationDate:{$gte:new Date()}})
+
+        if (!Number.isFinite(totalPrice)) {
+        return res.status(400).json({ message: "Invalid cart total" });
+        }
+
+
+         const allCoupon = await coupon.find({
+        status: true,
+        minAmount: { $lte: totalPrice },
+        maxAmount: { $gte: totalPrice },
+        expirationDate: { $gte: new Date() }
+        });
         
         res.json(allCoupon)
 

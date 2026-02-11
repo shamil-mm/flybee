@@ -6,7 +6,7 @@ const invoiceRender=async(req,res,next)=>{
         if(req.session.user_id){
             const id=req.query.id
             const orderList = await Order.findOne({ userId: req.session.user_id,'OrderedProducts._id': id}).populate({path: 'OrderedProducts.productId',populate: {path: 'category'}});
-            res.render('invoice',{order:orderList,address:orderList.OrderedProducts[0].shippingAddress})
+            res.render('invoice',{order:orderList,address:orderList.shippingAddress})
 
         }else{
             res.redirect('/')

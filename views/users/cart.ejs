@@ -47,43 +47,45 @@
 										
 										<%data.forEach((value)=>{%>
 											
-										<tr class="rowsof" id="row<%=value.productId._id%>" >
-											<td class="product-col"  onclick="rowselection('<%=value.productId._id%>')">
+										
+											
+										<tr class="rowsof" id="row<%=value.productId%>" >
+											<td class="product-col"  onclick="rowselection('<%=value.productId%>')">
 												<div class="product">
 													<figure class="product-media">
 														<a href="#">
-															<img src="/proimgs/<%=value.productId.image[2]%>" alt="Product image">
+															<img src="<%=value.image%>" alt="Product image">
 														</a>
 													</figure>
 
 													<h3 class="product-title">
-														<a ><%=value.productId.product_name%></a>
+														<a ><%=value.productName%></a>
 													</h3><!-- End .product-title -->
 												</div><!-- End .product -->
 											</td>
-											<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
-												<td class="price-col"><%=value.productId.price-value.productId.price*value.productId.offerPercentage/100 %></td>
+											<%if((value.price*value.offerPercentage/100)!==0){%>
+												<td class="price-col"><%=value.price-value.price*value.offerPercentage/100 %></td>
 												<%}else{%>
-													<td class="price-col"><%=value.productId.price%></td>
+													<td class="price-col"><%=value.price%></td>
 												<%}%>
 									
 											<td class="quantity-col">
                                                 <div class="cart-product-quantity">
-													<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
+													<%if((value.price*value.offerPercentage/100)!==0){%>
 														
-                                                    <input class="numberTag" id="numberTag" type="number" value="<%=value.quantity%>" min="1" max="5" onchange="datachange(this,'<%=value.productId._id%>','<%=(value.productId.price-value.productId.price*value.productId.offerPercentage/100)*value.quantity%>')" step="1" data-decimals="0"  required >
+                                                    <input class="numberTag" id="numberTag" type="number" value="<%=value.quantity%>" min="1" max="5" onchange="datachange(this,'<%=value.productId%>','<%=(value.price-value.price*value.offerPercentage/100)%>','<%value.quantity%>')" step="1" data-decimals="0"  required >
 													
 													<%}else{%>
-														<input class="numberTag" id="numberTag" type="number" value="<%=value.quantity%>" min="1" max="5" onchange="datachange(this,'<%=value.productId._id%>','<%=value.productId.price*value.quantity%>')" step="1" data-decimals="0"  required >
+														<input class="numberTag" id="numberTag" type="number" value="<%=value.quantity%>" min="1" max="5" onchange="datachange(this,'<%=value.productId%>','<%=value.price%>','<%value.quantity%>')" step="1" data-decimals="0"  required >
 														<%}%>
                                                 </div><!-- End .cart-product-quantity -->
                                             </td>
-											<%if((value.productId.price*value.productId.offerPercentage/100)!==0){%>
-											<td class="total-col cart_total"  id="total<%=value.productId._id%>"><%=(value.productId.price-value.productId.price*value.productId.offerPercentage/100)*value.quantity%></td>
+											<%if((value.price*value.offerPercentage/100)!==0){%>
+											<td class="total-col cart_total"  id="total<%=value.productId%>"><%=(value.price-value.price*value.offerPercentage/100)*value.quantity%></td>
 											<%}else{%>
-												<td class="total-col cart_total"  id="total<%=value.productId._id%>"><%=value.productId.price*value.quantity%></td>
-												<%}%>
-										<td class="remove-col"><button class="btn-remove" onclick="return removeRow('<%=value.productId._id%>','<%=value.productId.price%>')"><i class="icon-close"></i></button></td>
+												<td class="total-col cart_total"  id="total<%=value.productId%>"><%=value.price*value.quantity%></td>
+											<%}%>
+										<td class="remove-col"><button class="btn-remove" onclick="return removeRow('<%=value.productId%>','<%=value.price%>')"><i class="icon-close"></i></button></td>
 										</tr>
 										<%})%>
 
@@ -154,56 +156,70 @@ window.onload=function(){
 				})
 			total.innerHTML=ft
 			Gtotal.innerHTML=ft
-			 if('<%=cart%>'){
+			if('<%=cart%>'){
 			    Swal.fire({
-            text: '<%=cart%>',
-            icon: 'success'  
-        })
-			  }
+				text: '<%=cart%>',
+				icon: 'success'  
+				})
+			}
+			if('<%=error %>'){
+			    Swal.fire({
+				text: '<%=error %>',
+				icon: 'error'  
+				})
+			}  
+		}
+			
+function datachange(tag,id,price,quantity){
+	
 
-			  
+			const countValue=tag.value
+			const maxLimit = parseInt(tag.getAttribute('max')) || 5;
+			if (countValue == maxLimit) {
+
+				Swal.fire({
+					icon: 'error',
+					title: 'Product Limit Exceeded',
+					text: `Maximum allowed quantity is ${maxLimit}`
+				});
 			}
 			
-function datachange(tag,id,price){
 
-	// console.log(price)	
-			const countValue=tag.value
 			const totaltag=document.getElementById('total'+id)
 			totaltag.innerHTML=Math.round(countValue*price)
-			
-		
-			if(countValue>=5){
-				Swal.fire({
-            icon: 'error',
-            title: 'Product Limit Exceeded',
-            text: `You have reached the maximum limit of products.`,
-        });
-			}
-			
-// =============================================================================
- 
- const totalamount = document.getElementsByClassName('cart_total')
-    finalTotal = 0; 
-    Array.from(totalamount).forEach((element) => {
-        finalTotal += parseInt(element.textContent);
-    });
-    const total = document.getElementById('carttotal');
-    const Gtotal = document.getElementById('grandtotal');
-    total.innerHTML = finalTotal;
-    Gtotal.innerHTML = finalTotal;
-// =============================================================================	
+			let finalTotal = 0; 
+			const totalamount = document.getElementsByClassName('cart_total')
+			Array.from(totalamount).forEach((element) => {
+				finalTotal += parseInt(element.textContent)||0;
+			});
+
+			document.getElementById('carttotal').innerHTML = finalTotal;
+    		document.getElementById('grandtotal').innerHTML = finalTotal;
+
 			fetch(`/cartdynamic?id=${id}&value=${countValue}`,{method:'post'})
 			.then(response=>response.json())
 			.then((data)=>{
+				tag.setAttribute('max', data.stock);
+				totaltag.innerHTML=Math.round(data.stock*price)
+				let flAmount=0;
+				Array.from(totalamount).forEach((element) => {
+				flAmount += parseInt(element.textContent)||0;
+			});
+			document.getElementById('carttotal').innerHTML = flAmount;
+    		document.getElementById('grandtotal').innerHTML = flAmount;
 				
-				document.getElementById("numberTag").setAttribute('max',data.stock)
-				// console.log(document.getElementById('numberTag'))
-				Swal.fire({
-            title: 'Limit',
-            text: data.msg,
-            icon: 'info'})
+			if (data.msg) {
+                tag.value = data.stock;
+
+                Swal.fire({
+                    title: 'Stock Limit',
+                    text: data.msg,
+                    icon: 'info'
+                });
+            }
+
 			})
-	}
+}
 
 
 

@@ -4165,6 +4165,7 @@ body.dark .dropdown-menu .dropdown-item.text-danger {
   .card-header .col-check {
     display: none;
   }
+  
 }
 
 @media all and (max-width: 768px) {
@@ -4301,3 +4302,5 @@ body.dark .dropdown-menu .dropdown-item.text-danger {
   }
 }
 /*# sourceMappingURL=main.css.map */
+
+

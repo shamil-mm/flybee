@@ -3,7 +3,7 @@ const userSchema=require('../../models/userSchema')
 const otp_email_generator=require('../../functions/otp_email_generator')
 const Order=require('../../models/orderSchema')
 const bcrypt=require('bcrypt')
-const productSchema=require('../../models/productSchema')
+const {Product}=require('../../models/productSchema')
 
 const LoginPage=async(req,res)=>{
     try {
@@ -86,65 +86,58 @@ const loadRegisterForm=async(req,res)=>{
 const homePage=async(req,res)=>{
     try {
         const topCategories = await Order.aggregate([
-            {
-                $match: {
-                    'OrderedProducts.orderStatus': "Delivered"
-                }
-            },
-            {
-                $unwind: '$OrderedProducts'
-            },
+  
+            { $unwind: '$OrderedProducts' },
+
+            { $match: { 'OrderedProducts.orderStatus': 'Delivered' } },
+
             {
                 $group: {
-                    _id: '$OrderedProducts.productId',
-                    totalOrdered: { $sum: 1 }
+                _id: '$OrderedProducts.productId',
+                totalOrdered: { $sum: '$OrderedProducts.quantity' }
                 }
             },
+
             {
                 $lookup: {
-                    from: 'products',  
-                    localField: '_id',
-                    foreignField: '_id',
-                    as: 'productDetails'
+                from: 'products',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'productDetails'
                 }
             },
-            {
-                $unwind: '$productDetails'
-            },
+            { $unwind: '$productDetails' },
             {
                 $lookup: {
-                    from: 'cate_schemas',  
-                    localField: 'productDetails.category',
-                    foreignField: '_id',
-                    as: 'categoryDetails'
+                from: 'categories',
+                localField: 'productDetails.category',
+                foreignField: '_id',
+                as: 'categoryDetails'
                 }
             },
-            {
-                $unwind: '$categoryDetails'
-            },
+            { $unwind: '$categoryDetails' },
+
             {
                 $group: {
-                    _id: '$categoryDetails._id',
-                    name: { $first: '$categoryDetails.name' },
-                    description: { $first: '$categoryDetails.description' },
-                    totalOrdered: { $sum: '$totalOrdered' }
+                _id: '$categoryDetails._id',
+                name: { $first: '$categoryDetails.name' },
+                description: { $first: '$categoryDetails.description' },
+                totalOrdered: { $sum: '$totalOrdered' }
                 }
             },
-            {
-                $sort: { totalOrdered: -1 }
-            },
-            {
-                $limit: 5 
-            },
-            {
-                $project: {
-                    _id: 0,
-                    name: 1,
-                    description: 1,
-                    totalOrdered: 1
-                }
-            }
+
+
+            { $sort: { totalOrdered: -1 } },
+
+            { $limit: 5 },
+
+
+            { $project: { _id: 0, name: 1, description: 1, totalOrdered: 1 } }
+
         ]);
+
+
+
         
 
         const result = await Order.aggregate([
@@ -173,7 +166,7 @@ const homePage=async(req,res)=>{
             }
           ]);
 
-          const countoftotalproduct=await productSchema.add_pro_model.find({is_list:false,is_delete:false}).countDocuments()    
+          const countoftotalproduct=await Product.find({is_list:false,is_delete:false}).countDocuments()    
           
    
   

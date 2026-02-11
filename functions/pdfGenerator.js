@@ -1,93 +1,150 @@
 const PDFDocument = require('pdfkit');
-const fs = require('fs');
 
 async function pdfGenerate(deliveredOrders) {
     return new Promise((resolve, reject) => {
         try {
-            const doc = new PDFDocument();
+            const doc = new PDFDocument({ margin: 30 });
 
-            const overallMetrics = {
-                salesCount: deliveredOrders.length,
-                orderAmount: 0,
-                discountAmount: 0
-            };
+            let totalSalesCount = 0;
+            let totalOrderAmount = 0;
+            let totalOfferDiscount = 0;
+            let totalCouponDiscount = 0;
 
             const tableRows = [];
-            
-            deliveredOrders.forEach((order) => {
-                order.OrderedProducts.forEach((product) => {
-                    overallMetrics.orderAmount += order.TotalAmount;
-                    const productPrice = product.productId.price;
-                    const offerDiscount = product.productId.offerPercentage ? (productPrice * product.productId.offerPercentage / 100) : 0;
-                    const couponDiscount = order.couponPercentage ? (productPrice * order.couponPercentage / 100) : 0;
-                    overallMetrics.discountAmount += offerDiscount + couponDiscount;
-                    
+
+            deliveredOrders.forEach(value => {
+                value.OrderedProducts.forEach(order => {
+
+                    totalSalesCount++;
+                    totalOrderAmount += value.TotalAmount;
+
+                    const offerDiscount =
+                        order.productId.offerPercentage === 0
+                            ? 0
+                            : (order.price * order.productId.offerPercentage) / 100;
+
+                    const couponDiscount =
+                        value.couponPercentage === 0
+                            ? 0
+                            : (order.price * value.couponPercentage) / 100;
+
+                    totalOfferDiscount += offerDiscount;
+                    totalCouponDiscount += couponDiscount;
+
+                    const orderDate = new Date(value.createdAt).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+
                     tableRows.push([
-                        product._id.toString().slice(-4),
-                        new Date(product.orderDate).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric'
-                        }),
-                        product.productId.product_name,
-                        `${product.shippingAddress?.name}, ${product.shippingAddress?.address}`,
-                        product.paymentMethod,
-                        product.productId.offerPercentage === 0 ? 'No Offer Applied' : (productPrice * product.productId.offerPercentage / 100).toFixed(2),
-                        order.couponPercentage === 0 ? 'No Coupon Applied' : (productPrice * order.couponPercentage / 100).toFixed(2),
-                        order.TotalAmount.toFixed(2)
+                        order._id.toString().slice(-4),
+                        orderDate,
+                        order.productId.product_name,
+                        `${value.shippingAddress.name},`,
+                        value.paymentMethod,
+                        order.productId.offerPercentage === 0
+                            ? 'Not Applied'
+                            : offerDiscount.toFixed(2),
+                        value.couponPercentage === 0
+                            ? 'Not Applied'
+                            : couponDiscount.toFixed(2),
+                        value.TotalAmount.toFixed(2)
                     ]);
                 });
             });
 
-            // Title
-            doc.fontSize(20).text('Sales Report', { align: 'center' }).fontSize(12);
-            doc.moveDown();
-            doc.moveDown();
-            doc.moveDown();
+            // ===== TITLE =====
+            doc.fontSize(20).text('Sales Report', { align: 'center' });
+            doc.moveDown(2);
 
-            // Table Headers
-            const tableHeaders = ['Order ID', 'Order Date', 'Product', 'Customer', 'Payment Method', 'Offer Discount', 'Coupon Discount', 'Final Cart Price'];
-            const columnWidth = (doc.page.width - 20) / tableHeaders.length; // Adjust width based on page width
-            const tableWidth = columnWidth * tableHeaders.length;
-            const startX = (doc.page.width - tableWidth) / 2; // Calculate startX to center the table
+            // ===== TABLE CONFIG =====
+            const headers = [
+                'Order ID',
+                'Order Date',
+                'Product',
+                'Customer',
+                'Payment Method',
+                'Offer Discount',
+                'Coupon Discount',
+                'Final Cart Price'
+            ];
 
+            const columnWidth = (doc.page.width - 60) / headers.length;
+            const startX = 30;
             let y = doc.y;
-            tableHeaders.forEach((header, i) => {
-                doc.text(header, startX + i * columnWidth, y, { width: columnWidth, align: 'center' });
-            });
-            
-            // Increase y to create a distance between table headers and rows
-            y += 50;
 
-            // Table Rows
+            // ===== TABLE HEADERS =====
+            doc.fontSize(10).font('Helvetica-Bold');
+            headers.forEach((h, i) => {
+                doc.text(h, startX + i * columnWidth, y, {
+                    width: columnWidth,
+                    align: 'center'
+                });
+            });
+
+            y += 30;
+            doc.font('Helvetica');
+
+            // ===== TABLE ROWS =====
             tableRows.forEach(row => {
                 row.forEach((cell, i) => {
-                    doc.text(cell, startX + i * columnWidth, y, { width: columnWidth, align: 'center' });
+                    doc.text(String(cell), startX + i * columnWidth, y, {
+                        width: columnWidth,
+                        align: 'center'
+                    });
                 });
-                y += 75;
 
-                // Add a new page if the table goes beyond the current page height
-                if (y > doc.page.height - 50) {
+                y += 25;
+
+                if (y > doc.page.height - 80) {
                     doc.addPage();
-                    y = 50; // Reset y to the top of the new page
+                    y = 50;
                 }
             });
 
-            // Horizontal Metrics
-            const metricsY = y + 30; // Position below the table with some space
-            const metricsXStart = startX+50; // Align metrics start with the table
-            const metricsSpacing = tableWidth / 3; // Space between each metric, dividing the table width by the number of metrics
+            // ===== TOTALS ROW =====
+            y += 20;
+            doc.font('Helvetica-Bold');
 
-            doc.text(`Overall Sales Count: ${overallMetrics.salesCount}`, metricsXStart, metricsY);
-            doc.text(`Overall Discount: ${overallMetrics.discountAmount}`, metricsXStart + metricsSpacing, metricsY);
-            doc.text(`Overall Order Amount: ${overallMetrics.orderAmount}`, metricsXStart + 2 * metricsSpacing, metricsY);
+            doc.text('Totals', startX, y, {
+                width: columnWidth * 5,
+                align: 'center'
+            });
 
+            doc.text(totalOfferDiscount.toFixed(2), startX + 5 * columnWidth, y, {
+                width: columnWidth,
+                align: 'center'
+            });
+
+            doc.text(totalCouponDiscount.toFixed(2), startX + 6 * columnWidth, y, {
+                width: columnWidth,
+                align: 'center'
+            });
+
+            doc.text(totalOrderAmount.toFixed(2), startX + 7 * columnWidth, y, {
+                width: columnWidth,
+                align: 'center'
+            });
+
+            // ===== SALES COUNT ROW =====
+            y += 30;
+            doc.text(
+                `Overall Sales Count: ${totalSalesCount}`,
+                startX + 6 * columnWidth,
+                y,
+                { width: columnWidth * 2, align: 'center' }
+            );
+
+            // ===== FINALIZE =====
             doc.end();
-            const buffer = [];
-            doc.on('data', buffer.push.bind(buffer));
-            doc.on('end', () => resolve(Buffer.concat(buffer)));
-        } catch (error) {
-            reject(error);
+
+            const buffers = [];
+            doc.on('data', buffers.push.bind(buffers));
+            doc.on('end', () => resolve(Buffer.concat(buffers)));
+
+        } catch (err) {
+            reject(err);
         }
     });
 }

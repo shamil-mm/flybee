@@ -21,8 +21,6 @@ const order=require('../controller/User/order')
 const invoice=require('../controller/User/invoice')
 const wallet=require('../controller/User/wallet')
 
-const sortProduct=require('../controller/User/sortProduct')
-const filteredProduct=require('../controller/User/filteredProduct');
 const Razorpay = require('razorpay')
 const razorpay=require('../controller/User/razorpay');
 const about=require('../controller/User/about')
@@ -54,6 +52,7 @@ userRouter.get('/product',userAuth.is_login,product.productPageRender)
 userRouter.get('/men',userAuth.is_login,product.mensPageRender)
 userRouter.get('/women',userAuth.is_login,product.womensPageRender)
 userRouter.get('/productView',userAuth.is_login,product.productViewPage)
+userRouter.get('/products',userAuth.is_login,product.fetchProducts )
 
 
 // profileInfo
@@ -91,13 +90,6 @@ userRouter.post('/failedPaymentRetry',order.failedPaymentRetry)
 
 userRouter.get('/invoiceRender',userAuth.is_login,invoice.invoiceRender)
 userRouter.get('/downloadInvoice',userAuth.is_login,invoice.downloadInvoice)
-
-
-
-
-// sort filter in separate
-userRouter.post('/sortProduct',sortProduct)
-userRouter.post('/filteredProduct',filteredProduct)
 
 
 // coupons

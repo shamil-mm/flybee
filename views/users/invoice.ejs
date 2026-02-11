@@ -168,10 +168,11 @@
             <div>
                 <p><strong>Invoice Number : <%=order.OrderedProducts[0]._id.toString().slice(-5) %></p>
 
-                <p><strong>Date : <%=order.OrderedProducts[0].orderDate.toLocaleDateString()%></strong></p>
+                <p><strong>Date : <%=order.createdAt.toLocaleDateString()%></strong></p>
             </div>
             <div>
                 <p><strong>Bill from:</strong> FLYBEE.Inc , 333 Main Street , San Francisco , CA 94111 , USA</p>
+                
                 <p><strong>Bill to:</strong> <%=address.name%> , <%=address.address%> , <%=address.state%> , <%=address.pincode%> , <%=address.country%> </p>
             </div>
         </div>
@@ -190,12 +191,14 @@
             
             <!-- To keep track of the total final price -->
             <% order.OrderedProducts.forEach((value) => { %>
+                <%console.log("value",value)%>
                 <% 
-                    let price = value.productId.price;
+                    let price = value.price;
                     let productOffer = value.productId.offerPercentage || 0;
                     let categoryOffer = value.productId.category.offerPercentage || 0;
                     let couponOffer = order.couponPercentage || 0;
                     let finalPrice = price;
+                    
         
                     // Calculate the maximum of product or category offer
                     if (productOffer && categoryOffer) {
@@ -211,10 +214,10 @@
         
                     // Apply coupon offer
                     if(couponOffer>0){
-
+                        let before=finalPrice;
                         finalPrice -= finalPrice * (couponOffer / 100);
-                        coupon=-finalPrice * (couponOffer / 100)
-
+                       
+                        coupon=before-finalPrice
                     }
                     
         
@@ -233,7 +236,7 @@
                 <tr style="font-size: small;">
                     <td><%= value.productId.product_name %></td>
                     <td><%= value.quantity %></td>
-                    <td><%= value.productId.price %> ₹ </td>
+                    <td><%= value.price %> ₹ </td>
                     <td><%= subtotal %> ₹</td>
                 </tr>
             <% }) %>
@@ -249,6 +252,7 @@
               
             
             <p><strong>Discount:</strong> <%=offer %> ₹</p>
+            
            <% if(coupon>0){%>
             <p><strong>Coupon Applied :</strong> <%=coupon %> ₹</p>
             <%}%>

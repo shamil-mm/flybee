@@ -5,12 +5,15 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "dev": "node index.js",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.9.0",
     "connect-flash": "^0.1.1",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
@@ -29,5 +32,12 @@
     "pdfkit-table": "^0.1.99",
     "razorpay": "^2.9.4",
     "sweetalert2": "^11.10.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.3.0",
+    "prettier": "^3.8.1"
   }
 }

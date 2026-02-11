@@ -26,13 +26,11 @@
                            
                                 <%if(data){%>
                                     <%data.forEach((singles)=>{%>
-                                       
-                                    
                                 <tr id="card<%=singles._id%>">
                                     
-                                    <td><img src="/proimgs/<%=singles.image[0]%>" alt="" width="150em"></td>
+                                <td><img src="<%=singles.variants[0].images[0]%>" alt="" width="150em"></td>
                                 <td><%=singles.product_name%></td>
-                                <td><p style=" width:28em; overflow: scroll; scrollbar-width: none;"><%=singles.Description%></p></td>
+                                <td><p style=" width:28em; overflow: scroll; scrollbar-width: none;"><%=singles.description%></p></td>
                                  <td><%=singles.price%></td>          
                                  <td class="text-end">
                                     <div class="dropdown">

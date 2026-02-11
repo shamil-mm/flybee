@@ -33,7 +33,6 @@ const razorpay=async(req,res,next)=>{
                }else{
                 console.log(err);
                    res.status(400).send({success:false,msg:'Something went wrong!'});
-           
                }
            
               })
