@@ -1,6 +1,6 @@
-import cloudinary from '../config/cloudinary.js';
+const cloudinary = require('../config/cloudinary');
 
-export const uploadToCloudinary = async (base64, folder = 'products') => {
+const uploadToCloudinary = async (base64, folder = 'products') => {
   if (!base64) return null;
 
   const result = await cloudinary.uploader.upload(base64, {
@@ -10,3 +10,4 @@ export const uploadToCloudinary = async (base64, folder = 'products') => {
 
   return result.secure_url;
 };
+module.exports = {uploadToCloudinary}
